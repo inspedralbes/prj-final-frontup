@@ -38,11 +38,11 @@ services:
   # Servicio de Nuxt.js
   nuxt:
     build:
-      context: ./web
+      context: ./front
     ports:
       - "3000:3000"
     volumes:
-      - ./web:/app
+      - ./front:/app
       - /app/node_modules
     depends_on:
       - laravel
@@ -56,7 +56,7 @@ services:
     build:
       context: ./back/node
     ports:
-      - "3000:3000"
+      - "3001:3001"
     volumes:
       - ./back/node:/node-app  # Volumen mapeado a /node-app en lugar de /app
     depends_on:
