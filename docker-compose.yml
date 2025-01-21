@@ -1,0 +1,23 @@
+
+services:
+  # Base de dades MySQL (db)
+  db:
+    image: mysql:8.2.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: math
+    ports:
+      - "1000:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+      - ./back/math.sql:/docker-entrypoint-initdb.d/dades.sql
+
+  # Adminer: Interfaz para gestionar la base de datos
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "9090:8080"
