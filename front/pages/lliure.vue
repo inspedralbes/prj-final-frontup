@@ -95,7 +95,7 @@ export default {
     const html = ref("");
     const css = ref("");
     const js = ref("");
-    const title = ref("Untitled");  // El título del proyecto
+    const title = ref("Untitled");  
 
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
@@ -103,7 +103,7 @@ export default {
     const isEditing = ref(false);  
     const showSettingsModal = ref(false); 
 
-    const modalTitle = ref(title.value);  // Inicializamos modalTitle con title
+    const modalTitle = ref(title.value);  
     const modalDescription = ref("");     
 
     let htmlEditorInstance = null;
@@ -145,7 +145,6 @@ export default {
       });
     });
 
-    // Cambiar el título cuando cambie el valor en el modal
     watch(modalTitle, (newTitle) => {
       title.value = newTitle;
     });
@@ -154,10 +153,9 @@ export default {
       router.push("/");  
     };
 
-    // Funciones para abrir y cerrar el modal
     const openSettingsModal = () => {
       showSettingsModal.value = true;
-      modalTitle.value = title.value;  // Aseguramos que al abrir el modal se actualice el título
+      modalTitle.value = title.value;  
     };
 
     const closeSettingsModal = () => {
@@ -165,7 +163,7 @@ export default {
     };
 
     const saveSettings = () => {
-      title.value = modalTitle.value;  // Guardamos el título en el proyecto
+      title.value = modalTitle.value;  
       closeSettingsModal();
     };
 
@@ -206,19 +204,19 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  background-color: #333;
+  background-color: black;
   color: #fff;
 }
 
 .header-title {
-  font-size: 18px;
+  font-size: 15px;
   color: #fff;
   background-color: #444;
   border: none;
   padding: 8px;
   border-radius: 4px;
   text-align: center;
-  margin-right: 20px;
+  margin-right: 750px;
 }
 
 .header-actions {
@@ -234,7 +232,6 @@ export default {
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.3s;
 }
 
 .header-button:hover {
@@ -271,16 +268,18 @@ export default {
 
 .code-editor {
   margin-top: 40px;
-  height: 330px;
+  height: 300px;
   border: 1px solid #444;
   border-radius: 4px;
 }
 
 .output {
-  height: 60%;
-  margin-top: 20px;
+  height: 50%;
   border: none;
   border-radius: 8px;
+  border: 1px solid black;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .modal-overlay {
