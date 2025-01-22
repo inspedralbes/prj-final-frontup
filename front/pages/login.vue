@@ -52,34 +52,53 @@
   
 <script setup>
   import { reactive, computed } from 'vue';
-  import { useRouter } from 'nuxt/app';
-  import { comunicationManager } from "@/stores/comunicationManager";
-  
-  const router = useRouter();
-  const { loginUser } = comunicationManager();
-  
-  const formData = reactive({ email: '', password: '' });
-  const errors = reactive({ email: '', password: '' });
-  
-  const validateEmail = () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    errors.email = emailRegex.test(formData.email) ? '' : 'Correo inválido';
-  };
-  
-  const validatePassword = () => {
-    errors.password = formData.password ? '' : 'La contraseña es obligatoria';
-  };
-  
-  const isFormValid = computed(() => !errors.email && !errors.password);
-  
-  const login = async () => {
-    validateEmail();
-    validatePassword();
-    if (isFormValid.value) {
-      const success = await loginUser(formData);
-      if (success) router.push('/home');
+import { useRouter } from 'nuxt/app';
+
+const router = useRouter();
+
+const formData = reactive({ email: '', password: '' });
+const errors = reactive({ email: '', password: '' });
+
+const validateEmail = () => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  errors.email = emailRegex.test(formData.email) ? '' : 'Correo inválido';
+};
+
+const validatePassword = () => {
+  errors.password = formData.password ? '' : 'La contraseña es obligatoria';
+};
+
+const isFormValid = computed(() => !errors.email && !errors.password);
+
+const login = async () => {
+  validateEmail();
+  validatePassword();
+  if (isFormValid.value) {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Si el login es exitoso, guarda el token en el almacenamiento local
+        localStorage.setItem('token', data.token);
+        router.push('/home'); // Redirige al usuario a la página de inicio
+      } else {
+        // Si hay error, muestra el mensaje
+        alert(data.message || 'Error al iniciar sesión');
+      }
+    } catch (error) {
+      console.error('Error durante el login:', error);
+      alert('Error de red. No se pudo conectar al servidor.');
     }
-  };
+  }
+};
 </script>
   
 <style scoped>

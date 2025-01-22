@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
@@ -7,7 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
+
 class AuthenticatorController extends Controller
 {
     /**
@@ -15,13 +14,18 @@ class AuthenticatorController extends Controller
      */
     public function authenticate(Request $request)
     {
+        // Validación de las credenciales de inicio de sesión
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
+        // Intentar autenticar al usuario
         if (Auth::attempt($credentials)) {
+            // Obtener el usuario autenticado
             $user = Auth::user();
+
+            // Crear un token de acceso
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return response()->json([
@@ -32,15 +36,17 @@ class AuthenticatorController extends Controller
             ]);
         }
 
+        // Si las credenciales no son válidas
         return response()->json(['status' => 'error', 'message' => 'Invalid credentials'], 401);
     }
 
     /**
      * Logout user and invalidate token.
      */
-    public function logout()
+    public function logout(Request $request)
     {
-        Auth::logout();
+        // Revocar el token del usuario actual
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json([
             'status' => 'success',
@@ -53,12 +59,13 @@ class AuthenticatorController extends Controller
      */
     public function register(Request $request)
     {
+        // Validación de los datos de entrada para el registro
         $data = $request->validate([
             'username' => 'required|string|min:3',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:4',
-            'avatar' => 'nullable|string',
-            'nivel' => 'nullable|integer|min:1',
+            'avatar' => 'nullable|string', // Avatar es opcional
+            'nivel' => 'nullable|integer|min:1', // Nivel es opcional
         ], [
             'username.required' => 'El campo nombre es obligatorio',
             'email.required' => 'El campo email es obligatorio',
@@ -69,16 +76,18 @@ class AuthenticatorController extends Controller
         ]);
 
         try {
+            // Crear un nuevo usuario con los datos validados
             $user = new User();
             $user->name = $data['username'];
             $user->email = $data['email'];
-            $user->password = Hash::make($data['password']);
-            $user->avatar = $data['avatar'] ?? 'default-avatar.png';
-            $user->nivel = $data['nivel'] ?? 1;
+            $user->password = Hash::make($data['password']); // Encriptar la contraseña
+            $user->avatar = $data['avatar'] ?? 'default-avatar.png'; // Avatar predeterminado si no se proporciona
+            $user->nivel = $data['nivel'] ?? 1; // Nivel predeterminado si no se proporciona
             $user->save();
 
+            // Crear un token para el usuario
             $token = $user->createToken('auth_token')->plainTextToken;
-            Auth::login($user);
+            Auth::login($user); // Iniciar sesión automáticamente
 
             return response()->json([
                 'status' => 'success',
@@ -87,6 +96,7 @@ class AuthenticatorController extends Controller
                 'user' => $user,
             ]);
         } catch (\Exception $e) {
+            // Manejo de errores durante el registro
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error during registration: ' . $e->getMessage(),
