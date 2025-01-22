@@ -1,0 +1,23 @@
+# Usa una imagen de Node.js como base
+FROM node:18
+
+# Establece el directorio de trabajo en el contenedor
+WORKDIR /app
+
+# Copia package.json y package-lock.json para instalar dependencias
+COPY package*.json ./
+
+# Instala las dependencias de Nuxt.js
+RUN npm install
+
+# Copia todo el código fuente al contenedor
+COPY . .
+
+# Construye la aplicación (esto es útil si estás en modo producción)
+RUN npm run build
+
+# Expón el puerto que usará Nuxt.js (puerto por defecto de Nuxt es 3000)
+EXPOSE 3000
+
+# Comando para ejecutar el servidor de Nuxt.js
+CMD ["npm", "run", "start"]

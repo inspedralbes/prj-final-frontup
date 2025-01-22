@@ -1,0 +1,65 @@
+services:
+  # Base de datos MySQL
+  db:
+    image: mysql:8.2.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: math
+    ports:
+      - "1000:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+      - ./back/frontup.sql:/docker-entrypoint-initdb.d/dades.sql
+
+  # Adminer: Interfaz para gestionar la base de datos
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "9090:8080"
+
+   # Servicio de Laravel
+  laravel:
+    build: ./back/laravel
+    ports:
+      - "8000:8000"
+    volumes:
+    #Quina carpeta LOCAL s'ha de mapejar / veure DINS del contenidor?
+      - ./back/laravel:/var/www/
+    working_dir: /var/www/
+    depends_on:
+      - db
+    #Quan es crea, es poden executar ordres
+    command: bash -c "composer install && php artisan key:generate && php artisan migrate && php artisan serve --host=0.0.0.0"
+
+  # Servicio de Nuxt.js
+  nuxt:
+    build:
+      context: ./front
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+    depends_on:
+      - laravel
+    environment:
+      NUXT_PUBLIC_API_URL: http://laravel:8000
+    working_dir: /app
+    command: bash -c "npm install && npm run dev"
+
+  # Servicio de Node.js
+  node:
+    build:
+      context: ./back/node
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./back/node:/node-app  # Volumen mapeado a /node-app en lugar de /app
+    depends_on:
+      - db
+    working_dir: /node-app  # Directorio de trabajo específico para Node.js
+    command: bash -c "npm install && node server.js"
