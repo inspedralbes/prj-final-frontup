@@ -10,7 +10,7 @@ services:
       - "1000:3306"
     volumes:
       - ./mysql_data:/var/lib/mysql
-      - ./back/xxx.sql:/docker-entrypoint-initdb.d/dades.sql
+      - ./back/frontup.sql:/docker-entrypoint-initdb.d/dades.sql
 
   # Adminer: Interfaz para gestionar la base de datos
   adminer:
