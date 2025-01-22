@@ -3,7 +3,7 @@
     <!-- Left Section -->
     <div class="left-section" :class="theme">
       <h2>CodeCod</h2>
-      <button class="btn" :class="theme">Mis proyectos</button>
+      <button class="btn" :class="theme"  @click="meusProjectes">Mis proyectos</button>
       <button class="btn" :class="theme" @click="navigateToLliure">Libre</button>
       <button class="btn" :class="theme">Niveles</button>
       <button class="btn" :class="theme">Proyectos favoritos</button>
@@ -95,11 +95,14 @@ export default {
     navigateToLliure() {
       this.$router.push('/lliure'); 
     },
+    meusProjectes(){
+      this.$router.push('/mprojectes'); 
+    },
   },
 };
 </script>
 
-<style>
+<style scoped>
 body {
   display: flex;
   flex-direction: row; /* Fixing flex-direction to 'row' for side-by-side layout */
