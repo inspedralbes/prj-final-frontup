@@ -33,10 +33,10 @@
   <script setup>
   import { reactive, computed } from 'vue';
   import { useRouter } from 'nuxt/app';
-  import useAuth from '~/composables/useAuth';
+  import { comunicationManager } from "@/stores/comunicationManager";
   
   const router = useRouter();
-  const { registerUser } = useAuth();
+  const { registerUser } = comunicationManager();
   
   const formData = reactive({ username: '', email: '', password: '', passwordRepeat: '' });
   const errors = reactive({ username: '', email: '', password: '', passwordRepeat: '' });
