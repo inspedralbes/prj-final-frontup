@@ -17,8 +17,8 @@
       </div>
       <div class="header-right">
         <button @click="toggleTheme" class="btn" :class="theme">{{ themeIcon }}</button>
-        <button class="btn" :class="theme">{{ registerText }}</button>
-        <button class="btn" :class="theme">{{ loginText }}</button>
+        <button class="btn" :class="theme" @click="goToRegister">{{ registerText }}</button>
+        <button class="btn" :class="theme" @click="goToLogin">{{ loginText }}</button>
       </div>
     </header>
 
@@ -95,6 +95,12 @@ export default {
     navigateToLliure() {
       this.$router.push('/lliure'); 
     },
+    goToRegister(){
+      this.$router.push('/register'); 
+    },
+    goToLogin(){
+      this.$router.push('/login'); 
+    }
   },
 };
 </script>
