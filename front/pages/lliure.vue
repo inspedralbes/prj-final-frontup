@@ -1,44 +1,70 @@
 <template>
   <div class="mini-codepen">
-    <div class="editor">
+    <!-- Encabezado -->
+    <header class="header">
+      <input
+        type="text"
+        v-model="title"
+        class="header-title"
+        @focus="isEditing = true"
+        @blur="isEditing = false"
+        :readonly="!isEditing"
+      />
+      <div class="header-actions">
+        <button class="header-button">Save</button>
+        <button class="header-button">Settings</button>
+        <button class="header-button">💡</button>
+      </div>
+    </header>
+
+    <!-- Contenedor principal -->
+    <div class="editor-container">
       <!-- Editor de HTML -->
-      <div ref="htmlEditor" class="code-editor"></div>
-      <div class="editor-label">HTML</div>
+      <div class="editor-box">
+        <div class="editor-label">HTML</div>
+        <div ref="htmlEditor" class="code-editor"></div>
+      </div>
 
       <!-- Editor de CSS -->
-      <div ref="cssEditor" class="code-editor"></div>
-      <div class="editor-label">CSS</div>
+      <div class="editor-box">
+        <div class="editor-label">CSS</div>
+        <div ref="cssEditor" class="code-editor"></div>
+      </div>
 
       <!-- Editor de JS -->
-      <div ref="jsEditor" class="code-editor"></div>
-      <div class="editor-label">JS</div>
+      <div class="editor-box">
+        <div class="editor-label">JS</div>
+        <div ref="jsEditor" class="code-editor"></div>
+      </div>
     </div>
 
-    <!-- Mostrar el resultado en un iframe -->
+    <!-- Salida del código -->
     <iframe class="output" :srcdoc="output"></iframe>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
-import CodeMirror from 'codemirror';
+import { ref, onMounted } from "vue";
+import CodeMirror from "codemirror";
 
-// Importar los modos y temas de manera correcta
-import 'codemirror/lib/codemirror.css'; // Debería funcionar con la versión 5.x
-import 'codemirror/theme/eclipse.css'; // Tema claro
-import 'codemirror/mode/htmlmixed/htmlmixed'; // Para HTML
-import 'codemirror/mode/css/css'; // Para CSS
-import 'codemirror/mode/javascript/javascript'; // Para JS
+// Importar los modos y temas
+import "codemirror/lib/codemirror.css";
+import "codemirror/theme/eclipse.css";
+import "codemirror/mode/htmlmixed/htmlmixed";
+import "codemirror/mode/css/css";
+import "codemirror/mode/javascript/javascript";
 
 export default {
   setup() {
-    const html = ref('');
-    const css = ref('');
-    const js = ref('');
+    const html = ref("");
+    const css = ref("");
+    const js = ref("");
+    const title = ref("Untitled");  
 
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
     const jsEditor = ref(null);
+    const isEditing = ref(false);  
 
     let htmlEditorInstance = null;
     let cssEditorInstance = null;
@@ -46,64 +72,42 @@ export default {
 
     onMounted(() => {
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
-        mode: 'htmlmixed',
-        theme: 'eclipse', // Tema claro
+        mode: "htmlmixed",
+        theme: "eclipse",
         lineNumbers: true,
         value: html.value,
-        lineWrapping: true,
-        indentWithTabs: false, // Desactiva el uso de tabuladores
-        smartIndent: false, // Desactiva la indentación inteligente
       });
 
       cssEditorInstance = CodeMirror(cssEditor.value, {
-        mode: 'css',
-        theme: 'eclipse',
+        mode: "css",
+        theme: "eclipse",
         lineNumbers: true,
         value: css.value,
-        lineWrapping: true,
-        indentWithTabs: false, // Desactiva el uso de tabuladores
-        smartIndent: false, // Desactiva la indentación inteligente
       });
 
       jsEditorInstance = CodeMirror(jsEditor.value, {
-        mode: 'javascript',
-        theme: 'eclipse',
+        mode: "javascript",
+        theme: "eclipse",
         lineNumbers: true,
         value: js.value,
-        lineWrapping: true,
-        indentWithTabs: false, // Desactiva el uso de tabuladores
-        smartIndent: false, // Desactiva la indentación inteligente
       });
 
-      // Escuchar cambios y actualizar las variables de Vue
-      htmlEditorInstance.on('change', (instance) => {
+      htmlEditorInstance.on("change", (instance) => {
         html.value = instance.getValue();
       });
 
-      cssEditorInstance.on('change', (instance) => {
+      cssEditorInstance.on("change", (instance) => {
         css.value = instance.getValue();
       });
 
-      jsEditorInstance.on('change', (instance) => {
+      jsEditorInstance.on("change", (instance) => {
         js.value = instance.getValue();
       });
-
-      // Forzar la altura de los editores
-      setEditorHeight(htmlEditorInstance);
-      setEditorHeight(cssEditorInstance);
-      setEditorHeight(jsEditorInstance);
     });
 
-    // Función para ajustar la altura del editor
-    const setEditorHeight = (editorInstance) => {
-      const container = editorInstance.getWrapperElement();
-      container.style.height = '100%'; // Forzar altura del editor a ocupar todo el espacio disponible
-    };
-
-    return { html, css, js, htmlEditor, cssEditor, jsEditor };
+    return { html, css, js, htmlEditor, cssEditor, jsEditor, title, isEditing };
   },
   computed: {
-    // Generar el HTML completo para el iframe
     output() {
       return `
         <html>
@@ -116,44 +120,92 @@ export default {
           </body>
         </html>
       `;
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
+
 .mini-codepen {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  background-color: #6e6b6b;
+  
 }
 
-.editor {
+.header {
   display: flex;
-  gap: 15px;
-  padding: 20px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #000;
+  color: #fff;
+}
+
+.header-title {
+  font-size: 14px;
+  color: #fff;
+  background-color: #202020;
+  border: none;
+  width: 200px; 
+  padding: 5px;
+  border-radius: 4px;
+  text-align: center;
+  margin-left: 50px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.header-button {
+  background-color: #444;
+  border: none;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.header-button:hover {
+  background-color: #555;
+}
+
+.editor-container {
+  display: flex;
+}
+
+.editor-box {
   flex: 1;
-  height: 60%; /* Limitar el alto de los editores */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border-right: 1px solid #333;
 }
 
 .editor-label {
-  margin-top: 10px;
-  font-size: 12px;
-  color: #333;
-}
-
-.output {
-  flex: 1;
-  border: none;
-  width: 100%;
-  height: 200px;
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  font-size: 20px;
+  color: #fff;
+  background-color: #202020;
+  padding: 2px 6px;
 }
 
 .code-editor {
-  flex: 1;
+  margin-top: 40px;
   height: 100%;
-  border: 1px solid #ddd;
+  border: 1px solid #444;
   border-radius: 4px;
-  min-height: 150px; /* Ajuste para limitar la altura de los editores */
+ 
+}
+
+.output {
+  height: 33%;
 }
 </style>

@@ -5,7 +5,7 @@
       <h2>CodeCod</h2>
       <button class="btn" :class="theme">Mis proyectos</button>
       <button class="btn" :class="theme" @click="navigateToLliure">Libre</button>
-      <button class="btn" :class="theme">Niveles</button>
+      <button class="btn" :class="theme" @click="navigateToNiveles">Niveles</button>
       <button class="btn" :class="theme">Proyectos favoritos</button>
     </div>      
 
@@ -75,7 +75,7 @@ export default {
   data() {
     return {
       theme: '',
-      themeIcon: '🌙',
+      themeIcon: '☀️',
       footerText: '© 2025 Mi Página Web',
       registerText: 'Registro',
       loginText: 'Login',
@@ -85,101 +85,32 @@ export default {
     toggleTheme() {
       if (this.theme === '') {
         this.theme = 'light-mode';
-        this.themeIcon = '☀️';
+        this.themeIcon = '🌙';
       } else {
         this.theme = '';
-        this.themeIcon = '🌙';
+        this.themeIcon = '☀️';
       }
       document.body.className = this.theme;
     },
     navigateToLliure() {
       this.$router.push('/lliure'); 
     },
+    navigateToNiveles() {
+      this.$router.push('/niveles'); 
+    },
   },
 };
 </script>
 
-<style>
-body {
-  display: flex;
-  flex-direction: row; /* Fixing flex-direction to 'row' for side-by-side layout */
-  height: 100%;
-  margin: 0;
-  font-family: 'Arial', sans-serif;
-  padding-left: 180px; /* Adds space for left section */
-  background-color: #202020;
-  overflow-x: hidden;
-  color: white;
-}
+<style scoped>
 
-body.light-mode {
-  background-color: #dbcccc;
-  color: black;
-}
-
-header {
-  background-color: black;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  height: 50px;
-}
-
-header.light-mode {
-  background-color: white;
-  color: black;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-}
-
-.header-right {
-  display: flex;
-  gap: 20px;
-}
-
-.search-box {
-  padding: 5px;
-  font-size: 16px;
-  border: none;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.btn {
-  padding: 10px 15px;
-  background-color: #333;
-  color: #fff;
-  cursor: pointer;
-  text-transform: uppercase;
-  border-radius: 4px;
-}
-
-.btn.light-mode {
-  background-color: #ccc;
-  color: black;
-}
-
-footer {
-  background-color: #333;
-  color: white;
-  text-align: center;
-  padding: 10px;
-  bottom: 0;
-  width: 100%;
-}
-
-footer.light-mode {
-  background-color: #cfcdcd;
-  color: black;
+div {
+  box-sizing: border-box;
 }
 
 .left-section {
   position: fixed;
+  top: 0;
   left: 0;
   width: 180px;
   height: 100%;
@@ -188,52 +119,7 @@ footer.light-mode {
   box-sizing: border-box;
 }
 
-.left-section button {
-  margin-bottom: 15px;
-}
-
-.left-section.light-mode {
-  background-color: #cfcdcd;
-  color: black;
-}
-
-.left-section button.light-mode {
-  background-color: #ccc;
-  color: black;
-}
-
-.main-container {
-  display: flex;
-  flex-direction: column;
-  margin-left: 180px; /* Adds space for left section */
-}
-
-.body-content {
-  margin: 50px;
-}
-
-.card-container {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 20px;
-  flex-wrap: wrap;
-}
-
-.card {
-  background-color: #2C303A;
-  padding: 20px;
-  border-radius: 8px;
-  text-align: center;
-  width: 300px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.card p {
-  color: #C7C9D3;
-}
-
-.card button {
+.left-section .btn {
   padding: 10px 15px;
   background-color: #333;
   color: #fff;
@@ -242,22 +128,152 @@ footer.light-mode {
   border-radius: 4px;
 }
 
-.card.light-mode {
+.left-section button {
+  margin-bottom: 15px;
+}
+
+/* Header */
+header {
+  position: fixed;
+  top: 0;
+  left: 180px;
+  right: 0;
+  height: 80px;
+  background-color: black;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+}
+.header-right {
+  display: flex;
+  gap: 20px;
+}
+.search-box {
+  padding: 8px;
+  width: 300px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.header-right .btn {
+  padding: 10px 15px;
+  background-color: #333;
+  color: #fff;
+  cursor: pointer;
+  text-transform: uppercase;
+  border-radius: 4px;
+}
+
+.header-right .btn:hover {
+  background-color: #0056b3;
+}
+
+.main-container {
+  margin-top: 60px;
+  margin-left: 250px;
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.body-content {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.body-content h2 {
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+.body-content p {
+  font-size: 1em;
+  color: #666;
+}
+
+/* Card Container */
+.card-container {
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+}
+.card {
   background-color: #ffffff;
-  color: black;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  text-align: center;
+}
+.card h3 {
+  margin-bottom: 15px;
+}
+.card p {
+  color: #666;
+  margin-bottom: 20px;
+}
+.card button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007BFF;
+  color: white;
+  cursor: pointer;
 }
 
-.card h3.light-mode {
-  color: black;
+/* Footer */
+footer {
+  margin-left: 170px;
+  background-color: #333;
+  text-align: center;
+  padding: 10px 20px;
+  position: relative;
+  width: calc(100% - 204px);
+  color: white;
+  bottom: -8px;
 }
 
-.card p.light-mode {
+/* Light Mode */
+.light-mode {
+  background-color: #f7f7f7;  
+  color: #333;  
+}
+
+.light-mode .left-section {
+  background-color: #eee0e0; 
+}
+
+.light-mode .btn {  
+  background-color: #eee;  
+  color: #333;  
+  border: 1px solid #ccc; 
+}
+
+.light-mode .btn:hover {
+  background-color: #ddd;  
+}
+
+.light-mode header {
+  background-color: #cfc8c8;  
+}
+
+.light-mode .search-box {
+  background-color: #fff;  
+  border: 1px solid #ddd;  
+  color: #333;  
+}
+
+.light-mode .card {
+  background-color: #eee0e0;  
+  color: #333;    
+}
+
+.light-mode footer {
+  background-color: #eee0e0; 
   color: #333;
 }
 
-.card button.light-mode {
-  background-color: #ddd;
-  color: black;
-}
 </style>
