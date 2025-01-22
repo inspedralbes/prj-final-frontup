@@ -53,10 +53,10 @@
 <script setup>
   import { reactive, computed } from 'vue';
   import { useRouter } from 'nuxt/app';
-  import useAuth from '~/composables/useAuth';
+  import { comunicationManager } from "@/stores/comunicationManager";
   
   const router = useRouter();
-  const { loginUser } = useAuth();
+  const { loginUser } = comunicationManager();
   
   const formData = reactive({ email: '', password: '' });
   const errors = reactive({ email: '', password: '' });
