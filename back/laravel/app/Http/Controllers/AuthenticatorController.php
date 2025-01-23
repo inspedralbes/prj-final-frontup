@@ -65,14 +65,7 @@ class AuthenticatorController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:4',
             'avatar' => 'nullable|string', // Avatar es opcional
-            'nivel' => 'nullable|integer|min:1', // Nivel es opcional
-        ], [
-            'username.required' => 'El campo nombre es obligatorio',
-            'email.required' => 'El campo email es obligatorio',
-            'email.email' => 'El campo email debe ser una dirección válida',
-            'email.unique' => 'Este email ya está registrado',
-            'password.required' => 'El campo password es obligatorio',
-            'password.min' => 'La contraseña debe tener al menos 4 caracteres',
+            'nivel' => 'integer|min:1', // Nivel es opcional
         ]);
 
         try {
@@ -96,7 +89,6 @@ class AuthenticatorController extends Controller
                 'user' => $user,
             ]);
         } catch (\Exception $e) {
-            // Manejo de errores durante el registro
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error during registration: ' . $e->getMessage(),
