@@ -99,7 +99,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 body {
   display: flex;
   flex-direction: row; /* Fixing flex-direction to 'row' for side-by-side layout */
