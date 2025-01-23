@@ -1,44 +1,110 @@
 <template>
-  <div class="mini-codepen">
-    <div class="editor">
-      <!-- Editor de HTML -->
-      <div ref="htmlEditor" class="code-editor"></div>
-      <div class="editor-label">HTML</div>
+  <div class="todo">
+    <!-- Encabezado -->
+    <header class="header">
+      <button class="header-button" @click="goBack">Atras</button>
+      <input
+        type="text"
+        v-model="title"
+        class="header-title"
+        @focus="isEditing = true"
+        @blur="isEditing = false"
+        :readonly="!isEditing"
+      />
+      <div class="header-actions">
+        <button class="header-button">Save</button>
+        <button class="header-button" @click="openSettingsModal">Settings</button>
+        <button class="header-button">💡</button>
+      </div>
+    </header>
 
-      <!-- Editor de CSS -->
-      <div ref="cssEditor" class="code-editor"></div>
-      <div class="editor-label">CSS</div>
+    <!-- Modal de Configuración -->
+    <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
+      <div class="modal-content" @click.stop>
+        <h2>Configuración del Proyecto</h2>
+        <form @submit.prevent="saveSettings">
+          <div class="input-group">
+            <label for="project-title">Título del Proyecto</label>
+            <input
+              type="text"
+              id="project-title"
+              v-model="modalTitle"
+              class="modal-input"
+              placeholder="Escribe el título"
+            />
+          </div>
 
-      <!-- Editor de JS -->
-      <div ref="jsEditor" class="code-editor"></div>
-      <div class="editor-label">JS</div>
+          <div class="input-group">
+            <label for="project-description">Descripción</label>
+            <textarea
+              id="project-description"
+              v-model="modalDescription"
+              class="modal-textarea"
+              placeholder="Escribe la descripción del proyecto"
+            ></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="submit" class="modal-button">Guardar</button>
+            <button type="button" class="modal-button cancel" @click="closeSettingsModal">Cancelar</button>
+          </div>
+        </form>
+      </div>
     </div>
 
-    <!-- Mostrar el resultado en un iframe -->
+    <!-- Contenedor principal -->
+    <div class="editor-container">
+      <!-- Editor de HTML -->
+      <div class="editor-box">
+        <div class="editor-label">HTML</div>
+        <div ref="htmlEditor" class="code-editor"></div>
+      </div>
+
+      <!-- Editor de CSS -->
+      <div class="editor-box">
+        <div class="editor-label">CSS</div>
+        <div ref="cssEditor" class="code-editor"></div>
+      </div>
+
+      <!-- Editor de JS -->
+      <div class="editor-box">
+        <div class="editor-label">JS</div>
+        <div ref="jsEditor" class="code-editor"></div>
+      </div>
+    </div>
+
+    <!-- Salida del código -->
     <iframe class="output" :srcdoc="output"></iframe>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
-import CodeMirror from 'codemirror';
+import { ref, onMounted, watch } from "vue";
+import { useRouter } from "vue-router"; 
+import CodeMirror from "codemirror";
 
-// Importar los modos y temas de manera correcta
-import 'codemirror/lib/codemirror.css'; // Debería funcionar con la versión 5.x
-import 'codemirror/theme/eclipse.css'; // Tema claro
-import 'codemirror/mode/htmlmixed/htmlmixed'; // Para HTML
-import 'codemirror/mode/css/css'; // Para CSS
-import 'codemirror/mode/javascript/javascript'; // Para JS
+import "codemirror/lib/codemirror.css";
+import "codemirror/theme/eclipse.css";
+import "codemirror/mode/htmlmixed/htmlmixed";
+import "codemirror/mode/css/css";
+import "codemirror/mode/javascript/javascript";
 
 export default {
   setup() {
-    const html = ref('');
-    const css = ref('');
-    const js = ref('');
+    const router = useRouter();  
+    const html = ref("");
+    const css = ref("");
+    const js = ref("");
+    const title = ref("Untitled");  
 
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
     const jsEditor = ref(null);
+    const isEditing = ref(false);  
+    const showSettingsModal = ref(false); 
+
+    const modalTitle = ref(title.value);  
+    const modalDescription = ref("");     
 
     let htmlEditorInstance = null;
     let cssEditorInstance = null;
@@ -46,64 +112,68 @@ export default {
 
     onMounted(() => {
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
-        mode: 'htmlmixed',
-        theme: 'eclipse', // Tema claro
+        mode: "htmlmixed",
+        theme: "eclipse",
         lineNumbers: true,
         value: html.value,
-        lineWrapping: true,
-        indentWithTabs: false, // Desactiva el uso de tabuladores
-        smartIndent: false, // Desactiva la indentación inteligente
       });
 
       cssEditorInstance = CodeMirror(cssEditor.value, {
-        mode: 'css',
-        theme: 'eclipse',
+        mode: "css",
+        theme: "eclipse",
         lineNumbers: true,
         value: css.value,
-        lineWrapping: true,
-        indentWithTabs: false, // Desactiva el uso de tabuladores
-        smartIndent: false, // Desactiva la indentación inteligente
       });
 
       jsEditorInstance = CodeMirror(jsEditor.value, {
-        mode: 'javascript',
-        theme: 'eclipse',
+        mode: "javascript",
+        theme: "eclipse",
         lineNumbers: true,
         value: js.value,
-        lineWrapping: true,
-        indentWithTabs: false, // Desactiva el uso de tabuladores
-        smartIndent: false, // Desactiva la indentación inteligente
       });
 
-      // Escuchar cambios y actualizar las variables de Vue
-      htmlEditorInstance.on('change', (instance) => {
+      htmlEditorInstance.on("change", (instance) => {
         html.value = instance.getValue();
       });
 
-      cssEditorInstance.on('change', (instance) => {
+      cssEditorInstance.on("change", (instance) => {
         css.value = instance.getValue();
       });
 
-      jsEditorInstance.on('change', (instance) => {
+      jsEditorInstance.on("change", (instance) => {
         js.value = instance.getValue();
       });
-
-      // Forzar la altura de los editores
-      setEditorHeight(htmlEditorInstance);
-      setEditorHeight(cssEditorInstance);
-      setEditorHeight(jsEditorInstance);
     });
 
-    // Función para ajustar la altura del editor
-    const setEditorHeight = (editorInstance) => {
-      const container = editorInstance.getWrapperElement();
-      container.style.height = '100%'; // Forzar altura del editor a ocupar todo el espacio disponible
+    watch(modalTitle, (newTitle) => {
+      title.value = newTitle;
+    });
+
+    const goBack = () => {
+      router.push("/");  
     };
 
-    return { html, css, js, htmlEditor, cssEditor, jsEditor };
+    const openSettingsModal = () => {
+      showSettingsModal.value = true;
+      modalTitle.value = title.value;  
+    };
+
+    const closeSettingsModal = () => {
+      showSettingsModal.value = false;
+    };
+
+    const saveSettings = () => {
+      title.value = modalTitle.value;  
+      closeSettingsModal();
+    };
+
+    return { 
+      html, css, js, htmlEditor, cssEditor, jsEditor, title, isEditing, goBack, 
+      openSettingsModal, closeSettingsModal, showSettingsModal, 
+      modalTitle, modalDescription, saveSettings
+    };
   },
   computed: {
-    // Generar el HTML completo para el iframe
     output() {
       return `
         <html>
@@ -116,44 +186,169 @@ export default {
           </body>
         </html>
       `;
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
-.mini-codepen {
+.todo {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  background-color: #f4f4f4;
+  font-family: 'Arial', sans-serif;
 }
 
-.editor {
+.header {
   display: flex;
-  gap: 15px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: black;
+  color: #fff;
+}
+
+.header-title {
+  font-size: 15px;
+  color: #fff;
+  background-color: #444;
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  text-align: center;
+  margin-right: 750px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.header-button {
+  background-color: #555;
+  border: none;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.header-button:hover {
+  background-color: #777;
+}
+
+.editor-container {
+  display: flex;
   padding: 20px;
+  gap: 20px;
+}
+
+.editor-box {
   flex: 1;
-  height: 60%; /* Limitar el alto de los editores */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+  background-color: #fff;
 }
 
 .editor-label {
-  margin-top: 10px;
-  font-size: 12px;
-  color: #333;
-}
-
-.output {
-  flex: 1;
-  border: none;
-  width: 100%;
-  height: 200px;
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #444;
+  padding: 4px 8px;
+  border-radius: 3px;
 }
 
 .code-editor {
-  flex: 1;
+  margin-top: 40px;
+  height: 300px;
+  border: 1px solid #444;
+  border-radius: 4px;
+}
+
+.output {
+  height: 50%;
+  border: none;
+  border-radius: 8px;
+  border: 1px solid black;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  width: 450px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: #333;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.modal-input,
+.modal-textarea {
+  width: 100%;
+  padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  min-height: 150px; /* Ajuste para limitar la altura de los editores */
+  margin-top: 5px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.modal-button {
+  background-color: #444;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.modal-button:hover {
+  background-color: #555;
+}
+
+.cancel {
+  background-color: #ccc;
+  color: #333;
+}
+
+.cancel:hover {
+  background-color: #bbb;
 }
 </style>
