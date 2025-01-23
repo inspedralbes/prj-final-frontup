@@ -5,7 +5,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: math
+      MYSQL_DATABASE: frontup
     ports:
       - "1000:3306"
     volumes:
@@ -23,7 +23,7 @@ services:
 
    # Servicio de Laravel
   laravel:
-    build: ./back/laravel
+    build: ./back/laravel   
     ports:
       - "8000:8000"
     volumes:
