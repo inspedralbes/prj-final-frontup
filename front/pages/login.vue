@@ -22,6 +22,21 @@
     </p>
   </div>
 
+  <div v-if="showRegister" class="login">
+    <div class="atom">
+      <div class="center"></div>
+      <div class="orbit orbit1">
+        <div class="electron elector1"></div>
+      </div>
+      <div class="orbit orbit2">
+        <div class="electron electron2"></div>
+      </div>
+      <div class="orbit orbit3">
+        <div class="electron electron3"></div>
+      </div>
+    </div>
+  </div>
+
   <div v-if="!showRegister" class="register">
     <div class="atom">
       <div class="center"></div>
@@ -161,6 +176,18 @@ const login = async () => {
   position: absolute;
   margin-top: 0;
   right: 0;
+}
+
+.login {
+  width: 35%;
+  padding: 100px;
+  height: 500px;
+  background-color: #404040;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  margin-top: 0;
+  left: 0;
 }
 
 .error {
