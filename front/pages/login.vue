@@ -128,11 +128,9 @@ const login = async () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Si el login es exitoso, guarda el token en el almacenamiento local
         localStorage.setItem('token', data.token);
-        router.push('/home'); // Redirige al usuario a la página de inicio
+        router.push('/'); 
       } else {
-        // Si hay error, muestra el mensaje
         alert(data.message || 'Error al iniciar sesión');
       }
     } catch (error) {

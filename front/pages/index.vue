@@ -17,8 +17,13 @@
       </div>
       <div class="header-right">
         <button @click="toggleTheme" class="btn" :class="theme">{{ themeIcon }}</button>
-        <button class="btn" :class="theme" @click="goToRegister">{{ registerText }}</button>
-        <button class="btn" :class="theme" @click="goToLogin">{{ loginText }}</button>
+
+        <!-- Mostrar botones de login/registro solo si el usuario NO está autenticado -->
+        <button v-if="!isAuthenticated" class="btn" :class="theme" @click="goToRegister">{{ registerText }}</button>
+        <button v-if="!isAuthenticated" class="btn" :class="theme" @click="goToLogin">{{ loginText }}</button>
+        
+        <!-- Mostrar botón de perfil solo si el usuario está autenticado -->
+        <button v-if="isAuthenticated" class="btn" :class="theme" @click="goToProfile">Mi perfil</button>
       </div>
     </header>
 
@@ -79,6 +84,7 @@ export default {
       footerText: '© 2025 Mi Página Web',
       registerText: 'Registro',
       loginText: 'Login',
+      isAuthenticated: false, // Controla si el usuario está autenticado
     };
   },
   methods: {
@@ -95,12 +101,26 @@ export default {
     navigateToLliure() {
       this.$router.push('/lliure'); 
     },
-    goToRegister(){
+    goToRegister() {
       this.$router.push('/register'); 
     },
-    goToLogin(){
+    goToLogin() {
       this.$router.push('/login'); 
+    },
+    goToProfile() {
+      this.$router.push('/perfil'); // Redirige al perfil del usuario
+    },
+    // Simulación de autenticación (esto normalmente se gestionaría con una API o localStorage)
+    authenticateUser() {
+      this.isAuthenticated = true; // Establecer como verdadero cuando el usuario esté autenticado
+    },
+    logout() {
+      this.isAuthenticated = false; // Al hacer logout, se pone en falso
     }
+  },
+  mounted() {
+    // Si el usuario está autenticado (esto depende de tu lógica de autenticación)
+    this.authenticateUser(); // Simulación de que el usuario ya está autenticado
   },
 };
 </script>

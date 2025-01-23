@@ -77,7 +77,7 @@
           const data = await response.json();
 
           if (response.ok) {
-            router.push('/login'); // Redirige al login después de un registro exitoso
+            router.push('/'); // Redirige al login después de un registro exitoso
           } else {
             alert(data.message || 'Error al registrar usuario');
           }
