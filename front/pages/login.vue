@@ -26,7 +26,8 @@
     <form @submit.prevent="register">
       <div>
         <label for="username">Nom d'usuari:</label>
-        <input type="text" id="username" placeholder="Nom d'usuari" v-model="formData.username" @blur="validateUsername" />
+        <input type="text" id="username" placeholder="Nom d'usuari" v-model="formData.username"
+          @blur="validateUsername" />
         <p class="error" v-if="errors.username">{{ errors.username }}</p>
       </div>
       <div>
@@ -41,7 +42,8 @@
       </div>
       <div>
         <label for="passwordRepeat">Repetir Contrasenya:</label>
-        <input type="password" id="passwordRepeat" placeholder="Repetir contrasenya" v-model="formData.passwordRepeat" @blur="validatePasswordRepeat" />
+        <input type="password" id="passwordRepeat" placeholder="Repetir contrasenya" v-model="formData.passwordRepeat"
+          @blur="validatePasswordRepeat" />
         <p class="error" v-if="errors.passwordRepeat">{{ errors.passwordRepeat }}</p>
       </div>
       <button type="submit" :disabled="!isRegisterFormValid()">Registrar</button>
@@ -65,13 +67,18 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, onUnmounted } from 'vue';
 import { useRouter } from 'nuxt/app';
 import { useAppStore } from '@/stores/app';
+import { useLliureStore } from '~/stores/app'
 
+const lliureStore = useLliureStore();
 const router = useRouter();
 const appStore = useAppStore();
 
+onUnmounted(() => {
+  lliureStore.toggleLliure()
+});
 const formData = reactive({
   email: '',
   password: '',
@@ -86,7 +93,7 @@ const errors = reactive({
   passwordRepeat: ''
 });
 
-const errorMessage = ref(''); 
+const errorMessage = ref('');
 const showRegister = ref(false);
 const toggleRegister = () => {
   showRegister.value = !showRegister.value;
@@ -157,7 +164,7 @@ const login = async () => {
         });
         router.push('/');
       } else {
-        errorMessage.value = data.message || 'Credenciales inválidas'; 
+        errorMessage.value = data.message || 'Credenciales inválidas';
       }
     } catch (error) {
       console.error('Error durante el login:', error);
@@ -227,6 +234,7 @@ const register = async () => {
 .slide-to-right-enter-active {
   transition: transform 1s ease;
 }
+
 .slide-to-right-enter-from {
   transform: translateX(-100%);
 }
@@ -234,6 +242,7 @@ const register = async () => {
 .slide-to-left-enter-active {
   transition: transform 1s ease;
 }
+
 .slide-to-left-enter-from {
   transform: translateX(100%);
 }

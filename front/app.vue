@@ -69,6 +69,7 @@ const navigateToRegister = () => {
 }
 
 const navigateToLogin = () => {
+  lliureStore.toggleLliure()
   router.push('/login')
 }
 </script>
