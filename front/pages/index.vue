@@ -1,4 +1,5 @@
 <template>
+  <div class="todo">
   <div class="main-container">
     <!-- Body Content -->
     <div class="body-content">
@@ -42,6 +43,7 @@
       <p>© 2025 FrontUp</p>
     </footer>
   </div>
+</div>
 </template>
 
 <script>
@@ -53,6 +55,12 @@ export default {
 
 
 <style scoped>
+
+.todo{
+  background-color: rgb(177, 162, 162);
+  margin-right: -8px;
+  margin-bottom: -8px;
+}
 .main-container {
   margin-top: 80px;
   margin-left: 200px;
@@ -117,5 +125,8 @@ footer {
   padding: 10px 20px;
   color: white;
   margin-top: 150px;
+  margin-left: -50px;
+  margin-right : -20px; 
+  margin-bottom: -20px;
 }
 </style>
