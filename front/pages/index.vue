@@ -45,10 +45,13 @@
 </template>
 
 <script>
+import { useAppStore } from '../stores/app'; 
 export default {
   name: 'Index',
 };
 </script>
+
+
 
 <style scoped>
 .main-container {
