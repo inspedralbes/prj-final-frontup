@@ -56,11 +56,6 @@ export default {
 
 <style scoped>
 
-.todo{
-  background-color: rgb(177, 162, 162);
-  margin-right: -8px;
-  margin-bottom: -8px;
-}
 .main-container {
   margin-top: 80px;
   margin-left: 200px;
