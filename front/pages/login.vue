@@ -89,17 +89,13 @@
 <script setup>
 import { reactive, computed } from 'vue';
 import { useRouter } from 'nuxt/app';
+import { useAppStore } from '@/stores/app'; // Ruta del store
 
 const router = useRouter();
+const appStore = useAppStore();
 
 const formData = reactive({ email: '', password: '' });
 const errors = reactive({ email: '', password: '' });
-
-const showRegister = ref(false);
-
-const toggleRegister = () => {
-  showRegister.value = !showRegister.value;
-};
 
 const validateEmail = () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -128,7 +124,15 @@ const login = async () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('token', data.token);
+        appStore.setLoginInfo({
+          loggedIn: true,
+          token: data.token,
+          username: data.username,
+          email: data.email,
+          role: data.role,
+          image: data.image,
+          imageId: data.imageId,
+        });
         router.push('/'); 
       } else {
         alert(data.message || 'Error al iniciar sesión');
@@ -140,6 +144,7 @@ const login = async () => {
   }
 };
 </script>
+
 
 <style scoped>
 .auth-page {

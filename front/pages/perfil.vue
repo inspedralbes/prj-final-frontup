@@ -15,49 +15,52 @@
   </template>
   
   <script setup>
-  import { ref, onMounted } from 'vue';
-  import { useRouter } from 'nuxt/app';
-  
-  // Estado para el usuario
-  const user = ref(null);
-  
-  // Recuperamos el token desde localStorage
-  const token = localStorage.getItem('token');
-  
-  // Verificamos si el token existe, si no, redirigimos al login
-  if (!token) {
-    const router = useRouter();
-    router.push('/login');
-  } else {
-    // Realizamos la solicitud para obtener los detalles del usuario
-    onMounted(async () => {
-      try {
-        const response = await fetch('http://127.0.0.1:8000/api/user', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-  
-        if (response.ok) {
-          const data = await response.json();
-          user.value = data.user; // Asignamos los datos del usuario al estado
-        } else {
-          console.error('No se pudo obtener los detalles del usuario');
-        }
-      } catch (error) {
-        console.error('Error al obtener los datos del usuario:', error);
-      }
-    });
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'nuxt/app';
+
+const user = ref(null);
+const token = ref(null);
+const router = useRouter();
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    token.value = localStorage.getItem('token'); // Asignamos el token desde localStorage
   }
-  
-  const logout = () => {
-    localStorage.removeItem('token'); 
-    const router = useRouter();
-    router.push('/login'); 
-  };
-  </script>
+
+  if (!token.value) {
+    router.push('/login'); // Si no hay token, redirigimos al login
+  } else {
+    fetchUserData(token.value);
+  }
+});
+
+const fetchUserData = async (token) => {
+  try {
+    const response = await fetch('http://127.0.0.1:8000/api/user', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      user.value = data.user; // Asignamos los datos del usuario
+    } else {
+      console.error('No se pudo obtener los detalles del usuario');
+    }
+  } catch (error) {
+    console.error('Error al obtener los datos del usuario:', error);
+  }
+};
+
+const logout = () => {
+  localStorage.removeItem('token'); // Eliminar el token de localStorage
+  router.push('/login'); // Redirigir al login
+};
+</script>
+
   
   <style scoped>
   .profile-page {
