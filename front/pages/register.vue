@@ -34,7 +34,7 @@
 <script setup>
 import { reactive, computed } from 'vue';
 import { useRouter } from 'nuxt/app';
-import { useAppStore } from '@/stores/app'; // Ruta del store
+import { useAppStore } from '@/stores/app'; 
 
 const router = useRouter();
 const appStore = useAppStore();
