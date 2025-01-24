@@ -255,23 +255,37 @@ const register = async () => {
 .auth-page {
   width: 30%;
   padding: 30px;
-  background-color: #303030;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #1c1c1c, #3a3a3a);
+  border-radius: 16px;
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
   position: absolute;
   margin-top: 15%;
   left: 8%;
+  color: white;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-page:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 25px rgba(255, 255, 255, 0.3);
 }
 
 .register-page {
   width: 30%;
   padding: 30px;
-  background-color: #303030;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #3a3a3a, #1c1c1c);
+  border-radius: 16px;
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
   position: absolute;
   margin-top: 13%;
   right: 8%;
+  color: white;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.register-page:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 25px rgba(255, 255, 255, 0.3);
 }
 
 .register {
