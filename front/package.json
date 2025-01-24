@@ -12,6 +12,7 @@
   "dependencies": {
     "codemirror": "^5.65.18",
     "nuxt": "^3.15.2",
+    "pinia": "^2.3.1",
     "prismjs": "^1.29.0",
     "vue": "latest",
     "vue-router": "latest"
