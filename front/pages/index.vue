@@ -53,6 +53,7 @@ export default {
 
 
 <style scoped>
+
 .main-container {
   margin-top: 80px;
   margin-left: 200px;
