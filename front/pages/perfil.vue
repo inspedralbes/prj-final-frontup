@@ -1,36 +1,33 @@
 <template>
-    <div class="profile-page">
-      <h1>Perfil del Usuario</h1>
-  
-      <div v-if="user">
-        <p><strong>Nombre:</strong> {{ user.name }}</p>
-        <p><strong>Correo Electrónico:</strong> {{ user.email }}</p>
-        <p><strong>Nivel:</strong> {{ user.nivel }}</p>
-        <button @click="logout">Cerrar sesión</button>
-      </div>
-      <div v-else>
-        <p>No estás autenticado.</p>
-      </div>
+  <div class="profile-page">
+    <h1>Perfil del Usuario</h1>
+
+    <div v-if="user">
+      <p><strong>Nombre:</strong> {{ user.username }}</p>
+      <p><strong>Correo Electrónico:</strong> {{ user.email }}</p>
+      <p><strong>Nivel:</strong> {{ user.role }}</p>
+      <button @click="logout">Cerrar sesión</button>
     </div>
-  </template>
-  
-  <script setup>
+    <div v-else>
+      <p>No estás autenticado.</p>
+    </div>
+  </div>
+</template>
+
+<script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'nuxt/app';
+import { useRouter } from 'vue-router'; // Cambiado de nuxt/app a vue-router
+import { useAppStore } from '../stores/app'; // Importar Pinia store
 
 const user = ref(null);
-const token = ref(null);
 const router = useRouter();
+const appStore = useAppStore(); // Usar la tienda de Pinia para obtener el estado de autenticación
 
 onMounted(() => {
-  if (typeof window !== 'undefined') {
-    token.value = localStorage.getItem('token'); // Asignamos el token desde localStorage
-  }
-
-  if (!token.value) {
-    router.push('/login'); // Si no hay token, redirigimos al login
+  if (!appStore.isLoggedIn) {
+    router.push('/login'); // Si el usuario no está autenticado, redirigir al login
   } else {
-    fetchUserData(token.value);
+    fetchUserData(appStore.getLoginInfo.token); // Usar el token de Pinia store
   }
 });
 
@@ -56,34 +53,32 @@ const fetchUserData = async (token) => {
 };
 
 const logout = () => {
-  localStorage.removeItem('token'); // Eliminar el token de localStorage
+  appStore.logout(); // Llamar a la acción logout de Pinia para limpiar los datos
   router.push('/login'); // Redirigir al login
 };
 </script>
 
-  
-  <style scoped>
-  .profile-page {
-    width: 60%;
-    padding: 30px;
-    background-color: #404040;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin: 0 auto;
-    text-align: center;
-  }
-  
-  button {
-    padding: 10px;
-    background-color: #ff4d4d;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-  
-  button:hover {
-    background-color: #e03e3e;
-  }
-  </style>
-  
+<style scoped>
+.profile-page {
+  width: 60%;
+  padding: 30px;
+  background-color: #404040;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  text-align: center;
+}
+
+button {
+  padding: 10px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #e03e3e;
+}
+</style>

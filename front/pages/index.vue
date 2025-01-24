@@ -18,11 +18,13 @@
       <div class="header-right">
         <button @click="toggleTheme" class="btn" :class="theme">{{ themeIcon }}</button>
 
-        <!-- Mostrar botones de login/registro solo si el usuario NO está autenticado -->
+        <!-- Mostrar botón de "Iniciar sesión" si NO está autenticado -->
+        <button v-if="!isAuthenticated" class="btn" :class="theme" @click="goToLogin">Iniciar sesión</button>
+
+        <!-- Mostrar botón de "Registro" si NO está autenticado -->
         <button v-if="!isAuthenticated" class="btn" :class="theme" @click="goToRegister">{{ registerText }}</button>
-        <button v-if="!isAuthenticated" class="btn" :class="theme" @click="goToLogin">{{ loginText }}</button>
-        
-        <!-- Mostrar botón de perfil solo si el usuario está autenticado -->
+
+        <!-- Mostrar botón de perfil si está autenticado -->
         <button v-if="isAuthenticated" class="btn" :class="theme" @click="goToProfile">Mi perfil</button>
       </div>
     </header>
@@ -75,6 +77,8 @@
 </template>
 
 <script>
+import { useAppStore } from '../stores/app'; // Asegúrate de importar la tienda de Pinia
+
 export default {
   name: 'HomePage',
   data() {
@@ -84,8 +88,14 @@ export default {
       footerText: '© 2025 Mi Página Web',
       registerText: 'Registro',
       loginText: 'Login',
-      isAuthenticated: false, // Estado de autenticación
     };
+  },
+  computed: {
+    // Usar Pinia para obtener el estado de autenticación
+    isAuthenticated() {
+      const appStore = useAppStore();
+      return appStore.isLoggedIn; // Esto obtiene el estado de autenticación desde Pinia
+    },
   },
   methods: {
     // Alterna entre tema claro y oscuro
@@ -113,38 +123,46 @@ export default {
     },
     // Navegación al login
     goToLogin() {
-      if (this.isAuthenticated) {
-        this.goToProfile();
-      } else {
-        this.$router.push('/login'); 
-      }
+      this.$router.push('/login'); 
     },
     goToProfile() {
-      this.$router.push('/perfil'); 
-    },
-    authenticateUser() {
-      this.isAuthenticated = true;
-      localStorage.setItem('isAuthenticated', 'true'); 
+      if (this.isAuthenticated) {
+        this.$router.push('/perfil'); // Solo permite ir al perfil si está autenticado
+      } else {
+        this.$router.push('/login'); // Redirige al login si no está autenticado
+      }
     },
     logout() {
-      this.isAuthenticated = false;
-      localStorage.removeItem('isAuthenticated'); 
+      const appStore = useAppStore();
+      appStore.logout(); // Llamamos a la acción de logout en la tienda
+      this.$router.push('/login');
     },
   },
   mounted() {
-    this.isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    // Comprobar el estado de autenticación en Pinia al montar el componente
+    const appStore = useAppStore();
+    console.log("Estado en la tienda Pinia:", appStore.isLoggedIn);
+
+    // Si el valor de "isLoggedIn" es verdadero, debes asegurarte de actualizar el valor en tu componente.
+    if (appStore.isLoggedIn) {
+      console.log("El usuario está autenticado");
+    } else {
+      console.log("El usuario NO está autenticado");
+    }
   },
 };
 </script>
 
+
+
 <style>
 body {
   display: flex;
-  flex-direction: row; /* Fixing flex-direction to 'row' for side-by-side layout */
+  flex-direction: row;
   height: 100%;
   margin: 0;
   font-family: 'Arial', sans-serif;
-  padding-left: 180px; /* Adds space for left section */
+  padding-left: 180px; 
   background-color: #202020;
   overflow-x: hidden;
   color: white;
@@ -243,7 +261,7 @@ footer.light-mode {
 .main-container {
   display: flex;
   flex-direction: column;
-  margin-left: 180px; /* Adds space for left section */
+  margin-left: 180px; 
 }
 
 .body-content {
