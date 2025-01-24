@@ -66,6 +66,11 @@ const appStore = useAppStore();
 const formData = reactive({ email: '', password: '' });
 const errors = reactive({ email: '', password: '' });
 
+const showRegister = ref(false);
+const toggleRegister = () => {
+  showRegister.value = !showRegister.value;
+};
+
 const validateEmail = () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   errors.email = emailRegex.test(formData.email) ? '' : 'Correo inválido';
