@@ -1,15 +1,15 @@
 <template>
   <div v-if="!showRegister" class="auth-page">
-    <h1>Iniciar Sesión</h1>
+    <h1>Inici de sessió</h1>
     <form @submit.prevent="login">
       <div>
-        <label for="email">Correo Electrónico:</label>
-        <input type="email" id="email" v-model="formData.email" @blur="validateEmail" />
+        <label for="email">Correu Electrònic:</label>
+        <input type="email" id="email" placeholder="Correu electrònic" v-model="formData.email" @blur="validateEmail" />
         <p class="error" v-if="errors.email">{{ errors.email }}</p>
       </div>
       <div>
-        <label for="password">Contraseña:</label>
-        <input type="password" id="password" v-model="formData.password" />
+        <label for="password">Contrasenya:</label>
+        <input type="password" id="password" placeholder="Contrasenya" v-model="formData.password" />
         <p class="error" v-if="errors.password">{{ errors.password }}</p>
       </div>
       <button type="submit" :disabled="!isLoginFormValid()">Ingresar</button>
@@ -17,21 +17,21 @@
     <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     <p>¿No tienes cuenta?</p>
     <div class="creglog" :class="{ active: showRegister }">
-      <button @click="toggleRegister">Regístrate aquí</button>
+      <button @click="toggleRegister">Registra't aquí</button>
     </div>
   </div>
 
   <div v-if="showRegister" class="register-page">
-    <h1>Crear Cuenta</h1>
+    <h1>Crear nou compte</h1>
     <form @submit.prevent="register">
       <div>
-        <label for="username">Nombre de Usuario:</label>
-        <input type="text" id="username" v-model="formData.username" @blur="validateUsername" />
+        <label for="username">Nom d'usuari:</label>
+        <input type="text" id="username" placeholder="Nom d'usuari" v-model="formData.username" @blur="validateUsername" />
         <p class="error" v-if="errors.username">{{ errors.username }}</p>
       </div>
       <div>
-        <label for="email">Correo Electrónico:</label>
-        <input type="email" id="email" v-model="formData.email" @blur="validateEmail" />
+        <label for="email">Correu Electrònic:</label>
+        <input type="email" id="email" placeholder="Correu electrònic" v-model="formData.email" @blur="validateEmail" />
         <p class="error" v-if="errors.email">{{ errors.email }}</p>
       </div>
       <div>
@@ -40,13 +40,13 @@
         <p class="error" v-if="errors.password">{{ errors.password }}</p>
       </div>
       <div>
-        <label for="passwordRepeat">Repetir Contraseña:</label>
-        <input type="password" id="passwordRepeat" v-model="formData.passwordRepeat" @blur="validatePasswordRepeat" />
+        <label for="passwordRepeat">Repetir Contrasenya:</label>
+        <input type="password" id="passwordRepeat" placeholder="Repetir contrasenya" v-model="formData.passwordRepeat" @blur="validatePasswordRepeat" />
         <p class="error" v-if="errors.passwordRepeat">{{ errors.passwordRepeat }}</p>
       </div>
       <button type="submit" :disabled="!isRegisterFormValid()">Registrar</button>
     </form>
-    <p>¿Ya tienes cuenta?</p>
+    <p>¿Ja tens compte?</p>
     <div class="creglog" :class="{ active: showRegister }">
       <button @click="toggleRegister">Inicia sesión aquí</button>
     </div>
@@ -241,7 +241,7 @@ const register = async () => {
 .auth-page {
   width: 30%;
   padding: 30px;
-  background-color: #404040;
+  background-color: #303030;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: absolute;
@@ -252,7 +252,7 @@ const register = async () => {
 .register-page {
   width: 30%;
   padding: 30px;
-  background-color: #404040;
+  background-color: #303030;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: absolute;
@@ -263,7 +263,7 @@ const register = async () => {
 .register {
   width: 50%;
   height: 100%;
-  background-color: #404040;
+  background-color: #303030;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: absolute;
   margin-top: 0;
@@ -273,7 +273,7 @@ const register = async () => {
 .login {
   width: 50%;
   height: 100%;
-  background-color: #404040;
+  background-color: #303030;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: absolute;
   margin-top: 0;
