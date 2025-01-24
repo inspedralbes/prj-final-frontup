@@ -51,8 +51,16 @@
     </div>
   </div>
 
-  <div v-if="!showRegister" class="register"><img src="../public/desk-4222025_1920.jpg" alt=""></div>
-  <div v-if="showRegister" class="login"><img src="../public/desk-4222025_1920.jpg" alt=""></div>
+  <transition name="slide-to-right">
+    <div v-if="!showRegister" class="register">
+      <img src="../public/desk-4222025_1920.jpg" alt="Registre" @click="toggleRegister">
+    </div>
+  </transition>
+  <transition name="slide-to-left">
+    <div v-if="showRegister" class="login">
+      <img src="../public/desk-4222025_1920.jpg" alt="Login" @click="toggleRegister">
+    </div>
+  </transition>
 </template>
 
 <script setup>
@@ -107,7 +115,7 @@ const login = async () => {
           image: data.image,
           imageId: data.imageId,
         });
-        router.push('/'); 
+        router.push('/');
       } else {
         alert(data.message || 'Error al iniciar sesión');
       }
@@ -121,6 +129,20 @@ const login = async () => {
 
 
 <style scoped>
+.slide-to-right-enter-active {
+  transition: transform 1s ease;
+}
+.slide-to-right-enter-from {
+  transform: translateX(-100%);
+}
+
+.slide-to-left-enter-active {
+  transition: transform 1s ease;
+}
+.slide-to-left-enter-from {
+  transform: translateX(100%);
+}
+
 .auth-page {
   width: 30%;
   padding: 30px;
@@ -163,7 +185,7 @@ const login = async () => {
   left: 0;
 }
 
-img{
+img {
   height: 100%;
   width: 100%;
 }
