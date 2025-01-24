@@ -84,10 +84,11 @@ export default {
       footerText: '© 2025 Mi Página Web',
       registerText: 'Registro',
       loginText: 'Login',
-      isAuthenticated: false, // Controla si el usuario está autenticado
+      isAuthenticated: false, // Estado de autenticación
     };
   },
   methods: {
+    // Alterna entre tema claro y oscuro
     toggleTheme() {
       if (this.theme === '') {
         this.theme = 'light-mode';
@@ -98,29 +99,40 @@ export default {
       }
       document.body.className = this.theme;
     },
+    // Navegación a la página "Lliure"
     navigateToLliure() {
       this.$router.push('/lliure'); 
     },
+    // Navegación al registro
     goToRegister() {
-      this.$router.push('/register'); 
+      if (this.isAuthenticated) {
+        this.goToProfile(); // Si ya está autenticado, redirige al perfil
+      } else {
+        this.$router.push('/register'); 
+      }
     },
+    // Navegación al login
     goToLogin() {
-      this.$router.push('/login'); 
+      if (this.isAuthenticated) {
+        this.goToProfile();
+      } else {
+        this.$router.push('/login'); 
+      }
     },
     goToProfile() {
-      this.$router.push('/perfil'); // Redirige al perfil del usuario
+      this.$router.push('/perfil'); 
     },
-    // Simulación de autenticación (esto normalmente se gestionaría con una API o localStorage)
     authenticateUser() {
-      this.isAuthenticated = true; // Establecer como verdadero cuando el usuario esté autenticado
+      this.isAuthenticated = true;
+      localStorage.setItem('isAuthenticated', 'true'); 
     },
     logout() {
-      this.isAuthenticated = false; // Al hacer logout, se pone en falso
-    }
+      this.isAuthenticated = false;
+      localStorage.removeItem('isAuthenticated'); 
+    },
   },
   mounted() {
-    // Si el usuario está autenticado (esto depende de tu lógica de autenticación)
-    this.authenticateUser(); // Simulación de que el usuario ya está autenticado
+    this.isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
   },
 };
 </script>
