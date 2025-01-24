@@ -12,7 +12,7 @@
         :readonly="!isEditing"
       />
       <div class="header-actions">
-        <button class="header-button">Save</button>
+        <button class="header-button" @click="saveProject">Save</button>
         <button class="header-button" @click="openSettingsModal">Settings</button>
         <button class="header-button">💡</button>
       </div>
@@ -95,7 +95,7 @@ export default {
     const html = ref("");
     const css = ref("");
     const js = ref("");
-    const title = ref("Untitled");  
+    const title = ref("Untitled"); 
 
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
@@ -149,6 +149,40 @@ export default {
       title.value = newTitle;
     });
 
+  const saveProject = async () => {
+  const projectData = {
+    nombre:  "Mi proyecto",
+    user_id: 1,
+    html_code:  "<h1>Hola</h1>",
+    css_code: "body { background-color: red; }",
+    js_code: "console.log('Hola');",
+  };
+  {
+    {
+}
+}
+  try {
+    const response = await fetch("http://localhost:8000/api/projects", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(projectData),
+      
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    alert("Proyecto guardado exitosamente: " + result.message);
+  } catch (error) {
+    console.error("Error al guardar el proyecto:", error);
+    alert("Hubo un error al guardar el proyecto");
+  }
+};
+
     const goBack = () => {
       router.push("/");  
     };
@@ -170,7 +204,7 @@ export default {
     return { 
       html, css, js, htmlEditor, cssEditor, jsEditor, title, isEditing, goBack, 
       openSettingsModal, closeSettingsModal, showSettingsModal, 
-      modalTitle, modalDescription, saveSettings
+      modalTitle, modalDescription, saveSettings, saveProject,
     };
   },
   computed: {
