@@ -11,7 +11,7 @@
         @blur="isEditing = false"
         :readonly="!isEditing"
       />
-      <div class="header-actions">
+      <div class="header-actions">  
         <button class="header-button">Save</button>
         <button class="header-button" @click="openSettingsModal">Settings</button>
         <button class="header-button">💡</button>
@@ -79,10 +79,10 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, onUnmounted } from "vue";
 import { useRouter } from "vue-router"; 
 import CodeMirror from "codemirror";
-
+import { useLliureStore } from '~/stores/app'
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/eclipse.css";
 import "codemirror/mode/htmlmixed/htmlmixed";
@@ -91,6 +91,7 @@ import "codemirror/mode/javascript/javascript";
 
 export default {
   setup() {
+    const lliureStore = useLliureStore();
     const router = useRouter();  
     const html = ref("");
     const css = ref("");
@@ -109,8 +110,11 @@ export default {
     let htmlEditorInstance = null;
     let cssEditorInstance = null;
     let jsEditorInstance = null;
-
+    onUnmounted(() => {
+      lliureStore.toggleLliure()
+    });
     onMounted(() => {
+      console.log('has entrado en lliure');
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
         mode: "htmlmixed",
         theme: "eclipse",
