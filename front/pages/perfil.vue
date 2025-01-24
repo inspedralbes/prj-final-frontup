@@ -16,18 +16,18 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router'; // Cambiado de nuxt/app a vue-router
-import { useAppStore } from '../stores/app'; // Importar Pinia store
+import { useRouter } from 'vue-router';
+import { useAppStore } from '../stores/app';
 
 const user = ref(null);
 const router = useRouter();
-const appStore = useAppStore(); // Usar la tienda de Pinia para obtener el estado de autenticación
+const appStore = useAppStore();
 
 onMounted(() => {
   if (!appStore.isLoggedIn) {
-    router.push('/login'); // Si el usuario no está autenticado, redirigir al login
+    router.push('/login');
   } else {
-    fetchUserData(appStore.getLoginInfo.token); // Usar el token de Pinia store
+    fetchUserData(appStore.getLoginInfo.token);
   }
 });
 
@@ -43,7 +43,7 @@ const fetchUserData = async (token) => {
 
     if (response.ok) {
       const data = await response.json();
-      user.value = data.user; // Asignamos los datos del usuario
+      user.value = data.user; 
     } else {
       console.error('No se pudo obtener los detalles del usuario');
     }
@@ -53,8 +53,8 @@ const fetchUserData = async (token) => {
 };
 
 const logout = () => {
-  appStore.logout(); // Llamar a la acción logout de Pinia para limpiar los datos
-  router.push('/login'); // Redirigir al login
+  appStore.logout(); 
+  router.push('/login');
 };
 </script>
 
