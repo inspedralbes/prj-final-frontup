@@ -83,6 +83,9 @@ const appStore = useAppStore();
 onUnmounted(() => {
   lliureStore.toggleLliure()
 });
+onMounted(() => {
+  lliureStore.toggleLliure()
+});
 const formData = reactive({
   email: '',
   password: '',

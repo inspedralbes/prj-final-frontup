@@ -114,6 +114,7 @@ export default {
       lliureStore.toggleLliure()
     });
     onMounted(() => {
+      lliureStore.toggleLliure()
       console.log('has entrado en lliure');
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
         mode: "htmlmixed",

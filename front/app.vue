@@ -56,7 +56,6 @@ const toggleTheme = () => {
 }
 
 const navigateToLliure = () => {
-  lliureStore.toggleLliure()
   router.push('/lliure')
 }
 
@@ -69,7 +68,6 @@ const navigateToRegister = () => {
 }
 
 const navigateToLogin = () => {
-  lliureStore.toggleLliure()
   router.push('/login')
 }
 </script>
