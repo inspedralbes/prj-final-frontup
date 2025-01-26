@@ -48,7 +48,7 @@ export default {
   position: absolute;
   width: 80px;
   height: 80px;
-  background-color: #4caf50;
+  background-color: gray;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -62,7 +62,7 @@ export default {
 
 .level-button:hover {
   transform: scale(1.2);
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+  background-color: black;
 }
 
 /* Configuración de la posición de cada nivel con mayor separación */
@@ -112,7 +112,7 @@ export default {
   top: 10px;
   left: 10px;
   padding: 10px 20px;
-  background-color: #4caf50;
+  background-color: gray;
   color: white;
   border: none;
   border-radius: 5px;
@@ -122,6 +122,6 @@ export default {
 }
 
 .back-button:hover {
-  background-color: #45a049;
+  background-color: black;
 }
 </style>
