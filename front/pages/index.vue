@@ -8,6 +8,7 @@
       <button class="btn" :class="theme" @click="navigateToLliure">Lliure</button>
       <button class="btn" :class="theme" @click="navigateToNiveles">Nivells</button>
       <button class="btn" :class="theme">Projectes favorits</button>
+    
     </div>      
 
     <!-- Header -->
@@ -99,6 +100,8 @@ export default {
     navigateToNiveles() {
       this.$router.push('/niveles'); 
     },
+    
+
   },
 };
 </script>
