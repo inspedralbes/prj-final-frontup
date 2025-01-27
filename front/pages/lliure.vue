@@ -339,12 +339,13 @@ export default {
   padding: 8px 12px;
   border-radius: 4px;
   cursor: pointer;
-  background-color: #444;
-  transition: background-color 0.3s;
+  opacity: 0.5;
+  background-color: white;
 }
 
 .expand-button:hover {
-  background-color: #666;
+  opacity: 1;
+  background-color: white;
 }
 
 .output {
