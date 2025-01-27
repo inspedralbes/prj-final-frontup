@@ -1,6 +1,5 @@
 <template>
   <router-view />
-  <link rel="stylesheet" href="/front/static/normalize.css">
   <div id="app" v-if="!lliureStore.lliure">
     <!-- Barra lateral y barra superior -->
     <div class="left-section">
@@ -17,7 +16,9 @@
       </div>
       <div class="header-right">
         <button @click="toggleTheme" class="btn">{{ themeIcon }}</button>
-        <button class="btn" @click="navigateToLogin">{{ loginText }}</button>
+        <button class="btn" @click="navigateToProfile" v-if="appStore.isLoggedIn">Mi Perfil</button>
+        <button class="btn" @click="navigateToLogin" v-else>{{ loginText }}</button>
+
       </div>
     </header>
 
@@ -29,6 +30,8 @@
 import { ref } from 'vue'
 import { useLliureStore } from '~/stores/app' // Asegúrate de importar el store correctamente
 import { useRouter } from 'vue-router' // Asegúrate de usar el router correctamente
+import { useAppStore } from '@/stores/app';
+
 
 // Variables reactivas
 const theme = ref('')
@@ -36,6 +39,7 @@ const themeIcon = ref('☀️')
 const loginText = ref('Login')
 
 // Usar el store
+const appStore = useAppStore();
 const lliureStore = useLliureStore()
 
 // Usar el router
@@ -63,6 +67,10 @@ const navigateToNiveles = () => {
 
 const navigateToLogin = () => {
   router.push('/login')
+}
+
+const navigateToProfile = () => {
+  router.push('/perfil')
 }
 </script>
 

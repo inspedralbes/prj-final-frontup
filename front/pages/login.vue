@@ -239,6 +239,15 @@ const register = async () => {
 
 <style scoped>
 
+.todo {
+  height: 100vh;
+  width: 100%;
+  background-color: #1c1c1c;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .slide-to-right-enter-active {
   transition: transform 1s ease;
 }
@@ -256,39 +265,31 @@ const register = async () => {
 }
 
 .auth-page {
-  width: 30%;
+  width: 100%;
+  max-width: 400px; 
   padding: 30px;
   background: linear-gradient(135deg, #1c1c1c, #3a3a3a);
   border-radius: 16px;
   box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
   position: absolute;
-  margin-top: 15%;
-  left: 8%;
   color: white;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.auth-page:hover {
-  transform: scale(1.05);
-  box-shadow: 0 15px 25px rgba(255, 255, 255, 0.3);
+  left: 8%;
+  text-align: center;
 }
 
 .register-page {
-  width: 30%;
+  width: 100%;
+  max-width: 400px; 
   padding: 30px;
-  background: linear-gradient(135deg, #3a3a3a, #1c1c1c);
+  background: linear-gradient(135deg, #1c1c1c, #3a3a3a);
   border-radius: 16px;
   box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
   position: absolute;
-  margin-top: 13%;
-  right: 8%;
   color: white;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.register-page:hover {
-  transform: scale(1.05);
-  box-shadow: 0 15px 25px rgba(255, 255, 255, 0.3);
+  right: 8%;
+  text-align: center;
 }
 
 .register {
@@ -309,11 +310,71 @@ const register = async () => {
   position: absolute;
   margin-top: 0;
   left: 0;
+  background: linear-gradient(135deg, #3a3a3a, #1c1c1c);
 }
 
 img {
   height: 100%;
   width: 100%;
+  object-fit: cover;
+}
+
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 70%;
+  align-items: center ;
+  margin: 0 auto;
+  align-items: center;
+}
+
+form div {
+  width: 100%;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input {
+  width: 70%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background: #2a2a2a;
+  color: white;
+}
+
+input:focus {
+  outline: 2px solid #555;
+}
+
+button {
+  padding: 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+
+.creglog button {
+  background: transparent;
+  color: #007bff;
+  border: none;
+  cursor: pointer;
+}
+
+.creglog button:hover {
+  text-decoration: underline;
 }
 
 .error {
