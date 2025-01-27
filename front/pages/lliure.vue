@@ -44,17 +44,14 @@
 
     <!-- Contenedor principal -->
     <div class="editor-container">
-      <!-- Editor de HTML -->
       <div class="editor-box">
         <div class="editor-label">HTML</div>
         <div ref="htmlEditor" class="code-editor"></div>
       </div>
-      <!-- Editor de CSS -->
       <div class="editor-box">
         <div class="editor-label">CSS</div>
         <div ref="cssEditor" class="code-editor"></div>
       </div>
-      <!-- Editor de JS -->
       <div class="editor-box">
         <div class="editor-label">JS</div>
         <div ref="jsEditor" class="code-editor"></div>
@@ -62,7 +59,14 @@
     </div>
 
     <!-- Salida del código -->
-    <div class="output-container">
+    <div class="output-container" :class="{ expanded: isExpanded }" ref="outputContainer">
+      <button class="expand-button" @click="toggleExpand">
+        <!-- Usar SVG como icono en lugar de texto -->
+        <img v-if="!isExpanded" src="/assets/img/pantalla-grande.svg" alt="Pantalla Grande" width="30" />
+        <img v-if="isExpanded" src="/assets/img/pantalla-pequeña.svg" alt="Pantalla Pequeña" width="30" />
+      </button>
+      <!-- Barra de redimensionamiento -->
+      <div class="resize-bar" @mousedown="startResize"></div>
       <iframe class="output" :srcdoc="output"></iframe>
     </div>
   </div>
@@ -96,6 +100,7 @@ export default {
     const notification = ref("");
     const modalTitle = ref("");
     const modalDescription = ref("");
+    const isExpanded = ref(false); 
 
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
@@ -143,6 +148,10 @@ export default {
     });
 
     // Functions
+    const toggleExpand = () => {
+      isExpanded.value = !isExpanded.value;
+    };
+
     const goBack = () => router.push("/");
 
     const openSettingsModal = () => {
@@ -162,13 +171,13 @@ export default {
     const guardarProyecto = async () => {
       try {
         await guardarProyectoDB({
-          nombre: title.value || '',
+          nombre: title.value || "",
           user_id: 1 || null,
-          html_code: html.value || '',
-          css_code: css.value || '',
-          js_code: js.value || '',
+          html_code: html.value || "",
+          css_code: css.value || "",
+          js_code: js.value || "",
         });
-        notification.value = "Proyecto guardado con éxito.";
+        alert.value = "Proyecto guardado con éxito.";
       } catch (error) {
         notification.value = "Error al guardar el proyecto.";
         console.error(error);
@@ -195,6 +204,8 @@ export default {
       closeSettingsModal,
       saveSettings,
       guardarProyecto,
+      isExpanded, 
+      toggleExpand, 
       output: computed(() => {
         let jsContent = js.value;
         let scriptContent = `
@@ -212,10 +223,10 @@ export default {
       </body>
     </html>`;
       }),
-
     };
   },
 };
+
 </script>
 
 <style scoped>
@@ -267,8 +278,8 @@ export default {
 
 .editor-container {
   display: flex;
-  padding: 20px;
   gap: 20px;
+  margin-top: 10px;
 }
 
 .editor-box {
@@ -284,8 +295,8 @@ export default {
 
 .editor-label {
   position: absolute;
-  top: 8px;
-  left: 10px;
+  top: 15px;
+  left: 15px;
   font-size: 16px;
   color: #fff;
   background-color: #444;
@@ -295,24 +306,62 @@ export default {
 
 .code-editor {
   margin-top: 40px;
-  height: 300px;
+  height: 320px; 
+  width: 400px; 
   border: 1px solid #444;
   border-radius: 4px;
   background-color: #1e1e1e;
-  color: #fff;
+  color: #fff; 
+  padding: 10px; 
+  box-sizing: border-box; 
 }
 
 .output-container {
-  flex-grow: 1;
-  padding: 20px;
   background-color: #f4f4f4;
+  position: relative;
+  transition: all 0.3s ease-in-out;
+}
+
+.output-container.expanded {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+}
+
+.output-container.expanded .output {
+  border-radius: 0;
+}
+
+.expand-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.expand-button:hover {
+  background-color: #666;
 }
 
 .output {
   width: 100%;
   height: 100%;
   border: none;
-  background-color: #fff;
-  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.svg-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.svg-container img {
+  max-width: 100%;
+  height: auto;
 }
 </style>
