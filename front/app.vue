@@ -17,7 +17,6 @@
       </div>
       <div class="header-right">
         <button @click="toggleTheme" class="btn">{{ themeIcon }}</button>
-        <button class="btn" @click="navigateToRegister">{{ registerText }}</button>
         <button class="btn" @click="navigateToLogin">{{ loginText }}</button>
       </div>
     </header>
@@ -34,7 +33,6 @@ import { useRouter } from 'vue-router' // Asegúrate de usar el router correctam
 // Variables reactivas
 const theme = ref('')
 const themeIcon = ref('☀️')
-const registerText = ref('Registro')
 const loginText = ref('Login')
 
 // Usar el store
@@ -61,10 +59,6 @@ const navigateToLliure = () => {
 
 const navigateToNiveles = () => {
   router.push('/niveles')
-}
-
-const navigateToRegister = () => {
-  router.push('/register')
 }
 
 const navigateToLogin = () => {
