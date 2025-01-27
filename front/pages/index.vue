@@ -1,14 +1,5 @@
 <template>
   <div class="todo">
-    <!-- Left Section -->
-    <div class="left-section" :class="theme">
-      <h2>FrontUp</h2>
-      <button class="btn" :class="theme">Els meus projectes</button>
-      <button class="btn" :class="theme" @click="navigateToLliure">Lliure</button>
-      <button class="btn" :class="theme" @click="navigateToNiveles">Nivells</button>
-      <button class="btn" :class="theme">Projectes favorits</button>
-    </div>      
-
     <!-- Header -->
     <header :class="theme">
       <div class="header-left">
@@ -64,7 +55,6 @@
     <br><br>
     <!-- Footer -->
   </div>
-</div>
 <footer>
   <p>© 2025 FrontUp</p>
 </footer>

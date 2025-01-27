@@ -4,10 +4,17 @@
     <div
       v-for="level in levels"
       :key="level.id"
-      class="level-button"
-      @click="ir_nivel(level.id)"
+      class="level-button-container"
     >
-      {{ level.id }}
+      <div
+        class="level-button"
+        @click="ir_nivel(level.id)"
+        @mouseenter="hoveredLevel = level.id"
+        @mouseleave="hoveredLevel = null"
+      >
+        {{ level.id }}
+      </div>
+      <div v-if="hoveredLevel === level.id" class="hover-text">Nivel {{ level.id }}</div>
     </div>
   </div>
 </template>
@@ -19,6 +26,7 @@ export default {
       levels: Array.from({ length: 10 }, (_, i) => ({
         id: i + 1,
       })),
+      hoveredLevel: null,
     };
   },
   methods: {
@@ -35,17 +43,28 @@ export default {
 <style>
 .level-container {
   position: relative;
-  width: 600px; /* Aumentado para acomodar más espacio */
-  height: 800px; /* Aumentado para un diseño más espacioso */
-  margin: 0 auto;
+  width: 600px;
+  height: 800px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
   background-color: #f9f9f9;  
   border: 1px solid #ddd;
   border-radius: 10px;
-  
+}
+
+.level-button-container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .level-button {
-  position: absolute;
   width: 80px;
   height: 80px;
   background-color: gray;
@@ -65,48 +84,24 @@ export default {
   background-color: black;
 }
 
-/* Configuración de la posición de cada nivel con mayor separación */
-.level-button:nth-child(1) {
-  top: 90%;
-  left: 55%;
-  transform: translate(-50%, -50%);
+.hover-text {
+  margin-top: 10px;
+  font-size: 14px;
+  color: black;
+  font-weight: bold;
 }
-.level-button:nth-child(2) {
-  top: 75%;
-  left: 20%;
-}
-.level-button:nth-child(3) {
-  top: 70%;
-  left: 80%;
-}
-.level-button:nth-child(4) {
-  top: 60%;
-  left: 25%;
-}
-.level-button:nth-child(5) {
-  top: 50%;
-  left: 75%;
-}
-.level-button:nth-child(6) {
-  top: 40%;
-  left: 30%;
-}
-.level-button:nth-child(7) {
-  top: 30%;
-  left: 70%;
-}
-.level-button:nth-child(8) {
-  top: 20%;
-  left: 35%;
-}
-.level-button:nth-child(9) {
-  top: 10%;
-  left: 65%;
-}
-.level-button:nth-child(10) {
-  top: 0%;
-  left: 50%;
-}
+
+.level-button-container:nth-child(1) { top: 90%; left: 55%; transform: translate(-50%, -50%); }
+.level-button-container:nth-child(2) { top: 75%; left: 20%; }
+.level-button-container:nth-child(3) { top: 70%; left: 80%; }
+.level-button-container:nth-child(4) { top: 60%; left: 25%; }
+.level-button-container:nth-child(5) { top: 50%; left: 75%; }
+.level-button-container:nth-child(6) { top: 40%; left: 30%; }
+.level-button-container:nth-child(7) { top: 30%; left: 70%; }
+.level-button-container:nth-child(8) { top: 20%; left: 35%; }
+.level-button-container:nth-child(9) { top: 10%; left: 65%; }
+.level-button-container:nth-child(10) { top: 0%; left: 50%; }
+
 .back-button {
   position: absolute;
   top: 10px;
