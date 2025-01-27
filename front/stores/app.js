@@ -2,11 +2,11 @@ import { defineStore } from 'pinia';
 
 export const useLliureStore = defineStore('lliure', {
   state: () => ({
-    lliure: false, // Variable booleana
+    lliure: false, 
   }),
   actions: {
     toggleLliure() {
-      this.lliure = !this.lliure; // Cambia el valor de la variable
+      this.lliure = !this.lliure;
     },
     setLliure(value) {
       this.lliure = value; 
@@ -21,9 +21,9 @@ export const useAppStore = defineStore('app', {
       : {
           loggedIn: false,
           token: '',
-          username: '',
+          name: '',
           email: '',
-          role: '',
+          nivel: '',
           image: typeof window !== 'undefined' ? localStorage.getItem('avatarUrl') || '' : '',
           imageId: '',
         },
@@ -34,9 +34,9 @@ export const useAppStore = defineStore('app', {
       this.loginInfo = {
         loggedIn: false,
         token: '',
-        username: '',
+        name: '',
         email: '',
-        role: '',
+        nivel: '',
         image: '',
         imageId: '',
       };
@@ -47,8 +47,8 @@ export const useAppStore = defineStore('app', {
       }
     },
 
-    setLoginInfo({ loggedIn, token, username, email, role, image, imageId }) {
-      this.loginInfo = { loggedIn, token, username, email, role, image, imageId };
+    setLoginInfo({ loggedIn, token, name, email, role, image, imageId }) {
+      this.loginInfo = { loggedIn, token, name, email, role, image, imageId };
       if (typeof window !== 'undefined') {
         localStorage.setItem('loginInfo', JSON.stringify(this.loginInfo));
         localStorage.setItem('token', token);

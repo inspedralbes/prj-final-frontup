@@ -3,9 +3,9 @@
     <h1>Perfil del Usuario</h1>
 
     <div v-if="user">
-      <p><strong>Nombre:</strong> {{ user.username }}</p>
-      <p><strong>Correo Electrónico:</strong> {{ user.email }}</p>
-      <p><strong>Nivel:</strong> {{ user.role }}</p>
+      <p><strong>Nombre:</strong> {{ user.name || 'No disponible' }}</p>
+      <p><strong>Correo Electrónico:</strong> {{ user.email || 'No disponible' }}</p>
+      <p><strong>Nivel:</strong> {{ user.nivel || 'No disponible' }}</p>
       <button @click="logout">Cerrar sesión</button>
     </div>
     <div v-else>
@@ -43,7 +43,8 @@ const fetchUserData = async (token) => {
 
     if (response.ok) {
       const data = await response.json();
-      user.value = data.user; 
+      console.log(data); 
+      user.value = data.user;
     } else {
       console.error('No se pudo obtener los detalles del usuario');
     }
@@ -51,6 +52,7 @@ const fetchUserData = async (token) => {
     console.error('Error al obtener los datos del usuario:', error);
   }
 };
+
 
 const logout = () => {
   appStore.logout(); 

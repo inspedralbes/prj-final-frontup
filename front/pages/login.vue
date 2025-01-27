@@ -27,10 +27,10 @@
       <h1>Crear nou compte</h1>
       <form @submit.prevent="register">
         <div>
-          <label for="username">Nom d'usuari:</label>
-          <input type="text" id="username" placeholder="Nom d'usuari" v-model="formData.username"
+          <label for="name">Nom d'usuari:</label>
+          <input type="text" id="name" placeholder="Nom d'usuari" v-model="formData.name"
             @blur="validateUsername" />
-          <p class="error" v-if="errors.username">{{ errors.username }}</p>
+          <p class="error" v-if="errors.name">{{ errors.name }}</p>
         </div>
         <div>
           <label for="email">Correu Electrònic:</label>
@@ -89,14 +89,14 @@ onMounted(() => {
 const formData = reactive({
   email: '',
   password: '',
-  username: '',
+  name: '',
   passwordRepeat: ''
 });
 
 const errors = reactive({
   email: '',
   password: '',
-  username: '',
+  name: '',
   passwordRepeat: ''
 });
 
@@ -112,7 +112,7 @@ const validateEmail = () => {
 };
 
 const validateUsername = () => {
-  errors.username = formData.username ? '' : 'El nombre de usuario es obligatorio';
+  errors.name = formData.name ? '' : 'El nombre de usuario es obligatorio';
 };
 
 const validatePassword = () => {
@@ -132,11 +132,11 @@ const isRegisterFormValid = () => {
   return (
     formData.email &&
     formData.password &&
-    formData.username &&
+    formData.name &&
     formData.passwordRepeat &&
     !errors.email &&
     !errors.password &&
-    !errors.username &&
+    !errors.name &&
     !errors.passwordRepeat
   );
 };
@@ -163,9 +163,9 @@ const login = async () => {
         appStore.setLoginInfo({
           loggedIn: true,
           token: data.token,
-          username: data.username,
+          name: data.name,
           email: data.email,
-          role: data.role,
+          nivel: data.nivel,
           image: data.image,
           imageId: data.imageId,
         });
@@ -215,9 +215,9 @@ const register = async () => {
           appStore.setLoginInfo({
             loggedIn: true,
             token: loginData.token,
-            username: loginData.username,
+            name: loginData.name,
             email: loginData.email,
-            role: loginData.role,
+            nivel: loginData.nivel,
             image: loginData.image,
             imageId: loginData.imageId,
           });
