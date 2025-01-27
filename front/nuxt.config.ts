@@ -5,6 +5,9 @@ export default defineNuxtConfig({
   plugins: [
     '~/plugins/pinia.js',  // Asegúrate de que el plugin esté registrado
   ],
+  css: [
+    '@/assets/normalize.css'
+   ],
   build: {
     transpile: ['pinia'],  // Transpila Pinia si es necesario
   }
