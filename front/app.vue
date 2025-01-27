@@ -1,6 +1,5 @@
 <template>
   <router-view />
-  <link rel="stylesheet" href="/front/static/normalize.css">
   <div id="app" v-if="!lliureStore.lliure">
     <!-- Barra lateral y barra superior -->
     <div class="left-section">
