@@ -1,5 +1,4 @@
 <template>
-  
   <div class="todo">
     <!-- Left Section -->
     <div class="left-section" :class="theme">
@@ -8,7 +7,6 @@
       <button class="btn" :class="theme" @click="navigateToLliure">Lliure</button>
       <button class="btn" :class="theme" @click="navigateToNiveles">Nivells</button>
       <button class="btn" :class="theme">Projectes favorits</button>
-    
     </div>      
 
     <!-- Header -->
@@ -65,10 +63,11 @@
     </div>
     <br><br>
     <!-- Footer -->
-    <footer :class="theme">
-      <p>{{ footerText }}</p>
-    </footer>
-  </div>  
+  </div>
+</div>
+<footer>
+  <p>© 2025 FrontUp</p>
+</footer>
 </template>
 
 <script>
@@ -100,94 +99,18 @@ export default {
     navigateToNiveles() {
       this.$router.push('/niveles'); 
     },
-    
-
   },
 };
 </script>
 
 <style scoped>
 
-.todo {
-  height: 130vh;  
-  display: flex;
-  flex-direction: column;
-  margin-right: -8px;
-  background-color: rgb(161, 152, 152);
+.todo{
+  background-color: rgb(177, 162, 162);
 }
-
-.left-section { 
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 180px;
-  height: 100%;  
-  background-color: #404040;
-  padding: 15px;
-  box-sizing: border-box;
-}
-
-.left-section .btn {
-  padding: 10px 15px;
-  background-color: #333;
-  color: #fff;
-  cursor: pointer;
-  text-transform: uppercase;
-  border-radius: 4px;
-}
-
-.left-section button {
-  margin-bottom: 15px;
-}
-
-.left-section h2{
-  color: white;
-}
-/* Header */
-header {
-  position: absolute;
-  top: 0;
-  left: 180px;    
-  right: 0;
-  height: 80px;  
-  background-color: black;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;  
-}
-.header-left {
-  display: flex;
-  align-items: center;
-}
-.header-right {
-  display: flex;
-  gap: 20px;
-}
-.search-box {
-  padding: 8px;
-  width: 300px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.header-right .btn {
-  padding: 10px 15px;
-  background-color: #333;
-  color: #fff;
-  cursor: pointer;
-  text-transform: uppercase;
-  border-radius: 4px;
-}
-
-.header-right .btn:hover {
-  background-color: #0056b3;
-}
-
-/* Main Content */
 .main-container {
-  margin-top: 80px;  
-  margin-left: 200px;  
+  margin-top: 80px;
+  margin-left: 200px;
   padding: 20px;
   flex-direction: column;
   justify-content: space-between;
@@ -197,16 +120,17 @@ header {
   text-align: left;
   margin-bottom: 40px;
 }
+
 .body-content h2 {
   font-size: 2em;
   margin-bottom: 20px;
 }
+
 .body-content p {
   font-size: 1em;
   color: #666;
 }
 
-/* Card Container */
 .card-container {
   display: flex;
   justify-content: space-around;
@@ -232,6 +156,7 @@ header {
   color: #d4cece;
   margin-bottom: 20px;
 }
+
 .card button {
   padding: 10px 20px;
   border: none;
@@ -241,112 +166,10 @@ header {
   cursor: pointer;
 }
 
-/* Footer */
 footer {
-  margin-left: 172px;
   background-color: #404040;
   text-align: center;
   padding: 10px 20px;
-  position: relative;
   color: white;
-  margin-top: 150px;
-}
-
-/* Light Mode */
-.light-mode {
-  background-color: #f7f7f7;  
-  color: #333;  
-}
-
-.light-mode .todo{
-  background-color: #f5ebeb;
-}
-
-.light-mode .left-section {
-  background-color: #eee0e0; 
-}
-
-.light-mode .btn {  
-  background-color: #eee;  
-  color: #333;  
-  border: 1px solid #ccc; 
-}
-
-.light-mode .btn:hover {
-  background-color: #ddd;  
-}
-
-.light-mode header {
-  background-color: #cfc8c8;  
-}
-
-.light-mode h2{
-  color: black;
-}
-.light-mode .search-box {
-  background-color: #fff;  
-  border: 1px solid #ddd;  
-  color: #333;  
-}
-
-.light-mode .card {
-  background-color: #eee0e0;  
-  color: #333;    
-}
-
-.light-mode footer {
-  background-color: #eee0e0; 
-  color: #333;
-}
-</style>
-
-
-
-<style>
-/* Light Mode */
-.light-mode {
-  background-color: #f7f7f7;  
-  color: #333;  
-}
-
-.light-mode .todo{
-  background-color: #f5ebeb;
-}
-
-.light-mode .left-section {
-  background-color: #eee0e0; 
-}
-
-.light-mode .btn {  
-  background-color: #eee;  
-  color: #333;  
-  border: 1px solid #ccc; 
-}
-
-.light-mode .btn:hover {
-  background-color: #ddd;  
-}
-
-.light-mode header {
-  background-color: #cfc8c8;  
-}
-
-.light-mode h2{
-  color: black;
-}
-.light-mode .search-box {
-  background-color: #fff;  
-  border: 1px solid #ddd;  
-  color: #333;  
-}
-
-.light-mode .card {
-  background-color: #eee0e0;  
-  color: #333;    
-}
-
-.light-mode footer {
-  background-color: #eee0e0; 
-  color: #333;
 }
 </style>
