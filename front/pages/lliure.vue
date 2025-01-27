@@ -2,21 +2,22 @@
   <div class="todo">
     <!-- Encabezado -->
     <header class="header">
-      <button class="header-button" @click="goBack">Atras</button>
-      <input
-        type="text"
-        v-model="title"
-        class="header-title"
-        @focus="isEditing = true"
-        @blur="isEditing = false"
-        :readonly="!isEditing"
-      />
-      <div class="header-actions">  
-        <button class="header-button">Save</button>
-        <button class="header-button" @click="openSettingsModal">Settings</button>
+      <button class="header-button" @click="goBack">Atrás</button>
+      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
+        :readonly="!isEditing" />
+      <div class="header-actions">
+        <button class="header-button" @click="guardarProyecto">Guardar</button>
+        <button class="header-button" @click="openSettingsModal">Configuración</button>
         <button class="header-button">💡</button>
       </div>
     </header>
+
+    <!-- Notificación -->
+    <div v-if="notification" class="notification">
+      <div class="notification-icon">❗</div>
+      <span>{{ notification }}</span>
+      <button class="notification-close" @click="clearNotification">X</button>
+    </div>
 
     <!-- Modal de Configuración -->
     <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
@@ -25,25 +26,14 @@
         <form @submit.prevent="saveSettings">
           <div class="input-group">
             <label for="project-title">Título del Proyecto</label>
-            <input
-              type="text"
-              id="project-title"
-              v-model="modalTitle"
-              class="modal-input"
-              placeholder="Escribe el título"
-            />
+            <input type="text" id="project-title" v-model="modalTitle" class="modal-input"
+              placeholder="Escribe el título" />
           </div>
-
           <div class="input-group">
             <label for="project-description">Descripción</label>
-            <textarea
-              id="project-description"
-              v-model="modalDescription"
-              class="modal-textarea"
-              placeholder="Escribe la descripción del proyecto"
-            ></textarea>
+            <textarea id="project-description" v-model="modalDescription" class="modal-textarea"
+              placeholder="Escribe la descripción del proyecto"></textarea>
           </div>
-
           <div class="modal-actions">
             <button type="submit" class="modal-button">Guardar</button>
             <button type="button" class="modal-button cancel" @click="closeSettingsModal">Cancelar</button>
@@ -59,13 +49,11 @@
         <div class="editor-label">HTML</div>
         <div ref="htmlEditor" class="code-editor"></div>
       </div>
-
       <!-- Editor de CSS -->
       <div class="editor-box">
         <div class="editor-label">CSS</div>
         <div ref="cssEditor" class="code-editor"></div>
       </div>
-
       <!-- Editor de JS -->
       <div class="editor-box">
         <div class="editor-label">JS</div>
@@ -74,67 +62,67 @@
     </div>
 
     <!-- Salida del código -->
-    <iframe class="output" :srcdoc="output"></iframe>
+    <div class="output-container">
+      <iframe class="output" :srcdoc="output"></iframe>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted, watch, onUnmounted } from "vue";
-import { useRouter } from "vue-router"; 
+import { ref, onMounted, computed, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
 import CodeMirror from "codemirror";
-import { useLliureStore } from '~/stores/app'
+import { useLliureStore } from "~/stores/app";
 import "codemirror/lib/codemirror.css";
-import "codemirror/theme/eclipse.css";
+import "codemirror/theme/dracula.css";
 import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
 import "codemirror/mode/javascript/javascript";
+import useCommunicationManager from "@/stores/comunicationManager";
 
 export default {
   setup() {
+    const router = useRouter();
+    const { guardarProyectoDB } = useCommunicationManager();
     const lliureStore = useLliureStore();
-    const router = useRouter();  
+
+    // Reactive state
+    const title = ref("Untitled");
     const html = ref("");
     const css = ref("");
     const js = ref("");
-    const title = ref("Untitled");  
+    const isEditing = ref(false);
+    const showSettingsModal = ref(false);
+    const notification = ref("");
+    const modalTitle = ref("");
+    const modalDescription = ref("");
 
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
     const jsEditor = ref(null);
-    const isEditing = ref(false);  
-    const showSettingsModal = ref(false); 
 
-    const modalTitle = ref(title.value);  
-    const modalDescription = ref("");     
+    let htmlEditorInstance, cssEditorInstance, jsEditorInstance;
 
-    let htmlEditorInstance = null;
-    let cssEditorInstance = null;
-    let jsEditorInstance = null;
-    onUnmounted(() => {
-      lliureStore.toggleLliure()
-    });
+    // Lifecycle hooks
     onMounted(() => {
-      lliureStore.toggleLliure()
-      console.log('has entrado en lliure');
+      lliureStore.toggleLliure();
+
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
         mode: "htmlmixed",
-        theme: "eclipse",
+        theme: "dracula",
         lineNumbers: true,
-        value: html.value,
       });
 
       cssEditorInstance = CodeMirror(cssEditor.value, {
         mode: "css",
-        theme: "eclipse",
+        theme: "dracula",
         lineNumbers: true,
-        value: css.value,
       });
 
       jsEditorInstance = CodeMirror(jsEditor.value, {
         mode: "javascript",
-        theme: "eclipse",
+        theme: "dracula",
         lineNumbers: true,
-        value: js.value,
       });
 
       htmlEditorInstance.on("change", (instance) => {
@@ -150,17 +138,16 @@ export default {
       });
     });
 
-    watch(modalTitle, (newTitle) => {
-      title.value = newTitle;
+    onUnmounted(() => {
+      lliureStore.toggleLliure();
     });
 
-    const goBack = () => {
-      router.push("/");  
-    };
+    // Functions
+    const goBack = () => router.push("/");
 
     const openSettingsModal = () => {
       showSettingsModal.value = true;
-      modalTitle.value = title.value;  
+      modalTitle.value = title.value;
     };
 
     const closeSettingsModal = () => {
@@ -168,30 +155,65 @@ export default {
     };
 
     const saveSettings = () => {
-      title.value = modalTitle.value;  
+      title.value = modalTitle.value;
       closeSettingsModal();
     };
 
-    return { 
-      html, css, js, htmlEditor, cssEditor, jsEditor, title, isEditing, goBack, 
-      openSettingsModal, closeSettingsModal, showSettingsModal, 
-      modalTitle, modalDescription, saveSettings
+    const guardarProyecto = async () => {
+      try {
+        await guardarProyectoDB({
+          nombre: title.value || '',
+          user_id: 1 || null,
+          html_code: html.value || '',
+          css_code: css.value || '',
+          js_code: js.value || '',
+        });
+        notification.value = "Proyecto guardado con éxito.";
+      } catch (error) {
+        notification.value = "Error al guardar el proyecto.";
+        console.error(error);
+      } finally {
+        setTimeout(() => (notification.value = ""), 3000);
+      }
     };
-  },
-  computed: {
-    output() {
-      return `
-        <html>
-          <head>
-            <style>${this.css}</style>
-          </head>
-          <body>
-            ${this.html}
-            <script>${this.js}<\/script>
-          </body>
-        </html>
-      `;
-    },
+
+    return {
+      title,
+      html,
+      css,
+      js,
+      htmlEditor,
+      cssEditor,
+      jsEditor,
+      isEditing,
+      showSettingsModal,
+      notification,
+      modalTitle,
+      modalDescription,
+      goBack,
+      openSettingsModal,
+      closeSettingsModal,
+      saveSettings,
+      guardarProyecto,
+      output: computed(() => {
+        let jsContent = js.value;
+        let scriptContent = `
+    try {
+      ${jsContent}
+    } catch (e) {
+      console.error('Error in JavaScript:', e);
+    }
+  `;
+        return `
+    <html>
+      <head><style>${css.value}</style></head>
+      <body>${html.value}
+        <script>${scriptContent}<\/script>
+      </body>
+    </html>`;
+      }),
+
+    };
   },
 };
 </script>
@@ -200,8 +222,9 @@ export default {
 .todo {
   display: flex;
   flex-direction: column;
-  background-color: #f4f4f4;
+  background-color: #1e1e1e;
   font-family: 'Arial', sans-serif;
+  color: #ffffff;
 }
 
 .header {
@@ -209,7 +232,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  background-color: black;
+  background-color: #2d2d2d;
   color: #fff;
 }
 
@@ -221,7 +244,6 @@ export default {
   padding: 8px;
   border-radius: 4px;
   text-align: center;
-  margin-right: 750px;
 }
 
 .header-actions {
@@ -257,7 +279,7 @@ export default {
   padding: 15px;
   border-radius: 6px;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
-  background-color: #fff;
+  background-color: #2d2d2d;
 }
 
 .editor-label {
@@ -276,84 +298,21 @@ export default {
   height: 300px;
   border: 1px solid #444;
   border-radius: 4px;
+  background-color: #1e1e1e;
+  color: #fff;
+}
+
+.output-container {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #f4f4f4;
 }
 
 .output {
-  height: 50%;
-  border: none;
-  border-radius: 8px;
-  border: 1px solid black;
-  margin-left: 20px;
-  margin-right: 20px;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.modal-content {
-  background-color: #fff;
-  padding: 30px;
-  border-radius: 8px;
-  width: 450px;
-  text-align: center;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.modal-content h2 {
-  margin-bottom: 20px;
-  font-size: 18px;
-  color: #333;
-}
-
-.input-group {
-  margin-bottom: 20px;
-}
-
-.modal-input,
-.modal-textarea {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-top: 5px;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.modal-button {
-  background-color: #444;
-  color: #fff;
   border: none;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-}
-
-.modal-button:hover {
-  background-color: #555;
-}
-
-.cancel {
-  background-color: #ccc;
-  color: #333;
-}
-
-.cancel:hover {
-  background-color: #bbb;
+  background-color: #fff;
+  border-radius: 8px;
 }
 </style>

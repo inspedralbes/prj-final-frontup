@@ -69,7 +69,27 @@
         return false;
       }
     };
-
+    const guardarProyectoDB = async (proyecto) => {
+      fetch('http://localhost:8000/api/projects',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(proyecto),
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error en la solicitud: ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Respuesta del servidor:', data);
+      })
+      .catch(error => {
+        console.error('Hubo un problema con el fetch:', error);
+      });
+    }
     const logoutUser = async () => {
       try {
         await request('/logout', 'POST');
@@ -86,6 +106,7 @@
       loginUser,
       registerUser,
       logoutUser,
+      guardarProyectoDB,
     };
   };
 
