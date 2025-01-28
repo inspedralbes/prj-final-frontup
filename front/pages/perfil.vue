@@ -1,24 +1,26 @@
 <template>
-  <div class="profile-page">
-    <h1>Perfil d'Usuari</h1>
-
-    <div v-if="user">
-      <img :src="user.avatar" alt="Avatar d'Usuari" class="avatar-image" />
-      <p><strong>Nombre:</strong> {{ user.name }}</p>
-      <p><strong>Correo Electrónico:</strong> {{ user.email }}</p>
-      <p><strong>Nivel:</strong> {{ user.nivel }}</p>
-
-      <form @submit.prevent="updateAvatar">
-        <input v-model="newAvatar" type="text" placeholder="Nom del nou avatar" class="input-field" />
+  <div class="todo"> 
+    <div class="profile-page">
+      <h1>Perfil d'Usuari</h1>
+    
+      <div v-if="user">
+        <img :src="user.avatar" alt="Avatar d'Usuari" class="avatar-image" />
+        <p><strong>Nombre: </strong> &nbsp;{{ user.name }}</p>
+        <p><strong>Correo Electrónico: </strong> &nbsp;{{ user.email }}</p>
+        <p><strong>Nivel:</strong> &nbsp;{{ user.nivel }}</p>
+        
+        <form @submit.prevent="updateAvatar">
+          <input v-model="newAvatar" type="text" placeholder="Nom del nou avatar" class="input-field" />
         <button type="submit">Actualitzar Avatar</button>
       </form>
 
-      <button @click="logout">Cerrar sesión</button>
+      <button class="logout" @click="logout">Cerrar sesión</button>
     </div>
     <div v-else>
       <p>No estàs autenticat.</p>
     </div>
   </div>
+</div>
 </template>
 
 <script setup>
@@ -101,43 +103,147 @@ const logout = () => {
 </script>
 
 <style scoped>
+.todo{
+  width: 100%;
+  height: 115vh;
+  background-color: black;
+}
 .profile-page {
-  width: 60%;
-  padding: 30px;
-  background-color: #404040;
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #1E1E1E;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin: 0 auto;
+  box-shadow: 0px 4px 12px rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.87);
+}
+
+h1 {
+  color: #90CAF9;
+  font-size: 2.125rem;
+  font-weight: 500;
+  margin-bottom: 2rem;
   text-align: center;
-}
-
-button {
-  padding: 10px;
-  background-color: #ff4d4d;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-button:hover {
-  background-color: #e03e3e;
+  transition: color 0.3s ease;
 }
 
 .avatar-image {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  margin: 10px auto;
   object-fit: cover;
-  border: 2px solid white;
+  margin: 1rem auto;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+  border: 3px solid #424242;
+  transition: transform 0.3s ease;
+  display: block;
+  margin: 1rem auto;
+}
+
+.avatar-image:hover {
+  transform: scale(1.05);
+}
+
+p {
+  font-size: 1rem;
+  margin: 1rem 0;
+  color: rgba(255, 255, 255, 0.87);
+  display: flex;
+  transition: color 0.3s ease;
+}
+
+strong {
+  font-weight: 500;
+  color: #90CAF9;
+  margin-right: 0.5rem;
+}
+
+form {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: #2D2D2D;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+form:hover {
+  background-color: #424242;
 }
 
 .input-field {
-  width: calc(100% - 20px);
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
+  width: 100%;
+  padding: 12px 16px;
+  margin: 8px 0;
+  border: none;
+  border-bottom: 2px solid #616161;
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.input-field:focus {
+  border-color: #90CAF9;
+  outline: none;
+}
+
+.input-field::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+button {
+  padding: 12px 24px;
+  margin: 8px;
+  border: none;
   border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button[type="submit"] {
+  background-color: #1976D2;
+  color: white;
+  box-shadow: 0px 2px 4px rgba(25, 118, 210, 0.3);
+}
+
+button[type="submit"]:hover {
+  background-color: #1565C0;
+  box-shadow: 0px 4px 8px rgba(25, 118, 210, 0.3);
+  transform: scale(1.05);
+}
+
+.logout {
+  background-color: #D32F2F;
+  color: white;
+  box-shadow: 0px 2px 4px rgba(211, 47, 47, 0.3);
+}
+
+.logout:hover {
+  background-color: #C62828;
+  box-shadow: 0px 4px 8px rgba(211, 47, 47, 0.3);
+  transform: scale(1.05);}
+
+@media (max-width: 600px) {
+  .profile-page {
+    width: 95%;
+    padding: 1rem;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  p {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  strong {
+    margin-bottom: 0.5rem;
+  }
 }
 </style>
