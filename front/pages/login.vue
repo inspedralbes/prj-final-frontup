@@ -27,10 +27,10 @@
       <h1>Crear nou compte</h1>
       <form @submit.prevent="register">
         <div>
-          <label for="name">Nom d'usuari:</label>
-          <input type="text" id="name" placeholder="Nom d'usuari" v-model="formData.name"
+          <label for="username">Nom d'usuari:</label>
+          <input type="text" id="username" placeholder="Nom d'usuari" v-model="formData.username"
             @blur="validateUsername" />
-          <p class="error" v-if="errors.name">{{ errors.name }}</p>
+          <p class="error" v-if="errors.username">{{ errors.username }}</p>
         </div>
         <div>
           <label for="email">Correu Electrònic:</label>
@@ -89,14 +89,14 @@ onMounted(() => {
 const formData = reactive({
   email: '',
   password: '',
-  name: '',
+  username: '',
   passwordRepeat: ''
 });
 
 const errors = reactive({
   email: '',
   password: '',
-  name: '',
+  username: '',
   passwordRepeat: ''
 });
 
@@ -112,7 +112,7 @@ const validateEmail = () => {
 };
 
 const validateUsername = () => {
-  errors.name = formData.name ? '' : 'El nombre de usuario es obligatorio';
+  errors.username = formData.username ? '' : 'El nombre de usuario es obligatorio';
 };
 
 const validatePassword = () => {
@@ -132,11 +132,11 @@ const isRegisterFormValid = () => {
   return (
     formData.email &&
     formData.password &&
-    formData.name &&
+    formData.username &&
     formData.passwordRepeat &&
     !errors.email &&
     !errors.password &&
-    !errors.name &&
+    !errors.username &&
     !errors.passwordRepeat
   );
 };
@@ -163,7 +163,7 @@ const login = async () => {
         appStore.setLoginInfo({
           loggedIn: true,
           token: data.token,
-          name: data.name,
+          username: data.username,
           email: data.email,
           nivel: data.nivel,
           avatar: data.avatar,
@@ -187,7 +187,7 @@ const register = async () => {
   validatePasswordRepeat();
 
   if (isRegisterFormValid()) {
-    const avatarUrl = `https://api.multiavatar.com/${formData.name}.png`;
+    const avatarUrl = `https://api.multiavatar.com/${formData.username}.png`;
 
     try {
       const response = await fetch('http://127.0.0.1:8000/api/register', {
@@ -220,7 +220,7 @@ const register = async () => {
           appStore.setLoginInfo({
             loggedIn: true,
             token: loginData.token,
-            name: loginData.name,
+            username: loginData.username,
             email: loginData.email,
             nivel: loginData.nivel,
             avatar: avatarUrl,

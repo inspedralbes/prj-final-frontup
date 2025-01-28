@@ -57,10 +57,7 @@ class AuthenticatorController extends Controller
             'status' => 'success',
             'user' => $user,
         ]);
-    }
-
-    
-    
+    }    
 
     /**
      * Register a new user.
