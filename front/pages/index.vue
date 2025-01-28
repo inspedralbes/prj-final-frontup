@@ -39,11 +39,11 @@
     </div>
     <br><br>
     <!-- Footer -->
-    <footer>
-      <p>© 2025 FrontUp</p>
-    </footer>
   </div>
 </div>
+<footer>
+  <p>© 2025 FrontUp</p>
+</footer>
 </template>
 
 <script>
@@ -56,8 +56,6 @@ export default {
 
 .todo{
   background-color: rgb(177, 162, 162);
-  margin-right: -8px;
-  margin-bottom: -8px;
 }
 .main-container {
   margin-top: 80px;
@@ -122,9 +120,5 @@ footer {
   text-align: center;
   padding: 10px 20px;
   color: white;
-  margin-top: 150px;
-  margin-left: -50px;
-  margin-right : -20px; 
-  margin-bottom: -20px;
 }
 </style>

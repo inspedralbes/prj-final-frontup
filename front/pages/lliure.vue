@@ -227,12 +227,14 @@ export default {
 </script>
 
 <style scoped>
+
 .todo {
   display: flex;
   flex-direction: column;
   background-color: #121212;
   font-family: 'Arial', sans-serif;
   color: #ffffff;
+  
 }
 
 .header {
@@ -252,6 +254,7 @@ export default {
   padding: 8px;
   border-radius: 4px;
   text-align: center;
+  margin-right: 750px;
 }
 
 .header-actions {
@@ -285,7 +288,7 @@ export default {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 5px;
   border-radius: 8px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   background-color: #1e1e1e;
@@ -293,8 +296,8 @@ export default {
 
 .editor-label {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 17px;
+  left: 20px;
   font-size: 16px;
   color: #fff;
   background-color: #333;
@@ -303,8 +306,8 @@ export default {
 }
 
 .code-editor {
-  margin-top: 40px;
-  height: 350px; 
+  margin-top: 50px;
+  height: 322px; 
   width: 100%;
   border: 1px solid #333;
   border-radius: 4px;
@@ -315,16 +318,15 @@ export default {
 }
 
 .output-container {
-  background-color: #121212;
   position: relative;
   transition: all 0.3s ease-in-out;
+  background-color: white;
 }
 
 .output-container.expanded {
   position: fixed;
   width: 100vw;
   height: 100vh;
-  background-color: #000;
 }
 
 .output-container.expanded .output {
