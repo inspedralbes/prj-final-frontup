@@ -45,16 +45,22 @@ class AuthenticatorController extends Controller
             'message' => 'Logged out successfully',
         ]);
     }
-
     public function getUser(Request $request)
     {
         $user = $request->user();
+
+        if (!filter_var($user->avatar, FILTER_VALIDATE_URL)) {
+            $user->avatar = 'https://api.multiavatar.com/' . urlencode($user->name) . '.png';
+        }
 
         return response()->json([
             'status' => 'success',
             'user' => $user,
         ]);
     }
+
+    
+    
 
     /**
      * Register a new user.
@@ -73,14 +79,12 @@ class AuthenticatorController extends Controller
             $user = new User();
             $user->name = $data['username'];
             $user->email = $data['email'];
-            $user->password = Hash::make($data['password']); 
-            $user->avatar = $data['avatar'] ?? 'default-avatar.png'; 
-            $user->nivel = $data['nivel'] ?? 1; 
+            $user->password = Hash::make($data['password']);
+            $user->avatar = $data['avatar'] ?? 'https://api.multiavatar.com/' . urlencode($data['username']) . '.png';
+            $user->nivel = $data['nivel'] ?? 1;
             $user->save();
 
-            // Crear un token para el usuario
             $token = $user->createToken('auth_token')->plainTextToken;
-            Auth::login($user);
 
             return response()->json([
                 'status' => 'success',
@@ -95,4 +99,31 @@ class AuthenticatorController extends Controller
             ], 500);
         }
     }
+
+
+    public function updateAvatar(Request $request)
+    {
+        $user = $request->user();
+
+        $data = $request->validate([
+            'avatar' => 'required|string', // URL o nom del nou avatar
+        ]);
+
+        try {
+            $user->avatar = $data['avatar'];
+            $user->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Avatar actualizado correctamente',
+                'user' => $user,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No se pudo actualizar el avatar: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }
