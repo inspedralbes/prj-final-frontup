@@ -20,7 +20,7 @@
         </div>
         <button type="submit" :disabled="!isLoginFormValid()">Ingresar</button>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-        <p>¿No tienes cuenta?</p>
+        <p>¿No tens compte?</p>
         <div :class="{ active: showRegister }">
           <button class="button1" @click="toggleRegister">Registra't aquí</button>
         </div>
@@ -32,7 +32,7 @@
       <form class="form" @submit.prevent="register">
         <p>Crear nou compte</p>
         <div class="field">
-          <label for="username">Nom d'usuari:</label>
+          <svg viewBox="0 0 19 19" fill="none" width="16" height="16" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
           <input type="text" class="input-field" id="username" placeholder="Nom d'usuari" v-model="formData.username"
             @blur="validateUsername" />
           <p class="error" v-if="errors.username">{{ errors.username }}</p>
@@ -46,12 +46,16 @@
           <p class="error" v-if="errors.email">{{ errors.email }}</p>
         </div>
         <div class="field">
-          <label for="password">Contraseña:</label>
+          <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path>
+          </svg>
           <input type="password" class="input-field" id="password" placeholder="Contrasenya" v-model="formData.password" @blur="validatePassword" />
           <p class="error" v-if="errors.password">{{ errors.password }}</p>
         </div>
         <div class="field">
-          <label for="passwordRepeat">Repetir Contrasenya:</label>
+          <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path>
+          </svg>
           <input type="password" class="input-field" id="passwordRepeat" placeholder="Repetir contrasenya" v-model="formData.passwordRepeat"
             @blur="validatePasswordRepeat" />
           <p class="error" v-if="errors.passwordRepeat">{{ errors.passwordRepeat }}</p>
