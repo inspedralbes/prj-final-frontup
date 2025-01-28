@@ -166,7 +166,7 @@ const login = async () => {
           name: data.name,
           email: data.email,
           nivel: data.nivel,
-          image: data.image,
+          avatar: data.avatar,
           imageId: data.imageId,
         });
         router.push('/');
@@ -185,14 +185,20 @@ const register = async () => {
   validateUsername();
   validatePassword();
   validatePasswordRepeat();
+
   if (isRegisterFormValid()) {
+    const avatarUrl = `https://api.multiavatar.com/${formData.name}.png`;
+
     try {
       const response = await fetch('http://127.0.0.1:8000/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          avatar: avatarUrl,
+        }),
       });
 
       const data = await response.json();
@@ -210,7 +216,6 @@ const register = async () => {
         });
 
         const loginData = await loginResponse.json();
-
         if (loginResponse.ok) {
           appStore.setLoginInfo({
             loggedIn: true,
@@ -218,8 +223,7 @@ const register = async () => {
             name: loginData.name,
             email: loginData.email,
             nivel: loginData.nivel,
-            image: loginData.image,
-            imageId: loginData.imageId,
+            avatar: avatarUrl,
           });
 
           router.push('/');
@@ -235,6 +239,7 @@ const register = async () => {
     }
   }
 };
+
 </script>
 
 <style scoped>

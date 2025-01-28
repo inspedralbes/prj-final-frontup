@@ -1,15 +1,17 @@
 <template>
   <div class="profile-page">
-    <h1>Perfil del Usuario</h1>
+    <h1>Perfil d'Usuari</h1>
 
     <div v-if="user">
-      <p><strong>Nombre:</strong> {{ user.name || 'No disponible' }}</p>
-      <p><strong>Correo Electrónico:</strong> {{ user.email || 'No disponible' }}</p>
-      <p><strong>Nivel:</strong> {{ user.nivel || 'No disponible' }}</p>
+      <p><strong>Avatar:</strong></p>
+      <img :src="user.avatar" alt="Avatar d'Usuari" class="avatar-image" />
+      <p><strong>Nombre:</strong> {{ user.name }}</p>
+      <p><strong>Correo Electrónico:</strong> {{ user.email }}</p>
+      <p><strong>Nivel:</strong> {{ user.nivel }}</p>
       <button @click="logout">Cerrar sesión</button>
     </div>
     <div v-else>
-      <p>No estás autenticado.</p>
+      <p>No estàs autenticat.</p>
     </div>
   </div>
 </template>
@@ -43,8 +45,14 @@ const fetchUserData = async (token) => {
 
     if (response.ok) {
       const data = await response.json();
-      console.log(data); 
-      user.value = data.user;
+      console.log(data);
+
+      if (data.user) {
+        const avatarUrl = `https://api.multiavatar.com/${data.user.name}.png`;
+        user.value = { ...data.user, avatar: avatarUrl };
+      } else {
+        console.error('No es va trobar informació d\'usuari');
+      }
     } else {
       console.error('No se pudo obtener los detalles del usuario');
     }
@@ -52,7 +60,6 @@ const fetchUserData = async (token) => {
     console.error('Error al obtener los datos del usuario:', error);
   }
 };
-
 
 const logout = () => {
   appStore.logout(); 
@@ -83,4 +90,14 @@ button {
 button:hover {
   background-color: #e03e3e;
 }
+
+.avatar-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin: 10px auto;
+  object-fit: cover;
+  border: 2px solid white;
+}
+
 </style>
