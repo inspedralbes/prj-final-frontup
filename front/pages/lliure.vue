@@ -61,11 +61,9 @@
     <!-- Salida del código -->
     <div class="output-container" :class="{ expanded: isExpanded }" ref="outputContainer">
       <button class="expand-button" @click="toggleExpand">
-        <!-- Usar SVG como icono en lugar de texto -->
         <img v-if="!isExpanded" src="/assets/img/pantalla-grande.svg" alt="Pantalla Grande" width="30" />
         <img v-if="isExpanded" src="/assets/img/pantalla-pequeña.svg" alt="Pantalla Pequeña" width="30" />
       </button>
-      <!-- Barra de redimensionamiento -->
       <div class="resize-bar" @mousedown="startResize"></div>
       <iframe class="output" :srcdoc="output"></iframe>
     </div>
@@ -226,16 +224,17 @@ export default {
     };
   },
 };
-
 </script>
 
 <style scoped>
+
 .todo {
   display: flex;
   flex-direction: column;
-  background-color: #1e1e1e;
+  background-color: #121212;
   font-family: 'Arial', sans-serif;
   color: #ffffff;
+  
 }
 
 .header {
@@ -243,43 +242,45 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  background-color: #2d2d2d;
+  background-color: #1e1e1e;
   color: #fff;
 }
 
 .header-title {
   font-size: 15px;
   color: #fff;
-  background-color: #444;
+  background-color: #333;
   border: none;
   padding: 8px;
   border-radius: 4px;
   text-align: center;
+  margin-right: 750px;
 }
 
 .header-actions {
   display: flex;
-  gap: 10px;
+  gap: 15px;
 }
 
 .header-button {
-  background-color: #555;
+  background-color: #444;
   border: none;
   color: #fff;
-  padding: 8px 12px;
-  border-radius: 4px;
+  padding: 10px 15px;
+  border-radius: 5px;
   cursor: pointer;
   font-size: 14px;
+  transition: background-color 0.3s;
 }
 
 .header-button:hover {
-  background-color: #777;
+  background-color: #666;
 }
 
 .editor-container {
   display: flex;
-  gap: 20px;
-  margin-top: 10px;
+  gap: 30px;
+  margin-top: 20px;
 }
 
 .editor-box {
@@ -287,46 +288,45 @@ export default {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 15px;
-  border-radius: 6px;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
-  background-color: #2d2d2d;
+  padding: 5px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: #1e1e1e;
 }
 
 .editor-label {
   position: absolute;
-  top: 15px;
-  left: 15px;
+  top: 17px;
+  left: 20px;
   font-size: 16px;
   color: #fff;
-  background-color: #444;
-  padding: 4px 8px;
-  border-radius: 3px;
+  background-color: #333;
+  padding: 4px 10px;
+  border-radius: 5px;
 }
 
 .code-editor {
-  margin-top: 40px;
-  height: 320px; 
-  width: 400px; 
-  border: 1px solid #444;
+  margin-top: 50px;
+  height: 322px; 
+  width: 100%;
+  border: 1px solid #333;
   border-radius: 4px;
-  background-color: #1e1e1e;
+  background-color: #121212;
   color: #fff; 
-  padding: 10px; 
+  padding: 10px;
   box-sizing: border-box; 
 }
 
 .output-container {
-  background-color: #f4f4f4;
   position: relative;
   transition: all 0.3s ease-in-out;
+  background-color: white;
 }
 
 .output-container.expanded {
   position: fixed;
   width: 100vw;
   height: 100vh;
-  background-color: #000;
 }
 
 .output-container.expanded .output {
@@ -336,15 +336,18 @@ export default {
 .expand-button {
   position: absolute;
   top: 10px;
-  left: 10px;
+  right: 10px;
   border: none;
   padding: 8px 12px;
   border-radius: 4px;
   cursor: pointer;
+  opacity: 0.5;
+  background-color: white;
 }
 
 .expand-button:hover {
-  background-color: #666;
+  opacity: 1;
+  background-color: white;
 }
 
 .output {
@@ -354,14 +357,63 @@ export default {
   background-color: #ffffff;
 }
 
-.svg-container {
+.modal-overlay {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
-  padding: 20px;
+  align-items: center;
+  z-index: 1000;
 }
 
-.svg-container img {
-  max-width: 100%;
-  height: auto;
+.modal-content {
+  background-color: #2d2d2d;
+  padding: 30px;
+  border-radius: 10px;
+  width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: #fff;
+}
+
+.modal-input,
+.modal-textarea {
+  width: 100%;
+  padding: 12px;
+  background-color: #444;
+  color: #fff;
+  border-radius: 5px;
+  border: none;
+  margin-top: 10px;
+  box-sizing: border-box;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.modal-button {
+  background-color: #555;
+  border: none;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal-button:hover {
+  background-color: #777;
+}
+
+.cancel {
+  background-color: #888;
+  margin-left: 10px;
+}
+
+.cancel:hover {
+  background-color: #aaa;
 }
 </style>
