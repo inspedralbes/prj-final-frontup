@@ -90,7 +90,7 @@ const formData = reactive({
   email: '',
   password: '',
   name: '',
-  passwordRepeat: ''
+  avatar: avatarUrl || 'avatar'
 });
 
 const errors = reactive({
@@ -195,10 +195,7 @@ const register = async () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          avatar: avatarUrl,
-        }),
+        body: JSON.stringify({formData}),
       });
 
       const data = await response.json();
