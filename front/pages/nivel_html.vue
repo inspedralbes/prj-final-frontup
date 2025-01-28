@@ -1,6 +1,6 @@
 <template>
-  <button class="back-button" @click="irAtras">Atrás</button>
   <div class="level-container">
+    <button class="back-button" @click="irAtras">Atrás</button>
     <div
       v-for="level in levels"
       :key="level.id"
@@ -8,13 +8,14 @@
     >
       <div
         class="level-button"
-        @click="ir_nivel(level.id)"
+        :class="{ locked: level.locked }"
+        @click="!level.locked && ir_nivel(level.id)"
         @mouseenter="hoveredLevel = level.id"
         @mouseleave="hoveredLevel = null"
       >
         {{ level.id }}
+        <div v-if="level.locked" class="lock-icon">🔒</div>
       </div>
-      <div v-if="hoveredLevel === level.id" class="hover-text">Nivel {{ level.id }}</div>
     </div>
   </div>
 </template>
@@ -25,6 +26,7 @@ export default {
     return {
       levels: Array.from({ length: 10 }, (_, i) => ({
         id: i + 1,
+        locked: i !== 0, // Solo el primer nivel está desbloqueado
       })),
       hoveredLevel: null,
     };
@@ -43,17 +45,18 @@ export default {
 <style>
 .level-container {
   position: relative;
-  width: 600px;
-  height: 800px;
-  margin: auto;
+  height: 99vh;
+  width: 90%;
+  margin-left: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  background-color: #f9f9f9;  
+  background-color: #202020;
   border: 1px solid #ddd;
   border-radius: 10px;
+  background-size: cover;
+  background-position: center;
 }
 
 .level-button-container {
@@ -67,7 +70,8 @@ export default {
 .level-button {
   width: 80px;
   height: 80px;
-  background-color: gray;
+  background-color: #3498db;
+  transform: scale(1.03);
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -75,48 +79,62 @@ export default {
   font-weight: bold;
   color: white;
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
 }
 
 .level-button:hover {
-  transform: scale(1.2);
-  background-color: black;
+  background-color: #2980b9;
+  transform: scale(1.1);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
 }
 
-.hover-text {
-  margin-top: 10px;
-  font-size: 14px;
-  color: black;
-  font-weight: bold;
+/* 🔒 Estilo para niveles bloqueados */
+.level-button.locked {
+  background-color: #7f8c8d;
+  cursor: not-allowed;
 }
 
-.level-button-container:nth-child(1) { top: 90%; left: 55%; transform: translate(-50%, -50%); }
-.level-button-container:nth-child(2) { top: 75%; left: 20%; }
-.level-button-container:nth-child(3) { top: 70%; left: 80%; }
-.level-button-container:nth-child(4) { top: 60%; left: 25%; }
-.level-button-container:nth-child(5) { top: 50%; left: 75%; }
-.level-button-container:nth-child(6) { top: 40%; left: 30%; }
-.level-button-container:nth-child(7) { top: 30%; left: 70%; }
-.level-button-container:nth-child(8) { top: 20%; left: 35%; }
-.level-button-container:nth-child(9) { top: 10%; left: 65%; }
-.level-button-container:nth-child(10) { top: 0%; left: 50%; }
+.level-button.locked:hover {
+  background-color: #7f8c8d;
+  transform: scale(1.03);
+}
 
+.lock-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+}
+
+
+.level-button-container:nth-child(2) { top: 50%; left: 10%; }
+.level-button-container:nth-child(3) { top: 30%; left: 20%; }
+.level-button-container:nth-child(4) { top: 50%; left: 30%; }
+.level-button-container:nth-child(5) { top: 30%; left: 40%; }
+.level-button-container:nth-child(6) { top: 50%; left: 50%; }
+.level-button-container:nth-child(7) { top: 30%; left: 60%; }
+.level-button-container:nth-child(8) { top: 50%; left: 70%; }
+.level-button-container:nth-child(9) { top: 30%; left: 80%; }
+.level-button-container:nth-child(10) { top: 50%; left: 90%; }
+.level-button-container:nth-child(11) { top: 50%; left: 90%; }
 .back-button {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 20px;
+  left: 75%;
   padding: 10px 20px;
-  background-color: gray;
+  background-color: #34495e;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
   transition: background-color 0.3s;
+  z-index: 10; /* Asegura que el botón esté por encima de otros elementos */
 }
 
 .back-button:hover {
-  background-color: black;
+  background-color: #2c3e50;
 }
 </style>
