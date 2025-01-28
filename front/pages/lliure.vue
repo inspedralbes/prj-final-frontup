@@ -308,7 +308,7 @@ export default {
 .code-editor {
   margin-top: 50px;
   height: 322px; 
-  width: 64vh;
+  width: 31vw;
   border: 1px solid #333;
   border-radius: 4px;
   background-color: #121212;
