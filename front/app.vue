@@ -7,7 +7,7 @@
       <button class="btn">Els meus projectes</button>
       <button class="btn" @click="navigateToLliure">Lliure</button>
       <button class="btn" @click="navigateToNiveles">Nivells</button>
-      <button class="btn">Projectes favorits</button>
+      <button class="btn" @click="navigateToProjectes">Projectes favorits</button>
     </div>
 
     <header>
@@ -71,6 +71,9 @@ const navigateToLogin = () => {
 
 const navigateToProfile = () => {
   router.push('/perfil')
+}
+const navigateToProjectes = () => {
+  router.push('/projectes')
 }
 </script>
 
