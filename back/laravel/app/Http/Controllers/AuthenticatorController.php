@@ -21,7 +21,6 @@ class AuthenticatorController extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return response()->json([
@@ -32,10 +31,12 @@ class AuthenticatorController extends Controller
             ]);
         }
 
-        return response()->json(['status' => 'error', 'message' => 'Credencials incorrectes'], 401);
+        return response()->json(['status' => 'error', 'message' => 'Credenciales incorrectas'], 401);
     }
 
-
+    /**
+     * Logout the authenticated user.
+     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
@@ -45,19 +46,6 @@ class AuthenticatorController extends Controller
             'message' => 'Logged out successfully',
         ]);
     }
-    public function getUser(Request $request)
-    {
-        $user = $request->user();
-
-        if (!filter_var($user->avatar, FILTER_VALIDATE_URL)) {
-            $user->avatar = 'https://api.multiavatar.com/' . urlencode($user->name) . '.png';
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'user' => $user,
-        ]);
-    }    
 
     /**
      * Register a new user.
@@ -68,18 +56,16 @@ class AuthenticatorController extends Controller
             'username' => 'required|string|min:3',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:4',
-            'avatar' => 'nullable|string',
-            'nivel' => 'integer|min:1',
         ]);
 
         try {
-            $user = new User();
-            $user->name = $data['username'];
-            $user->email = $data['email'];
-            $user->password = Hash::make($data['password']);
-            $user->avatar = $data['avatar'] ?? 'https://api.multiavatar.com/' . urlencode($data['username']) . '.png';
-            $user->nivel = $data['nivel'] ?? 1;
-            $user->save();
+            $user = User::create([
+                'name' => $data['username'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'avatar' => 'https://api.multiavatar.com/' . urlencode($data['username']) . '.png',
+                'nivel' => 1,
+            ]);
 
             $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -96,31 +82,4 @@ class AuthenticatorController extends Controller
             ], 500);
         }
     }
-
-
-    public function updateAvatar(Request $request)
-    {
-        $user = $request->user();
-
-        $data = $request->validate([
-            'avatar' => 'required|string', // URL o nom del nou avatar
-        ]);
-
-        try {
-            $user->avatar = $data['avatar'];
-            $user->save();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Avatar actualizado correctamente',
-                'user' => $user,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'No se pudo actualizar el avatar: ' . $e->getMessage(),
-            ], 500);
-        }
-    }
-
 }
