@@ -5,16 +5,16 @@
     
       <div v-if="user">
         <img :src="user.avatar" alt="Avatar d'Usuari" class="avatar-image" />
-        <p><strong>Nombre: </strong> &nbsp;{{ user.name }}</p>
-        <p><strong>Correo Electrónico: </strong> &nbsp;{{ user.email }}</p>
-        <p><strong>Nivel:</strong> &nbsp;{{ user.nivel }}</p>
+        <p><strong>Nom: </strong> &nbsp;{{ user.name }}</p>
+        <p><strong>Correu Electrònic: </strong> &nbsp;{{ user.email }}</p>
+        <p><strong>Nivell:</strong> &nbsp;{{ user.nivel }}</p>
         
         <form @submit.prevent="updateAvatar">
           <input v-model="newAvatar" type="text" placeholder="Nom del nou avatar" class="input-field" />
         <button type="submit">Actualitzar Avatar</button>
       </form>
 
-      <button class="logout" @click="logout">Cerrar sesión</button>
+      <button class="logout" @click="logout">Tancar sessió</button>
     </div>
     <div v-else>
       <p>No estàs autenticat.</p>
@@ -106,7 +106,7 @@ const logout = () => {
 .todo{
   width: 100%;
   height: 115vh;
-  background-color: black;
+  background-color: rgb(31, 29, 29);
 }
 .profile-page {
   max-width: 600px;
