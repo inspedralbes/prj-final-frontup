@@ -10,21 +10,33 @@
         <button class="header-button">💡</button>
       </div>
     </header>
-    <h1>Bienvenido al nivel {{ levelId }}</h1>
 
-    <!-- Contenedor de Editor y Salida -->
+    <div class="exercise-instructions">
+      <p>
+        <strong>Instrucciones:</strong> Crea la estructura básica de una página web con los siguientes elementos:
+      </p>
+      <ul>
+        <li>Un <code>&lt;head&gt;</code> que incluya un título (<code>&lt;title&gt;</code>).</li>
+        <li>Un <code>&lt;body&gt;</code> con un encabezado (<code>&lt;h1&gt;</code>), un párrafo (<code>&lt;p&gt;</code>) y un enlace (<code>&lt;a&gt;</code>).</li>
+      </ul>
+    </div>
+
     <div class="editor-output-wrapper">
-      <!-- Editor de HTML -->
+      
       <div class="editor-box">
         <div class="editor-label">HTML</div>
         <div ref="htmlEditor" class="code-editor"></div>
       </div>
 
-      <!-- Salida HTML -->
+      <div class="submit-container">
+      <button class="submit-button" @click="validateExercise">Enviar</button>
+    </div>
+
       <div class="output-container">
         <iframe class="output" :srcdoc="output"></iframe>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -32,55 +44,32 @@
 import { ref, onMounted, computed, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import CodeMirror from "codemirror";
-import { useLliureStore } from "~/stores/app";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
 import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
 import "codemirror/mode/javascript/javascript";
-import useCommunicationManager from "@/stores/comunicationManager";
-
+import { useLliureStore } from "~/stores/app";
 export default {
   setup() {
     const router = useRouter();
-    const { guardarProyectoDB } = useCommunicationManager();
     const lliureStore = useLliureStore();
 
-    // Reactive state
     const title = ref("Untitled");
     const html = ref("");
     const css = ref("");
     const js = ref("");
     const isEditing = ref(false);
-    const showSettingsModal = ref(false);
-    const notification = ref("");
-    const modalTitle = ref("");
-    const modalDescription = ref("");
 
     const htmlEditor = ref(null);
-    const cssEditor = ref(null);
-    const jsEditor = ref(null);
-
-    let htmlEditorInstance, cssEditorInstance, jsEditorInstance;
-
-    // Lifecycle hooks
+    let htmlEditorInstance;
+    onUnmounted(() => {
+      lliureStore.toggleLliure();
+    });
     onMounted(() => {
       lliureStore.toggleLliure();
-
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
         mode: "htmlmixed",
-        theme: "dracula",
-        lineNumbers: true,
-      });
-
-      cssEditorInstance = CodeMirror(cssEditor.value, {
-        mode: "css",
-        theme: "dracula",
-        lineNumbers: true,
-      });
-
-      jsEditorInstance = CodeMirror(jsEditor.value, {
-        mode: "javascript",
         theme: "dracula",
         lineNumbers: true,
       });
@@ -88,54 +77,26 @@ export default {
       htmlEditorInstance.on("change", (instance) => {
         html.value = instance.getValue();
       });
-
-      cssEditorInstance.on("change", (instance) => {
-        css.value = instance.getValue();
-      });
-
-      jsEditorInstance.on("change", (instance) => {
-        js.value = instance.getValue();
-      });
     });
 
-    onUnmounted(() => {
-      lliureStore.toggleLliure();
-    });
-
-    // Functions
     const goBack = () => router.push("/");
 
-    const openSettingsModal = () => {
-      showSettingsModal.value = true;
-      modalTitle.value = title.value;
-    };
+    const validateExercise = () => {
+  const htmlContent = html.value.trim().toLowerCase();
 
-    const closeSettingsModal = () => {
-      showSettingsModal.value = false;
-    };
+  const hasHead = /<head>.*<\/head>/s.test(htmlContent);
+  const hasBody = /<body>.*<\/body>/s.test(htmlContent);
+  const hasTitle = /<title>.*<\/title>/s.test(htmlContent); 
+  const hasH1 = /<h1>.*<\/h1>/s.test(htmlContent);
+  const hasP = /<p>.*<\/p>/s.test(htmlContent);
+  const hasA = /<a\s+href=.*?>.*<\/a>/s.test(htmlContent);
 
-    const saveSettings = () => {
-      title.value = modalTitle.value;
-      closeSettingsModal();
-    };
-
-    const guardarProyecto = async () => {
-      try {
-        await guardarProyectoDB({
-          nombre: title.value || '',
-          user_id: 1 || null,
-          html_code: html.value || '',
-          css_code: css.value || '',
-          js_code: js.value || '',
-        });
-        notification.value = "Proyecto guardado con éxito.";
-      } catch (error) {
-        notification.value = "Error al guardar el proyecto.";
-        console.error(error);
-      } finally {
-        setTimeout(() => (notification.value = ""), 3000);
-      }
-    };
+  if (hasHead && hasBody && hasTitle && hasH1 && hasP && hasA) {
+    alert("¡Ejercicio completado correctamente!");
+  } else {
+    alert("Revisa tu código. Asegúrate de incluir <head>, <body>, <title>, <h1>, <p> y <a>.");
+  }
+};
 
     return {
       title,
@@ -143,34 +104,25 @@ export default {
       css,
       js,
       htmlEditor,
-      cssEditor,
-      jsEditor,
       isEditing,
-      showSettingsModal,
-      notification,
-      modalTitle,
-      modalDescription,
       goBack,
-      openSettingsModal,
-      closeSettingsModal,
-      saveSettings,
-      guardarProyecto,
+      validateExercise,
       output: computed(() => {
         let jsContent = js.value;
         let scriptContent = `
-    try {
-      ${jsContent}
-    } catch (e) {
-      console.error('Error in JavaScript:', e);
-    }
-  `;
+          try {
+            ${jsContent}
+          } catch (e) {
+            console.error('Error in JavaScript:', e);
+          }
+        `;
         return `
-    <html>
-      <head><style>${css.value}</style></head>
-      <body>${html.value}
-        <script>${scriptContent}<\/script>
-      </body>
-    </html>`;
+          <html>
+            <head><style>${css.value}</style></head>
+            <body>${html.value}
+              <script>${scriptContent}<\/script>
+            </body>
+          </html>`;
       }),
     };
   },
@@ -181,98 +133,118 @@ export default {
 .todo {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   background-color: #000000;
   font-family: 'Arial', sans-serif;
-  color: #000000;
+  color: #ffffff;
   height: 100vh;
   box-sizing: border-box;
 }
 
-h1 {
-  text-align: center;
-  font-size: 2rem;
-  color: #4caf50;
-  margin-bottom: 20px;
-}
-
 .header {
+  position: fixed;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 20px;
+  padding: 10px 15px; 
   background-color: #2d2d2d;
   color: #fff;
+  width: 100%;
+  height: 10%;
+  box-sizing: border-box;
 }
 
 .header-title {
-  font-size: 15px;
+  font-size: 16px; 
   color: #fff;
   background-color: #444;
   border: none;
-  padding: 8px;
+  padding: 6px;
   border-radius: 4px;
   text-align: center;
 }
 
 .header-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px; 
 }
 
 .header-button {
   background-color: #555;
   border: none;
   color: #fff;
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .header-button:hover {
   background-color: #777;
 }
 
-.editor-output-wrapper {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
-  margin-top: 20px;
+.exercise-instructions {
+  margin-top: 100px; 
+  background-color: #1e1e1e;
+  color: #fff;
+  padding: 8px 15px; 
+  border-radius: 6px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.3);
+  max-width: 750px; 
 }
 
-.editor-box, .output-container {
+.editor-output-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px; 
+  width: 100%;
+  max-width: 1000px;
+  margin-top: 30px; 
+  box-sizing: border-box;
+ 
+}
+
+.editor-box,
+.output-container {
   flex: 1;
-  max-width: 50%;
+  max-width: 100%; 
   border-radius: 6px;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .editor-box {
   background-color: #2d2d2d;
-  padding: 15px;
+  padding: 10px; 
+  display: flex;
+  flex-direction: column;
 }
 
 .editor-label {
-  margin-bottom: 10px;
-  font-size: 16px;
+  margin-bottom: 8px;
+  font-size: 15px; 
   color: #fff;
   background-color: #444;
-  padding: 4px 8px;
+  padding: 4px 6px;
   border-radius: 3px;
+  text-align: center;
 }
 
 .code-editor {
+  flex: 1;
   border: 1px solid #444;
   border-radius: 4px;
   background-color: #1e1e1e;
   color: #fff;
+  width: 31vw;
 }
 
 .output-container {
   background-color: #fff;
   overflow: hidden;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+  height: 100%;
 }
 
 .output {
@@ -282,4 +254,21 @@ h1 {
   background-color: #ffffff;
   border-radius: 10px;
 }
+
+.submit-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 300px;
+}
+
+.submit-button:hover {
+  background-color: #45a049;
+}
+
 </style>
+
