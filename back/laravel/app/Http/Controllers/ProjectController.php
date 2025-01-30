@@ -6,15 +6,21 @@ use App\Models\Project;
 
 class ProjectController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $projects = Project::all();
-        
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Usuario no autenticado'], 401);
+        }
+        $projects = Project::where('user_id', $user->id)->get();
+
         return response()->json([
             'message' => 'Proyectos obtenidos con éxito',
             'projects' => $projects,
         ], 200);
     }
+
 
     public function show($id)
     {

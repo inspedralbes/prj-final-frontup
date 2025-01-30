@@ -1,29 +1,33 @@
 <template>
-  <router-view />
-  <div id="app" v-if="!lliureStore.lliure">
-    <!-- Barra lateral y barra superior -->
+  <div id="app" :class="theme">
+    <!-- Barra lateral -->
     <div class="left-section">
       <h2>FrontUp</h2>
-      <button class="btn">Els meus projectes</button>
+      <button class="btn" @click="navigateProjects" v-if="appStore.isLoggedIn">Els meus projectes</button>
       <button class="btn" @click="navigateToLliure">Lliure</button>
       <button class="btn" @click="navigateToNiveles">Nivells</button>
       <button class="btn">Projectes favorits</button>
     </div>
 
-    <header>
-      <div class="header-left">
-        <input class="search-box" type="text" placeholder="Buscar...">
-      </div>
-      <div class="header-right">
-        <button @click="toggleTheme" class="btn">{{ themeIcon }}</button>
-        <button class="btn" @click="navigateProjects" v-if="appStore.isLoggedIn">Projectes</button>
-        <button class="btn" @click="navigateToProfile" v-if="appStore.isLoggedIn">Mi Perfil</button>
-        <button class="btn" @click="navigateToLogin" v-else>{{ loginText }}</button>
-
-      </div>
-    </header>
-
     <!-- Contenido principal -->
+    <div class="main-content">
+      <!-- Barra superior -->
+      <header>
+        <div class="header-left">
+          <input class="search-box" type="text" placeholder="Buscar...">
+        </div>
+        <div class="header-right">
+          <button @click="toggleTheme" class="btn">{{ themeIcon }}</button>
+          <button class="btn" @click="navigateToProfile" v-if="appStore.isLoggedIn">Mi Perfil</button>
+          <button class="btn" @click="navigateToLogin" v-else>{{ loginText }}</button>
+        </div>
+      </header>
+
+      <!-- Vista del router -->
+      <div class="content-wrapper">
+        <router-view />
+      </div>
+    </div>
   </div>
 </template>
 
