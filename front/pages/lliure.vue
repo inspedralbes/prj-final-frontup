@@ -254,7 +254,6 @@ export default {
   padding: 8px;
   border-radius: 4px;
   text-align: center;
-  margin-right: 750px;
 }
 
 .header-actions {
