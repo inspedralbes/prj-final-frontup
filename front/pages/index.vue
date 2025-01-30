@@ -56,6 +56,7 @@ export default {
 
 .todo{
   background-color: rgb(177, 162, 162);
+  height: 100vh;
 }
 .main-container {
   margin-top: 80px;
