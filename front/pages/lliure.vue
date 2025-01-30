@@ -303,12 +303,14 @@ export default {
 
 .code-editor {
   margin-top: 40px;
+  width: 29vw;
   height: 300px;
   border: 1px solid #444;
   border-radius: 4px;
   background-color: #1e1e1e;
   color: #fff;
 }
+
 
 .output-container {
   position: relative;
