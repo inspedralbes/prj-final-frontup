@@ -6,6 +6,7 @@
       <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
         :readonly="!isEditing" />
       <div class="header-actions">
+        <button class="header-button" @click="toggleChat">Chat IA</button>
         <button class="header-button" @click="guardarProyecto">Guardar</button>
         <button class="header-button" @click="openSettingsModal">Configuración</button>
         <button class="header-button">💡</button>
@@ -39,6 +40,21 @@
             <button type="button" class="modal-button cancel" @click="closeSettingsModal">Cancelar</button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- Chat IA flotante -->
+    <div v-if="isChatVisible" class="chat-container">
+      <button class="close-chat-button" @click="toggleChat">✖</button>
+      <h2 class="chat-title">Chat con Gemini</h2>
+      <div class="messages-container">
+        <div class="message ai">
+          <p>¡Hola! ¿En qué puedo ayudarte hoy?</p>
+        </div>
+      </div>
+      <div class="input-container">
+        <input type="text" placeholder="Escribe tu mensaje..." class="chat-input" />
+        <button class="send-button">Enviar</button>
       </div>
     </div>
 
@@ -98,7 +114,8 @@ export default {
     const notification = ref("");
     const modalTitle = ref("");
     const modalDescription = ref("");
-    const isExpanded = ref(false); 
+    const isExpanded = ref(false);
+    const isChatVisible = ref(false); 
 
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
@@ -144,6 +161,10 @@ export default {
     onUnmounted(() => {
       lliureStore.toggleLliure();
     });
+
+    const toggleChat = () => {
+      isChatVisible.value = !isChatVisible.value;
+    };
 
     // Functions
     const toggleExpand = () => {
@@ -202,8 +223,10 @@ export default {
       closeSettingsModal,
       saveSettings,
       guardarProyecto,
-      isExpanded, 
-      toggleExpand, 
+      isExpanded,
+      toggleExpand,
+      isChatVisible, 
+      toggleChat,
       output: computed(() => {
         let jsContent = js.value;
         let scriptContent = `
@@ -411,4 +434,96 @@ export default {
 .cancel:hover {
   background-color: #aaa;
 }
+
+/* Estilo del chat flotante */
+.chat-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  height: 400px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  z-index: 1000;
+}
+
+.chat-title {
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.messages-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 15px;
+  padding-right: 10px;
+}
+
+.message {
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
+.message.user {
+  background-color: #e0f7fa;
+  align-self: flex-end;
+}
+
+.message.ai {
+  background-color: #e1bee7;
+  align-self: flex-start;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-right: 10px;
+}
+
+.send-button {
+  padding: 10px 15px;
+  font-size: 1rem;
+  color: white;
+  background-color: #00796b;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.send-button:hover {
+  background-color: #004d40;
+}
+/* Estilo para el botón de cerrar (X) */
+.close-chat-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  border: none;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.close-chat-button:hover {
+  color: #f44336; /* Rojo al pasar el mouse */
+}
+
 </style>
