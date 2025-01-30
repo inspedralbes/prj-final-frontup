@@ -16,6 +16,7 @@
       </div>
       <div class="header-right">
         <button @click="toggleTheme" class="btn">{{ themeIcon }}</button>
+        <button class="btn" @click="navigateProjects" v-if="appStore.isLoggedIn">Projectes</button>
         <button class="btn" @click="navigateToProfile" v-if="appStore.isLoggedIn">Mi Perfil</button>
         <button class="btn" @click="navigateToLogin" v-else>{{ loginText }}</button>
 
@@ -71,6 +72,10 @@ const navigateToLogin = () => {
 
 const navigateToProfile = () => {
   router.push('/perfil')
+}
+
+const navigateProjects = () => {
+  router.push('/projectes')
 }
 </script>
 
