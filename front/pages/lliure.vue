@@ -227,14 +227,12 @@ export default {
 </script>
 
 <style scoped>
-
 .todo {
   display: flex;
   flex-direction: column;
-  background-color: #121212;
+  background-color: #1e1e1e;
   font-family: 'Arial', sans-serif;
   color: #ffffff;
-  
 }
 
 .header {
@@ -242,14 +240,14 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  background-color: #1e1e1e;
+  background-color: #2d2d2d;
   color: #fff;
 }
 
 .header-title {
   font-size: 15px;
   color: #fff;
-  background-color: #333;
+  background-color: #444;
   border: none;
   padding: 8px;
   border-radius: 4px;
@@ -258,28 +256,27 @@ export default {
 
 .header-actions {
   display: flex;
-  gap: 15px;
+  gap: 10px;
 }
 
 .header-button {
-  background-color: #444;
+  background-color: #555;
   border: none;
   color: #fff;
-  padding: 10px 15px;
-  border-radius: 5px;
+  padding: 8px 12px;
+  border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.3s;
 }
 
 .header-button:hover {
-  background-color: #666;
+  background-color: #777;
 }
 
 .editor-container {
   display: flex;
-  gap: 30px;
-  margin-top: 20px;
+  padding: 20px;
+  gap: 20px;
 }
 
 .editor-box {
@@ -287,34 +284,33 @@ export default {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 5px;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  background-color: #1e1e1e;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+  background-color: #2d2d2d;
 }
 
 .editor-label {
   position: absolute;
-  top: 17px;
-  left: 20px;
+  top: 8px;
+  left: 10px;
   font-size: 16px;
   color: #fff;
-  background-color: #333;
-  padding: 4px 10px;
-  border-radius: 5px;
+  background-color: #444;
+  padding: 4px 8px;
+  border-radius: 3px;
 }
 
 .code-editor {
-  margin-top: 50px;
-  height: 322px; 
-  width: 31vw;
-  border: 1px solid #333;
+  margin-top: 40px;
+  width: 29vw;
+  height: 300px;
+  border: 1px solid #444;
   border-radius: 4px;
-  background-color: #121212;
-  color: #fff; 
-  padding: 10px;
-  box-sizing: border-box; 
+  background-color: #1e1e1e;
+  color: #fff;
 }
+
 
 .output-container {
   position: relative;
