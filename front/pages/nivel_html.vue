@@ -26,7 +26,7 @@ export default {
     return {
       levels: Array.from({ length: 10 }, (_, i) => ({
         id: i + 1,
-        locked: i !== 0, // Solo el primer nivel está desbloqueado
+       
       })),
       hoveredLevel: null,
     };
