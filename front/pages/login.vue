@@ -119,23 +119,23 @@ const toggleRegister = () => {
   showRegister.value = !showRegister.value;
 };
 
-const validateEmail = () => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  errors.email = emailRegex.test(formData.email) ? '' : 'Correo inválido';
-};
+// const validateEmail = () => {
+//   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//   errors.email = emailRegex.test(formData.email) ? '' : 'Correo inválido';
+// };
 
-const validateUsername = () => {
-  errors.username = formData.username ? '' : 'El nombre de usuario es obligatorio';
-};
+// const validateUsername = () => {
+//   errors.username = formData.username ? '' : 'El nombre de usuario es obligatorio';
+// };
 
-const validatePassword = () => {
-  errors.password = formData.password ? '' : 'La contraseña es obligatoria';
-};
+// const validatePassword = () => {
+//   errors.password = formData.password ? '' : 'La contraseña es obligatoria';
+// };
 
-const validatePasswordRepeat = () => {
-  errors.passwordRepeat =
-    formData.passwordRepeat === formData.password ? '' : 'Las contraseñas no coinciden';
-};
+// const validatePasswordRepeat = () => {
+//   errors.passwordRepeat =
+//     formData.passwordRepeat === formData.password ? '' : 'Las contraseñas no coinciden';
+// };
 
 const isLoginFormValid = () => {
   return formData.email && formData.password && !errors.email && !errors.password;
@@ -259,7 +259,7 @@ const register = async () => {
 .todo {
  height: 100vh;
  width: 100%;
- background-color: #1c1c1c;
+ background-color: #202020;
  display: flex;
  justify-content: center;
  align-items: center;
@@ -283,8 +283,7 @@ const register = async () => {
 
 .auth-page {
  width: 100%;
- max-width: 400px;
- padding: 30px;
+ max-width: 450px;
  border-radius: 16px;
  position: absolute;
  color: white;
@@ -294,8 +293,8 @@ const register = async () => {
 
 .register-page {
  width: 100%;
- max-width: 400px;
- padding: 30px;
+ max-width: 450px;
+ padding: 40px;
  position: absolute;
  color: white;
  right: 8%;
@@ -341,7 +340,7 @@ img {
 }
 
 .form:hover {
- transform: scale(1.05);
+ transform: scale(1.35);
  border: 1px solid black;
 }
 
@@ -382,11 +381,15 @@ img {
  margin-right: 0.5em;
  border: none;
  outline: none;
- transition: .4s ease-in-out;
+ transition: .3s ease-in-out;
  background-color: #252525;
  color: white;
 }
 
+button:hover{
+  transform: scale(1.05);
+  transition: 0.3s ease-in-out;
+}
 .input-icon {
  height: 1.3em;
  width: 1.3em;
