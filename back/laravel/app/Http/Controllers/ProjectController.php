@@ -15,7 +15,7 @@ class ProjectController extends Controller
             'projects' => $projects,
         ], 200);
     }
-
+    
     public function show($id)
     {
         $project = Project::find($id);

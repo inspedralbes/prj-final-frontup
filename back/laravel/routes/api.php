@@ -7,7 +7,6 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\UserController;
 
 Route::middleware('auth:sanctum')->group(function () {
-
     Route::get('/user', [UserController::class, 'getUser']);
     Route::post('/user/avatar', [UserController::class, 'updateAvatar']);
 });
