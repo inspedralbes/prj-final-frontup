@@ -2,13 +2,14 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
+  ssr: false,
   plugins: [
-    '~/plugins/pinia.js',  // Asegúrate de que el plugin esté registrado
+    '~/plugins/pinia.js',  
   ],
   css: [
     '@/assets/normalize.css'
    ],
   build: {
-    transpile: ['pinia'],  // Transpila Pinia si es necesario
+    transpile: ['pinia'],
   }
 });
