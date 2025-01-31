@@ -5,5 +5,9 @@
 <script>
 </script>
 
-<style>
+<style scoped>
+body{
+  color: red;
+}
+
 </style>

@@ -4,7 +4,7 @@
     <!-- Barra lateral y barra superior -->
     <div class="left-section">
       <h2>FrontUp</h2>
-      <button class="btn">Els meus projectes</button>
+      <button class="btn" @click="navigateProjects" v-if="appStore.isLoggedIn">Els meus projectes</button>
       <button class="btn" @click="navigateToLliure">Lliure</button>
       <button class="btn" @click="navigateToNiveles">Nivells</button>
       <button class="btn">Projectes favorits</button>
@@ -16,7 +16,6 @@
       </div>
       <div class="header-right">
         <button @click="toggleTheme" class="btn">{{ themeIcon }}</button>
-        <button class="btn" @click="navigateProjects" v-if="appStore.isLoggedIn">Projectes</button>
         <button class="btn" @click="navigateToProfile" v-if="appStore.isLoggedIn">Mi Perfil</button>
         <button class="btn" @click="navigateToLogin" v-else>{{ loginText }}</button>
 
