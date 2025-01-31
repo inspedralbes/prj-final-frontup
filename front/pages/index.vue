@@ -1,49 +1,48 @@
 <template>
   <div class="todo">
-  <div class="main-container">
-    <!-- Body Content -->
-    <div class="body-content">
-      <h2>The best place to build <br>
-         test, and discover front- <br>end code.</h2>
-      <p>CodeCod is a social development environment for front-end<br> 
-        designers and developers. Build and deploy a website, show off your <br>
-        work, build test cases to learn and debug, and find inspiration.</p>
+    <div class="main-container">
+      <!-- Body Content -->
+      <div class="body-content">
+        <h2>El lloc ideal per crear, <br> provar i explorar codi web.</h2>
+        <p>Aquesta plataforma és un entorn interactiu per a desenvolupadors i dissenyadors front-end.
+          <br> Crea i experimenta amb projectes, comparteix les teves creacions,
+          <br> prova les teves idees i troba inspiració per continuar aprenent.
+        </p>
+      </div>
+      <br><br><br>
+      <!-- Card Container -->
+      <div class="card-container">
+        <div class="card">
+          <h3>Crea i Experimenta</h3>
+          <p>
+            Dóna vida a les teves idees construint projectes complets o provant funcions i animacions específiques.
+          </p>
+          <button>Prova l'Editor</button>
+        </div>
+        <div class="card">
+          <h3>Practica els teus coneixements</h3>
+          <p>
+            Vols provar-te fent uns exercicis per veure quin nivell tens?
+          </p>
+          <button>Participa els reptes que et proposem</button>
+        </div>
+        <div class="card">
+          <h3>Comparteix els Teus Projectes</h3>
+          <p>
+            Uneix-te a la comunitat global de desenvolupadors front-end compartint les teves creacions i inspirant
+            altres.
+          </p>
+          <button>Descobreix el Més Popular</button>
+        </div>
+
+      </div>
+      <br><br>
+      <!-- Footer -->
     </div>
-    <br><br><br>
-    <!-- Card Container -->
-    <div class="card-container">
-      <div class="card">
-        <h3>Build & Test</h3>
-        <p>
-          Get work done quicker by building out entire projects or isolating
-          code to test features and animations.
-        </p>
-        <button>Try the Editor</button>
-      </div>
-      <div class="card">
-        <h3>Learn & Discover</h3>
-        <p>
-          Want to upgrade your skills and get noticed? Participating in
-          CodePen Challenges is a great way to try something new.
-        </p>
-        <button>Join this Week's Challenge</button>
-      </div>
-      <div class="card">
-        <h3>Share Your Work</h3>
-        <p>
-          Become a part of the most active front-end community in the world
-          by sharing work.
-        </p>
-        <button>Explore Trending</button>
-      </div>
-    </div>
-    <br><br>
-    <!-- Footer -->
   </div>
-</div>
-<footer>
-  <p>© 2025 FrontUp</p>
-</footer>
+  <footer>
+    <p>© 2025 FrontUp</p>
+  </footer>
 </template>
 
 <script>
@@ -53,11 +52,11 @@ export default {
 </script>
 
 <style scoped>
-
-.todo{
+.todo {
   background-color: rgb(177, 162, 162);
   height: 100vh;
 }
+
 .main-container {
   margin-top: 80px;
   margin-left: 200px;

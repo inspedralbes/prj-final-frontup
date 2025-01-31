@@ -119,7 +119,7 @@ header {
   left: 180px;
   right: 0;
   height: 80px;
-  background-color: black;
+  background-color: rgb(65, 55, 55);
   display: flex;
   align-items: center;
   justify-content: space-between;
