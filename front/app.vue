@@ -94,10 +94,12 @@ body {
   background-color: #404040;
   padding: 15px;
   box-sizing: border-box;
+  text-align: center;
 }
 
 .left-section .btn {
   padding: 10px 15px;
+  width: 150px;
   background-color: #333;
   color: #fff;
   cursor: pointer;
