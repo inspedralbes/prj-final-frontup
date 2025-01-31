@@ -1,7 +1,7 @@
 <template>
   <router-view />
   <div id="app" v-if="!lliureStore.lliure">
-    <!-- Barra lateral y barra superior -->
+
     <div class="left-section">
       <h2>FrontUp</h2>
       <button class="btn">Els meus projectes</button>
@@ -23,30 +23,25 @@
       </div>
     </header>
 
-    <!-- Contenido principal -->
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useLliureStore } from '~/stores/app' // Asegúrate de importar el store correctamente
-import { useRouter } from 'vue-router' // Asegúrate de usar el router correctamente
+import { useLliureStore } from '~/stores/app' 
+import { useRouter } from 'vue-router' 
 import { useAppStore } from '@/stores/app';
 
 
-// Variables reactivas
 const theme = ref('')
 const themeIcon = ref('☀️')
 const loginText = ref('Login')
 
-// Usar el store
 const appStore = useAppStore();
 const lliureStore = useLliureStore()
 
-// Usar el router
 const router = useRouter()
 
-// Métodos
 const toggleTheme = () => {
   if (theme.value === '') {
     theme.value = 'light-mode'

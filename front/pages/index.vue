@@ -1,46 +1,60 @@
 <template>
   <div class="todo">
-  <div class="main-container">
-    <!-- Body Content -->
-    <div class="body-content">
-      <h2>The best place to build <br>
-         test, and discover front- <br>end code.</h2>
-      <p>CodeCod is a social development environment for front-end<br> 
-        designers and developers. Build and deploy a website, show off your <br>
-        work, build test cases to learn and debug, and find inspiration.</p>
-    </div>
-    <br><br><br>
-    <!-- Card Container -->
-    <div class="card-container">
-      <div class="card">
-        <h3>Build & Test</h3>
-        <p>
-          Get work done quicker by building out entire projects or isolating
-          code to test features and animations.
-        </p>
-        <button>Try the Editor</button>
+    <!-- Header -->
+    <header :class="theme">
+      <div class="header-left">
+        <!-- Buscador -->
+        <input class="search-box" type="text" placeholder="Buscar...">
       </div>
-      <div class="card">
-        <h3>Learn & Discover</h3>
-        <p>
-          Want to upgrade your skills and get noticed? Participating in
-          CodePen Challenges is a great way to try something new.
-        </p>
-        <button>Join this Week's Challenge</button>
+      <div class="header-right">
+        <button @click="toggleTheme" class="btn" :class="theme">{{ themeIcon }}</button>
+        <button class="btn" :class="theme">{{ registerText }}</button>
+        <button class="btn" :class="theme">{{ loginText }}</button>
       </div>
-      <div class="card">
-        <h3>Share Your Work</h3>
-        <p>
-          Become a part of the most active front-end community in the world
-          by sharing work.
-        </p>
-        <button>Explore Trending</button>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+      <!-- Body Content -->
+      <div class="body-content">
+        <h2>The best place to build <br>
+           test, and discover front- <br>end code.</h2>
+        <p>CodeCod is a social development environment for front-end<br> 
+          designers and developers. Build and deploy a website, show off your <br>
+          work, build test cases to learn and debug, and find inspiration.</p>
+      </div>
+      <br><br><br>
+      <!-- Card Container -->
+      <div class="card-container">
+        <div class="card" :class="theme">
+          <h3 :class="theme">Build & Test</h3>
+          <p :class="theme">
+            Get work done quicker by building out entire projects or isolating
+            code to test features and animations.
+          </p>
+          <button :class="theme">Try the Editor</button>
+        </div>
+        <div class="card" :class="theme">
+          <h3 :class="theme">Learn & Discover</h3>
+          <p :class="theme">
+            Want to upgrade your skills and get noticed? Participating in
+            CodePen Challenges is a great way to try something new.
+          </p>
+          <button :class="theme">Join this Week's Challenge</button>
+        </div>
+        <div class="card" :class="theme">
+          <h3 :class="theme">Share Your Work</h3>
+          <p :class="theme">
+            Become a part of the most active front-end community in the world
+            by sharing work.
+          </p>
+          <button :class="theme">Explore Trending</button>
+        </div>
       </div>
     </div>
     <br><br>
     <!-- Footer -->
   </div>
-</div>
 <footer>
   <p>© 2025 FrontUp</p>
 </footer>
@@ -48,7 +62,34 @@
 
 <script>
 export default {
-  name: 'Index',
+  name: 'HomePage',
+  data() {
+    return {
+      theme: '',
+      themeIcon: '☀️',
+      footerText: '© 2025 FrontUp',
+      registerText: 'Registro',
+      loginText: 'Login',
+    };
+  },
+  methods: {
+    toggleTheme() {
+      if (this.theme === '') {
+        this.theme = 'light-mode';
+        this.themeIcon = '🌙';
+      } else {
+        this.theme = '';
+        this.themeIcon = '☀️';
+      }
+      document.body.className = this.theme;
+    },
+    navigateToLliure() {
+      this.$router.push('/lliure'); 
+    },
+    navigateToNiveles() {
+      this.$router.push('/niveles'); 
+    },
+  },
 };
 </script>
 

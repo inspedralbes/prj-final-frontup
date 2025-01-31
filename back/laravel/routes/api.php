@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenticatorController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\UserController;
-
+use App\Http\Controllers\PreguntaController;
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [UserController::class, 'getUser']);
     Route::post('/user/avatar', [UserController::class, 'updateAvatar']);
@@ -19,4 +19,7 @@ Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
 
 Route::post('/register', [AuthenticatorController::class, 'register']);
 
+
 Route::post('/login', [AuthenticatorController::class, 'authenticate']);    
+
+Route::get('/preguntas/{nivelId}', [PreguntaController::class, 'getPreguntasPorNivel']);
