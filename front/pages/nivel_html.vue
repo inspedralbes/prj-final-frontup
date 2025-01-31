@@ -26,7 +26,6 @@ export default {
     return {
       levels: Array.from({ length: 10 }, (_, i) => ({
         id: i + 1,
-       
       })),
       hoveredLevel: null,
     };

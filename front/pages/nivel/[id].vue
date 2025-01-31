@@ -12,37 +12,32 @@
     </header>
 
     <div class="exercise-instructions">
-      <p>
-        <strong>Instrucciones:</strong> Crea la estructura básica de una página web con los siguientes elementos:
-      </p>
-      <ul>
-        <li>Un <code>&lt;head&gt;</code> que incluya un título (<code>&lt;title&gt;</code>).</li>
-        <li>Un <code>&lt;body&gt;</code> con un encabezado (<code>&lt;h1&gt;</code>), un párrafo (<code>&lt;p&gt;</code>) y un enlace (<code>&lt;a&gt;</code>).</li>
-      </ul>
+      <p><strong>Instrucciones:</strong></p>
+      <p v-if="loading">Cargando pregunta...</p>
+      <p v-else-if="error">Error al cargar la pregunta</p>
+      <p v-else>{{ question }}</p>
     </div>
 
     <div class="editor-output-wrapper">
-      
       <div class="editor-box">
         <div class="editor-label">HTML</div>
         <div ref="htmlEditor" class="code-editor"></div>
       </div>
 
       <div class="submit-container">
-      <button class="submit-button" @click="validateExercise">Enviar</button>
-    </div>
+        <button class="submit-button" @click="validateExercise">Enviar</button>
+      </div>
 
       <div class="output-container">
         <iframe class="output" :srcdoc="output"></iframe>
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
-import { ref, onMounted, computed, onUnmounted } from "vue";
-import { useRouter } from "vue-router";
+import { ref, onMounted, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import CodeMirror from "codemirror";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
@@ -50,24 +45,52 @@ import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
 import "codemirror/mode/javascript/javascript";
 import { useLliureStore } from "~/stores/app";
+
 export default {
   setup() {
     const router = useRouter();
+    const route = useRoute();  
     const lliureStore = useLliureStore();
 
-    const title = ref("Untitled");
+    const title = ref("Ejercicio");
     const html = ref("");
     const css = ref("");
     const js = ref("");
     const isEditing = ref(false);
+    const question = ref("");
+    const loading = ref(true);
+    const error = ref(false);
+    const nivelId = ref(route.params.id);  
 
     const htmlEditor = ref(null);
     let htmlEditorInstance;
-    onUnmounted(() => {
+
+    const fetchQuestion = async () => {
+      try {
+        loading.value = true;
+
+        const response = await fetch(`http://localhost:8000/api/preguntas/${nivelId.value}`);
+
+        if (!response.ok) throw new Error("Error al obtener la pregunta");
+
+        const data = await response.json();
+
+        question.value = data.question;
+      } catch (err) {
+        console.error("Error en fetchQuestion:", err);
+        error.value = true;
+      } finally {
+        loading.value = false;
+      }
+    };
+    onUnmounted(()=>{
       lliureStore.toggleLliure();
-    });
+
+    })
     onMounted(() => {
       lliureStore.toggleLliure();
+      fetchQuestion(); 
+
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
         mode: "htmlmixed",
         theme: "dracula",
@@ -81,23 +104,6 @@ export default {
 
     const goBack = () => router.push("/");
 
-    const validateExercise = () => {
-  const htmlContent = html.value.trim().toLowerCase();
-
-  const hasHead = /<head>.*<\/head>/s.test(htmlContent);
-  const hasBody = /<body>.*<\/body>/s.test(htmlContent);
-  const hasTitle = /<title>.*<\/title>/s.test(htmlContent); 
-  const hasH1 = /<h1>.*<\/h1>/s.test(htmlContent);
-  const hasP = /<p>.*<\/p>/s.test(htmlContent);
-  const hasA = /<a\s+href=.*?>.*<\/a>/s.test(htmlContent);
-
-  if (hasHead && hasBody && hasTitle && hasH1 && hasP && hasA) {
-    alert("¡Ejercicio completado correctamente!");
-  } else {
-    alert("Revisa tu código. Asegúrate de incluir <head>, <body>, <title>, <h1>, <p> y <a>.");
-  }
-};
-
     return {
       title,
       html,
@@ -106,24 +112,15 @@ export default {
       htmlEditor,
       isEditing,
       goBack,
-      validateExercise,
-      output: computed(() => {
-        let jsContent = js.value;
-        let scriptContent = `
-          try {
-            ${jsContent}
-          } catch (e) {
-            console.error('Error in JavaScript:', e);
-          }
-        `;
-        return `
-          <html>
-            <head><style>${css.value}</style></head>
-            <body>${html.value}
-              <script>${scriptContent}<\/script>
-            </body>
-          </html>`;
-      }),
+      question,
+      loading,
+      error,
+      output: computed(() => `
+        <html>
+          <head><style>${css.value}</style></head>
+          <body>${html.value}</body>
+        </html>
+      `),
     };
   },
 };
@@ -269,6 +266,4 @@ export default {
 .submit-button:hover {
   background-color: #45a049;
 }
-
 </style>
-
