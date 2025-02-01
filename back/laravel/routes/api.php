@@ -16,9 +16,7 @@ Route::get('/projects/{id}', [ProjectController::class, 'show']);
 Route::put('/projects/{id}', [ProjectController::class, 'update']); 
 Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
 
-
 Route::post('/register', [AuthenticatorController::class, 'register']);
-
 
 Route::post('/login', [AuthenticatorController::class, 'authenticate']);    
 
