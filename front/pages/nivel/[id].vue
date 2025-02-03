@@ -11,6 +11,8 @@
       </div>
     </header>
 
+    <div class="exercise-number">Ejercicio {{ nivelId }}</div>
+
     <div class="exercise-instructions">
       <p><strong>Instrucciones:</strong></p>
       <p v-if="loading">Cargando pregunta...</p>
@@ -53,7 +55,7 @@ export default {
     const route = useRoute();
     const lliureStore = useLliureStore();
 
-    const title = ref(`Ejercicio ${route.params.id}`);
+    const title = computed(() => `Ejercicio ${nivelId.value}`);
     const html = ref("");
     const css = ref("");
     const js = ref("");
@@ -67,69 +69,72 @@ export default {
     let htmlEditorInstance;
 
     const fetchQuestion = async () => {
-      try {
-        loading.value = true;
-        const response = await fetch(`http://localhost:8000/api/preguntas/${nivelId.value}`);
-        if (!response.ok) throw new Error("Error al obtener la pregunta");
-        const data = await response.json();
-        question.value = data.question;
-      } catch (err) {
-        console.error("Error en fetchQuestion:", err);
-        error.value = true;
-      } finally {
-        loading.value = false;
-      }
-    };
+  try {
+    loading.value = true;
+    const response = await fetch(`http://localhost:8000/api/preguntas/${nivelId.value}`);
+    if (!response.ok) throw new Error("Error al obtener la pregunta");
+    const data = await response.json();
+    question.value = data.question; 
+  } catch (err) {
+    console.error("Error en fetchQuestion:", err);
+    error.value = true;
+  } finally {
+    loading.value = false;
+  }
+};
 
     const validateExercise = () => {
-      if (!question.value) {
-        alert("No se ha cargado una pregunta.");
-        return;
-      }
+  if (!question.value) {
+    alert("No se ha cargado una pregunta.");
+    return;
+  }
 
-      const etiquetasRequeridas = question.value.match(/<\s*(\w+)/g);
+  const etiquetasRequeridas = question.value.match(/<\s*(\w+)/g);
 
-      if (!etiquetasRequeridas) {
-        alert("No se han encontrado etiquetas en la pregunta.");
-        return;
-      }
+  if (!etiquetasRequeridas) {
+    alert("No se han encontrado etiquetas en la pregunta.");
+    return;
+  }
 
-      const etiquetasLimpias = etiquetasRequeridas.map(etiqueta => etiqueta.replace("<", "").trim());
+  const etiquetasLimpias = etiquetasRequeridas.map(etiqueta => etiqueta.replace("<", "").trim());
 
-      const faltantes = etiquetasLimpias.filter(etiqueta => !html.value.includes(`<${etiqueta}`));
+  const faltantes = etiquetasLimpias.filter(etiqueta => !html.value.includes(`<${etiqueta}`));
 
-      if (faltantes.length === 0) {
-        alert("¡Está bien! Has completado el ejercicio.");
+  if (faltantes.length === 0) {
+    alert("¡Está bien! Has completado el ejercicio.");
 
-        const nextLevelId = parseInt(nivelId.value) + 1; 
-        lliureStore.setUnlockedLevel(nextLevelId);
+    const nextLevelId = parseInt(nivelId.value) + 1; 
 
-        html.value = '';
-        css.value = '';
-        js.value = '';
-        question.value = '';
+    html.value = '';
+    css.value = '';
+    js.value = '';
+    question.value = ''; 
 
-        router.push(`/nivel/${nextLevelId}`); 
-      } else {
-        alert(`Faltan las siguientes etiquetas: ${faltantes.join(", ")}`);
-      }
-    };
+    router.push(`/nivel/${nextLevelId}`); 
 
-    watch(() => route.params.id, (newNivelId) => {
-      nivelId.value = newNivelId;
-      title.value = `Ejercicio ${newNivelId}`;
-      fetchQuestion(); 
-      clearEditors();  
-    });
+  } else {
+    alert(`Faltan las siguientes etiquetas: ${faltantes.join(", ")}`);
+  }
+};
 
-    const clearEditors = () => {
-      html.value = '';
-      css.value = '';
-      js.value = '';
-      if (htmlEditorInstance) {
-        htmlEditorInstance.setValue(''); 
-      }
-    };
+
+watch(() => route.params.id, (newNivelId) => {
+  nivelId.value = newNivelId;
+  fetchQuestion(); 
+  clearEditors();  
+});
+
+const clearEditors = () => {
+  
+  html.value = '';
+  css.value = '';
+  js.value = '';
+
+  if (htmlEditorInstance) {
+    htmlEditorInstance.setValue('');
+  }
+};
+
 
     onMounted(() => {
       lliureStore.toggleLliure();  
