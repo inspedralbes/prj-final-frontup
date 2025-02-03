@@ -67,8 +67,7 @@
         </div>
       </form>
     </div>
- 
- 
+    
     <transition name="slide-to-right">
       <div v-if="!showRegister" class="register">
         <img src="../public/desk-4222025_1920.jpg" alt="Registre" @click="toggleRegister">
