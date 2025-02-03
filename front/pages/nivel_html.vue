@@ -26,6 +26,7 @@ export default {
     return {
       levels: Array.from({ length: 10 }, (_, i) => ({
         id: i + 1,
+        locked: i > 0
       })),
       hoveredLevel: null,
     };
@@ -106,7 +107,6 @@ export default {
   transform: translate(-50%, -50%);
   font-size: 24px;
 }
-
 
 .level-button-container:nth-child(2) { top: 50%; left: 10%; }
 .level-button-container:nth-child(3) { top: 30%; left: 20%; }
