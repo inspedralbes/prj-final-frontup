@@ -53,8 +53,9 @@ export default {
 
 <style scoped>
 .todo {
-  background-color: rgb(177, 162, 162);
+  background-color: #121212;
   height: 100vh;
+  color: #e0e0e0;
 }
 
 .main-container {
@@ -73,11 +74,12 @@ export default {
 .body-content h2 {
   font-size: 2em;
   margin-bottom: 20px;
+  color: #fff;
 }
 
 .body-content p {
   font-size: 1em;
-  color: #666;
+  color: #b0b0b0;
 }
 
 .card-container {
@@ -88,10 +90,10 @@ export default {
 }
 
 .card {
-  background-color: #4b4747;
+  background-color: #1e1e1e;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   width: 300px;
   text-align: center;
 }
@@ -99,6 +101,7 @@ export default {
 .card h3 {
   margin-bottom: 15px;
   font-size: 25px;
+  color: #fff;
 }
 
 .card p {
@@ -110,15 +113,20 @@ export default {
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
-  background-color: rgb(161, 152, 152);
-  color: black;
+  background-color: #333;
+  color: #fff;
   cursor: pointer;
 }
 
+.card button:hover {
+  background-color: #555;
+}
+
 footer {
-  background-color: #404040;
+  background-color: #222;
   text-align: center;
   padding: 10px 20px;
   color: white;
 }
 </style>
+
