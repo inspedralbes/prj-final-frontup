@@ -1,83 +1,83 @@
-  import { reactive } from 'vue';
+import { reactive } from 'vue';
 
-  const baseURL = 'http://127.0.0.1:8000/api';
+const baseURL = 'http://127.0.0.1:8000/api';
 
-  const useCommunicationManager = () => {
-    const state = reactive({
-      loading: false,
-      error: null,
-      token: localStorage.getItem('auth_token'), 
-    });
+const useCommunicationManager = () => {
+  const state = reactive({
+    loading: false,
+    error: null,
+    token: localStorage.getItem('auth_token'),
+  });
 
-    const request = async (url, method = 'GET', data = null) => {
-      state.loading = true;
-      state.error = null;
+  const request = async (url, method = 'GET', data = null) => {
+    state.loading = true;
+    state.error = null;
 
-      const headers = {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': state.token ? `Bearer ${state.token}` : '',
+    };
+
+
+    const options = {
+      method,
+      headers,
+    };
+
+    if (data) {
+      options.body = JSON.stringify(data);
+    }
+
+    try {
+      const response = await fetch(`${baseURL}${url}`, options);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Error desconocido');
+      }
+
+      return result;
+    } catch (err) {
+      state.error = err.message;
+      throw err;
+    } finally {
+      state.loading = false;
+    }
+  };
+
+  const loginUser = async (credentials) => {
+    try {
+      const response = await request('/login', 'POST', credentials);
+      if (response.token) {
+        localStorage.setItem('auth_token', response.token);
+        state.token = response.token;
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const registerUser = async (userData) => {
+    try {
+      const response = await request('/register', 'POST', userData);
+      if (response.token) {
+        localStorage.setItem('auth_token', response.token);
+        state.token = response.token;
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+  const guardarProyectoDB = async (proyecto) => {
+    fetch('http://localhost:8000/api/projects', {
+      method: 'POST',
+      headers: {
         'Content-Type': 'application/json',
-        'Authorization': state.token ? `Bearer ${state.token}` : '', 
-      };
-
-      
-      const options = {
-        method,
-        headers,
-      };
-
-      if (data) {
-        options.body = JSON.stringify(data);
-      }
-
-      try {
-        const response = await fetch(`${baseURL}${url}`, options);
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(result.message || 'Error desconocido');
-        }
-
-        return result;
-      } catch (err) {
-        state.error = err.message;
-        throw err;
-      } finally {
-        state.loading = false;
-      }
-    };
-
-    const loginUser = async (credentials) => {
-      try {
-        const response = await request('/login', 'POST', credentials);
-        if (response.token) {
-          localStorage.setItem('auth_token', response.token);
-          state.token = response.token;
-        }
-        return true;
-      } catch (error) {
-        return false; 
-      }
-    };
-
-    const registerUser = async (userData) => {
-      try {
-        const response = await request('/register', 'POST', userData);
-        if (response.token) {
-          localStorage.setItem('auth_token', response.token);
-          state.token = response.token;
-        }
-        return true;
-      } catch (error) {
-        return false;
-      }
-    };
-    const guardarProyectoDB = async (proyecto) => {
-      fetch('http://localhost:8000/api/projects',{
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(proyecto),
-      })
+      },
+      body: JSON.stringify(proyecto),
+    })
       .then(response => {
         if (!response.ok) {
           throw new Error('Error en la solicitud: ' + response.status);
@@ -90,25 +90,52 @@
       .catch(error => {
         console.error('Hubo un problema con el fetch:', error);
       });
-    }
-    const logoutUser = async () => {
-      try {
-        await request('/logout', 'POST');
-        localStorage.removeItem('auth_token');
-        state.token = null;
-        return true;
-      } catch (error) {
-        return false;
-      }
-    };
+  }
+  const chatIA = async (mensaje, html, css, js) => {
+    try {
+      const response = await fetch('http://localhost:5000/pregunta', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pregunta: mensaje,
+          html: html,
+          css: css,
+          js: js,
+        }),
+      });
 
-    return {
-      state,
-      loginUser,
-      registerUser,
-      logoutUser,
-      guardarProyectoDB,
-    };
+      if (!response.ok) {
+        throw new Error('Error en la solicitud: ' + response.status);
+      }
+
+      const data = await response.text();
+      return data;
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  };
+  const logoutUser = async () => {
+    try {
+      await request('/logout', 'POST');
+      localStorage.removeItem('auth_token');
+      state.token = null;
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
-  export default useCommunicationManager;
+  return {
+    state,
+    loginUser,
+    registerUser,
+    logoutUser,
+    guardarProyectoDB,
+    chatIA,
+  };
+};
+
+export default useCommunicationManager;

@@ -6,6 +6,7 @@
       <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
         :readonly="!isEditing" />
       <div class="header-actions">
+        <button class="header-button" @click="toggleChat">Chat IA</button>
         <button class="header-button" @click="guardarProyecto">Guardar</button>
         <button class="header-button" @click="openSettingsModal">Configuración</button>
         <button class="header-button">💡</button>
@@ -42,6 +43,31 @@
       </div>
     </div>
 
+    <!-- Chat IA flotante -->
+    <div v-if="isChatVisible" class="chat-container">
+      <button class="close-chat-button" @click="toggleChat">✖</button>
+      <h2 class="chat-title">Chat con Gemini</h2>
+      <div class="messages-container" ref="messagesContainer">
+        <div v-for="(msg, index) in messages" :key="index" class="message" :class="{
+          'user': msg.type === 'user',
+          'ai': msg.type === 'ai',
+          'loading': msg.type === 'loading'
+        }">
+          <div v-if="msg.type === 'loading'" class="loading-indicator">
+            <div class="dot-flashing"></div>
+          </div>
+          <p v-else>{{ msg.content }}</p>
+        </div>
+      </div>
+      <div class="input-container">
+        <input type="text" v-model="newMessage" placeholder="Escribe tu mensaje..." class="chat-input"
+          @keyup.enter="sendMessage" :disabled="state.loading" />
+        <button class="send-button" @click="sendMessage" :disabled="state.loading">
+          {{ state.loading ? 'Enviando...' : 'Enviar' }}
+        </button>
+      </div>
+    </div>
+
     <!-- Contenedor principal -->
     <div class="editor-container">
       <div class="editor-box">
@@ -69,9 +95,8 @@
     </div>
   </div>
 </template>
-
 <script>
-import { ref, onMounted, computed, onUnmounted } from "vue";
+import { ref, onMounted, computed, onUnmounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import CodeMirror from "codemirror";
 import { useLliureStore } from "~/stores/app";
@@ -85,10 +110,10 @@ import useCommunicationManager from "@/stores/comunicationManager";
 export default {
   setup() {
     const router = useRouter();
-    const { guardarProyectoDB } = useCommunicationManager();
+    const { guardarProyectoDB, chatIA, state } = useCommunicationManager();
     const lliureStore = useLliureStore();
 
-    // Reactive state
+    // Estados
     const title = ref("Untitled");
     const html = ref("");
     const css = ref("");
@@ -98,18 +123,26 @@ export default {
     const notification = ref("");
     const modalTitle = ref("");
     const modalDescription = ref("");
-    const isExpanded = ref(false); 
+    const isExpanded = ref(false);
+    const isChatVisible = ref(false);
+    const newMessage = ref("");
+    const messages = ref([
+      { type: 'ai', content: "¡Hola! ¿En qué puedo ayudarte hoy?" }
+    ]);
+    const messagesContainer = ref(null);
 
+    // Referencias de los editores
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
     const jsEditor = ref(null);
 
     let htmlEditorInstance, cssEditorInstance, jsEditorInstance;
 
-    // Lifecycle hooks
+    // Ciclo de vida
     onMounted(() => {
       lliureStore.toggleLliure();
 
+      // Configurar editores
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
         mode: "htmlmixed",
         theme: "dracula",
@@ -128,6 +161,7 @@ export default {
         lineNumbers: true,
       });
 
+      // Handlers de cambios
       htmlEditorInstance.on("change", (instance) => {
         html.value = instance.getValue();
       });
@@ -145,7 +179,51 @@ export default {
       lliureStore.toggleLliure();
     });
 
-    // Functions
+    // Funciones del chat
+    const toggleChat = () => {
+      isChatVisible.value = !isChatVisible.value;
+    };
+
+    const sendMessage = async () => {
+      if (!newMessage.value.trim() || state.loading) return;
+
+      const userMessage = newMessage.value;
+      newMessage.value = "";
+      
+      // Agregar mensaje del usuario
+      messages.value.push({
+        type: 'user',
+        content: userMessage
+      });
+
+      // Agregar mensaje de carga
+      messages.value.push({
+        type: 'loading',
+        content: ''
+      });
+
+      try {
+        const response = await chatIA(userMessage,html.value,css.value,js.value);
+        messages.value.pop();
+        messages.value.push({
+          type: 'ai',
+          content: response
+        });
+      } catch (error) {
+        messages.value.pop();
+        messages.value.push({
+          type: 'ai',
+          content: "❌ Error al obtener respuesta. Intenta nuevamente."
+        });
+      } finally {
+        await nextTick();
+        if (messagesContainer.value) {
+          messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+        }
+      }
+    };
+
+    // Funciones principales
     const toggleExpand = () => {
       isExpanded.value = !isExpanded.value;
     };
@@ -175,7 +253,7 @@ export default {
           css_code: css.value || "",
           js_code: js.value || "",
         });
-        alert.value = "Proyecto guardado con éxito.";
+        notification.value = "Proyecto guardado con éxito.";
       } catch (error) {
         notification.value = "Error al guardar el proyecto.";
         console.error(error);
@@ -197,35 +275,41 @@ export default {
       notification,
       modalTitle,
       modalDescription,
+      isExpanded,
+      isChatVisible,
+      newMessage,
+      messages,
+      messagesContainer,
+      state,
+      toggleChat,
+      sendMessage,
+      toggleExpand,
       goBack,
       openSettingsModal,
       closeSettingsModal,
       saveSettings,
       guardarProyecto,
-      isExpanded, 
-      toggleExpand, 
       output: computed(() => {
         let jsContent = js.value;
         let scriptContent = `
-    try {
-      ${jsContent}
-    } catch (e) {
-      console.error('Error in JavaScript:', e);
-    }
-  `;
+          try {
+            ${jsContent}
+          } catch (e) {
+            console.error('Error in JavaScript:', e);
+          }
+        `;
         return `
-    <html>
-      <head><style>${css.value}</style></head>
-      <body>${html.value}
-        <script>${scriptContent}<\/script>
-      </body>
-    </html>`;
+          <html>
+            <head><style>${css.value}</style></head>
+            <body>${html.value}
+              <script>${scriptContent}<\/script>
+            </body>
+          </html>`;
       }),
     };
   },
 };
 </script>
-
 <style scoped>
 .todo {
   display: flex;
@@ -316,6 +400,7 @@ export default {
   position: relative;
   transition: all 0.3s ease-in-out;
   background-color: white;
+  height: 28vh;
 }
 
 .output-container.expanded {
@@ -410,5 +495,171 @@ export default {
 
 .cancel:hover {
   background-color: #aaa;
+}
+
+.chat-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  height: 400px;
+  background-color: #2d2d2d;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  z-index: 1001;
+  color: #fff;
+}
+
+.chat-title {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.messages-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #1e1e1e;
+  border-radius: 8px;
+}
+
+.message {
+  padding: 8px 12px;
+  margin: 8px 0;
+  border-radius: 12px;
+  max-width: 80%;
+}
+
+.message.ai {
+  background-color: #444;
+  align-self: flex-start;
+}
+
+.message.user {
+  background-color: #00796b;
+  align-self: flex-end;
+}
+
+.input-container {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background-color: #1e1e1e;
+  color: #fff;
+}
+
+.send-button {
+  padding: 10px 20px;
+  background-color: #00796b;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.send-button:hover {
+  background-color: #004d40;
+}
+
+.close-chat-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.close-chat-button:hover {
+  color: #ff4444;
+}
+
+.dot-flashing {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #9880ff;
+  color: #9880ff;
+  animation: dotFlashing 1s infinite linear alternate;
+  animation-delay: .5s;
+}
+
+.dot-flashing::before,
+.dot-flashing::after {
+  content: '';
+  display: inline-block;
+  position: absolute;
+  top: 0;
+}
+
+.dot-flashing::before {
+  left: -15px;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #9880ff;
+  color: #9880ff;
+  animation: dotFlashing 1s infinite alternate;
+  animation-delay: 0s;
+}
+
+.dot-flashing::after {
+  left: 15px;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #9880ff;
+  color: #9880ff;
+  animation: dotFlashing 1s infinite alternate;
+  animation-delay: 1s;
+}
+
+@keyframes dotFlashing {
+  0% {
+    background-color: #9880ff;
+  }
+
+  50%,
+  100% {
+    background-color: #ebe6ff;
+  }
+}
+
+.loading-indicator {
+  padding: 10px;
+  color: #666;
+}
+
+.message.loading {
+  background-color: transparent;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.6;
+  }
 }
 </style>
