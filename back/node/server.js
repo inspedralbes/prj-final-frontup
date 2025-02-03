@@ -16,7 +16,7 @@ app.post("/pregunta", async (req, res) => {
         const { html } = req.body;
         const { css } = req.body;
         const { js } = req.body;
-        let preguntaIA = pregunta;
+        let preguntaIA = 'Eres un programador frontend experto, responde a la siguiente pregunta '+pregunta;
         if(html!=""){
             preguntaIA += ' este es mi html '+html;
         }
@@ -26,10 +26,9 @@ app.post("/pregunta", async (req, res) => {
         if(js!=""){
             preguntaIA += ' este es mi js '+js;
         }
-
         console.log("Pregunta recibida:", preguntaIA);
-
-        if (!pregunta) {
+        preguntaIA += ' responde con las minimas palabras posibles aunque si hace falta puedes alargarte algo mas pero sin pasarte abarcando todo lo que te este preguntando'
+        if (!preguntaIA) {
             return res.status(400).send("La pregunta es requerida");
         }
         
