@@ -87,6 +87,10 @@ body {
   color: #e0e0e0;
 }
 
+h2{
+  padding: 10px;
+}
+
 .left-section {
   position: fixed;
   top: 0;
@@ -94,7 +98,6 @@ body {
   width: 180px;
   height: 100%;
   background-color: #1e1e1e;
-  padding: 15px;
   box-sizing: border-box;
   text-align: center;
 }
@@ -104,6 +107,7 @@ body {
   color: #fff;
   border: none;
   padding: 10px 15px;
+  width: 100%;
   cursor: pointer;
   text-transform: uppercase;
   border-radius: 4px;
@@ -114,10 +118,11 @@ body {
 }
 
 .left-section .btn-crear {
-  background-color: #111; 
+  background-color: #000; 
   font-weight: bold;
   border: 2px solid;
   border-radius: 6px;
+  width: 80%;
 }
 
 .left-section .btn-crear:hover {
@@ -139,7 +144,7 @@ header {
   left: 180px;
   right: 0;
   height: 80px;
-  background-color: #222;
+  background-color: #000000;
   display: flex;
   align-items: center;
   justify-content: space-between;

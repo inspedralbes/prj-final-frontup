@@ -3,12 +3,11 @@
     <div class="main-container">
       <!-- Body Content -->
       <div class="body-content">
-        <h2>El lloc ideal per crear, <br> provar i explorar codi web.</h2>
-        <p>Aquesta plataforma és un entorn interactiu per a desenvolupadors i dissenyadors front-end.
-          <br> Crea i experimenta amb projectes, comparteix les teves creacions,
-          <br> prova les teves idees i troba inspiració per continuar aprenent.
+        <h2>El lloc ideal per crear, provar i explorar codi web.</h2>
+        <p>Aquesta plataforma és un entorn interactiu per a desenvolupadors i dissenyadors front-end. Crea i experimenta amb projectes, comparteix les teves creacions, prova les teves idees i troba inspiració per continuar aprenent.
         </p>
       </div>
+      <div class="loop"></div>
       <br><br><br>
       <!-- Card Container -->
       <div class="card-container">
@@ -61,20 +60,22 @@ export default {
 .main-container {
   margin-top: 80px;
   margin-left: 200px;
-  padding: 20px;
+  padding: 10px;
   flex-direction: column;
   justify-content: space-between;
+  background-color: #121212;
 }
 
 .body-content {
   text-align: left;
-  margin-bottom: 40px;
+  width: 50%;
 }
 
 .body-content h2 {
-  font-size: 2em;
+  font-size: 3em;
   margin-bottom: 20px;
   color: #fff;
+  font-family: Georgia, 'Times New Roman', Times, serif;
 }
 
 .body-content p {
@@ -85,13 +86,12 @@ export default {
 .card-container {
   display: flex;
   justify-content: space-around;
-  gap: 20px;
-  margin-right: 30px;
+  gap: 10px;
 }
 
 .card {
   background-color: #1e1e1e;
-  padding: 20px;
+  padding: 10px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   width: 300px;
@@ -116,14 +116,16 @@ export default {
   background-color: #333;
   color: #fff;
   cursor: pointer;
+  bottom: 0;
 }
 
 .card button:hover {
   background-color: #555;
 }
 
+
 footer {
-  background-color: #222;
+  background-color: #000000;
   text-align: center;
   padding: 10px 20px;
   color: white;
