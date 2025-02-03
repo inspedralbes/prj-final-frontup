@@ -5,7 +5,11 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProjectController;
 
 
-Route::get('/', [UserController::class, 'index'])->name('users.index'); // Página principal (lista de usuarios)
+Route::get('/', function () {
+    return view('home');
+})->name('home');
+
+Route::get('/users', [UserController::class, 'index'])->name('users.index'); // Página principal (lista de usuarios)
 Route::get('create', [UserController::class, 'create'])->name('users.create'); // Crear nuevo usuario
 Route::post('store', [UserController::class, 'store'])->name('users.store'); // Guardar nuevo usuario
 Route::get('{user}/edit', [UserController::class, 'edit'])->name('users.edit'); // Editar usuario
