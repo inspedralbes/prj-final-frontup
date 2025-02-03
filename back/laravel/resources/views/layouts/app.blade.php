@@ -10,6 +10,7 @@
     <nav class="navbar navbar-dark bg-dark">
         <a class="navbar-brand" href="{{ url('/') }}">Inicio</a>
         <a class="btn btn-light" href="{{ route('users.index') }}">Usuarios</a>
+        <a class="btn btn-light" href="{{ route('users.index') }}">Projectes</a>
     </nav>
     <div class="container mt-4">
         @yield('content')
