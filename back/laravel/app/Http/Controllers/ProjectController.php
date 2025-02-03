@@ -10,10 +10,7 @@ class ProjectController extends Controller
     {
         $projects = Project::all();
         
-        return response()->json([
-            'message' => 'Proyectos obtenidos con éxito',
-            'projects' => $projects,
-        ], 200);
+        return view('projects.index', compact('projects'));
     }
     
     public function show($id)
@@ -25,11 +22,13 @@ class ProjectController extends Controller
                 'message' => 'Proyecto no encontrado',
             ], 404);
         }
+        
+        return view('projects.show', compact('project'));
+    }
 
-        return response()->json([
-            'message' => 'Proyecto obtenido con éxito',
-            'project' => $project,
-        ], 200);
+    public function create()
+    {
+        return view('projects.create');
     }
 
     public function store(Request $request)
@@ -44,10 +43,15 @@ class ProjectController extends Controller
 
         $project = Project::create($validatedData);
 
-        return response()->json([
-            'message' => 'Proyecto creado con éxito',
-            'project' => $project,
-        ], 201);
+        return redirect()->route('projects.index')
+        ->with('success', 'Proyecto creado con éxito');
+
+    }
+    
+
+    public function edit(Project $project)
+    {
+        return view('projects.edit', compact('project'));
     }
 
     public function update(Request $request, $id)
@@ -69,10 +73,9 @@ class ProjectController extends Controller
 
         $project->update($validatedData);
 
-        return response()->json([
-            'message' => 'Proyecto actualizado con éxito',
-            'project' => $project,
-        ], 200);
+        return redirect()->route('projects.index')
+                         ->with('success', 'Proyecto actualizado con éxito');
+
     }
 
     public function destroy($id)
@@ -87,8 +90,7 @@ class ProjectController extends Controller
 
         $project->delete();
 
-        return response()->json([
-            'message' => 'Proyecto eliminado con éxito',
-        ], 200);
+        return redirect()->route('projects.index')
+        ->with('success', 'Proyecto eliminado con éxito');
     }
 }

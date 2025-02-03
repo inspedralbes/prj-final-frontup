@@ -50,6 +50,8 @@
     .btn-main:hover {
         background-color: #e09f3e;
         color: white;
+        transform: scale(1.05);
+        transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
     }
 
     /* Estilos de tarjetas */
@@ -66,31 +68,25 @@
 </style>
 
 <div class="hero">
-    <h1>Bienvenido a Mi Aplicación</h1>
-    <p>Administra usuarios y proyectos de manera sencilla y eficiente.</p>
-    <a href="{{ route('projects.index') }}" class="btn btn-main mt-3">Ver Proyectos</a>
+    <h1>Benvingut al CRUD</h1>
+    <p>Administra usuaris i projectes de manera sencilla i eficient.</p>
+    <a href="{{ route('projects.index') }}" class="btn btn-main mt-3">Veure Projectes</a>
 </div>
 
-<div class="row">
-    <div class="col-md-4">
+<!-- Centrado de las columnas -->
+<div class="row d-flex justify-content-center">
+    <div class="col-md-4 mb-4">
         <div class="card p-3 text-center">
-            <h3>Usuarios</h3>
-            <p>Gestiona los usuarios de tu aplicación de forma sencilla.</p>
-            <a href="{{ route('users.index') }}" class="btn btn-dark">Ver Usuarios</a>
+            <h3>Usuaris</h3>
+            <p>Gestiona els usuaris de la teva aplicació de forma sencilla.</p>
+            <a href="{{ route('users.index') }}" class="btn btn-dark">Veure Usuaris</a>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-4 mb-4">
         <div class="card p-3 text-center">
-            <h3>Proyectos</h3>
-            <p>Administra tus proyectos con facilidad y rapidez.</p>
-            <a href="{{ route('projects.index') }}" class="btn btn-dark">Ver Proyectos</a>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card p-3 text-center">
-            <h3>Crear Proyecto</h3>
-            <p>Empieza un nuevo proyecto con un solo clic.</p>
-            <a href="{{ route('projects.create') }}" class="btn btn-dark">Crear</a>
+            <h3>Projectes</h3>
+            <p>Administra els teus projectes amb facilitat i rapidesa.</p>
+            <a href="{{ route('projects.index') }}" class="btn btn-dark">Veure Projectes</a>
         </div>
     </div>
 </div>
