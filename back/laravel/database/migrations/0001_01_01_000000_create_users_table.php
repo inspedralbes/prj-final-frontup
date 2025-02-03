@@ -18,7 +18,9 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('avatar')->nullable();
-            $table->integer('nivel')->default(1);
+            $table->integer('nivel_html')->default(1);
+            $table->integer('nivel_css')->default(1);
+            $table->integer('nivel_js')->default(1);
             $table->rememberToken();
             $table->timestamps();
         });

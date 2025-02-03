@@ -35,8 +35,9 @@
   </div>
 </template>
 
+
 <script>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, onUnmounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import CodeMirror from "codemirror";
 import "codemirror/lib/codemirror.css";
@@ -49,10 +50,10 @@ import { useLliureStore } from "~/stores/app";
 export default {
   setup() {
     const router = useRouter();
-    const route = useRoute();  
+    const route = useRoute();
     const lliureStore = useLliureStore();
 
-    const title = ref("Ejercicio");
+    const title = ref(`Ejercicio ${route.params.id}`);
     const html = ref("");
     const css = ref("");
     const js = ref("");
@@ -68,13 +69,9 @@ export default {
     const fetchQuestion = async () => {
       try {
         loading.value = true;
-
         const response = await fetch(`http://localhost:8000/api/preguntas/${nivelId.value}`);
-
         if (!response.ok) throw new Error("Error al obtener la pregunta");
-
         const data = await response.json();
-
         question.value = data.question;
       } catch (err) {
         console.error("Error en fetchQuestion:", err);
@@ -83,14 +80,60 @@ export default {
         loading.value = false;
       }
     };
-    onUnmounted(()=>{
-      lliureStore.toggleLliure();
 
-    })
-    onMounted(() => {
-      lliureStore.toggleLliure();
+    const validateExercise = () => {
+      if (!question.value) {
+        alert("No se ha cargado una pregunta.");
+        return;
+      }
+
+      const etiquetasRequeridas = question.value.match(/<\s*(\w+)/g);
+
+      if (!etiquetasRequeridas) {
+        alert("No se han encontrado etiquetas en la pregunta.");
+        return;
+      }
+
+      const etiquetasLimpias = etiquetasRequeridas.map(etiqueta => etiqueta.replace("<", "").trim());
+
+      const faltantes = etiquetasLimpias.filter(etiqueta => !html.value.includes(`<${etiqueta}`));
+
+      if (faltantes.length === 0) {
+        alert("¡Está bien! Has completado el ejercicio.");
+
+        const nextLevelId = parseInt(nivelId.value) + 1; 
+        lliureStore.setUnlockedLevel(nextLevelId);
+
+        html.value = '';
+        css.value = '';
+        js.value = '';
+        question.value = '';
+
+        router.push(`/nivel/${nextLevelId}`); 
+      } else {
+        alert(`Faltan las siguientes etiquetas: ${faltantes.join(", ")}`);
+      }
+    };
+
+    watch(() => route.params.id, (newNivelId) => {
+      nivelId.value = newNivelId;
+      title.value = `Ejercicio ${newNivelId}`;
       fetchQuestion(); 
+      clearEditors();  
+    });
 
+    const clearEditors = () => {
+      html.value = '';
+      css.value = '';
+      js.value = '';
+      if (htmlEditorInstance) {
+        htmlEditorInstance.setValue(''); 
+      }
+    };
+
+    onMounted(() => {
+      lliureStore.toggleLliure();  
+      fetchQuestion();  
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
         mode: "htmlmixed",
         theme: "dracula",
@@ -98,11 +141,15 @@ export default {
       });
 
       htmlEditorInstance.on("change", (instance) => {
-        html.value = instance.getValue();
+        html.value = instance.getValue();  
       });
     });
 
-    const goBack = () => router.push("/");
+    const goBack = () => router.push("/"); 
+
+    onUnmounted(() => {
+      lliureStore.toggleLliure(); 
+    });
 
     return {
       title,
@@ -121,6 +168,7 @@ export default {
           <body>${html.value}</body>
         </html>
       `),
+      validateExercise,
     };
   },
 };
