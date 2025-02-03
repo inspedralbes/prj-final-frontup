@@ -7,7 +7,15 @@
         <p>Aquesta plataforma és un entorn interactiu per a desenvolupadors i dissenyadors front-end. Crea i experimenta amb projectes, comparteix les teves creacions, prova les teves idees i troba inspiració per continuar aprenent.
         </p>
       </div>
-      <div class="loop"></div>
+      <div class="looping-words">
+        <div class="looping-words__containers">
+          <ul class="looping-words__list">
+            <li class="looping-words__list-item">HTML</li>
+            <li class="looping-words__list-item">CSS</li>
+            <li class="looping-words__list-item">JAVASCRIPT</li>
+          </ul>
+        </div>
+      </div>
       <br><br><br>
       <!-- Card Container -->
       <div class="card-container">
@@ -47,6 +55,36 @@
 <script>
 export default {
   name: 'Index',
+  mounted() {
+    // Espera un poco para comenzar la animación después de que se haya renderizado el HTML
+    setTimeout(() => {
+      const wordList = document.querySelector('.looping-words__list');
+      const words = Array.from(wordList.children);
+      let currentIndex = 0;
+      const totalWords = words.length;
+      const wordHeight = 100 / totalWords;
+
+      const moveWords = () => {
+        currentIndex++; 
+        
+        // Cuando llegamos al final, reseteamos directamente al primer elemento.
+        if (currentIndex >= totalWords) {
+          currentIndex = 0; // Reseteamos al primer índice
+          wordList.style.transition = 'none'; // Desactivamos la transición
+          wordList.style.transform = `translateY(0%)`; // Reseteamos inmediatamente
+
+          // Forzamos una pequeña re-dibujada para hacer el cambio de animación
+          setTimeout(() => {
+            wordList.style.transition = 'transform 1s ease-out'; // Volvemos a activar la transición
+          }, 50);
+        } else {
+          wordList.style.transform = `translateY(-${wordHeight * currentIndex}%)`; 
+        }
+      };
+
+      setInterval(moveWords, 2000); // Mueve las palabras cada 2 segundos
+    }, 500); // Retrasar la animación 500ms después de que la página haya cargado
+  },
 };
 </script>
 
@@ -61,7 +99,7 @@ export default {
   margin-top: 80px;
   margin-left: 200px;
   padding: 10px;
-  flex-direction: column;
+  flex-direction: flex;
   justify-content: space-between;
   background-color: #121212;
 }
@@ -129,6 +167,35 @@ footer {
   text-align: center;
   padding: 10px 20px;
   color: white;
+}
+
+.looping-words {
+  position: absolute;
+  width: 20%; /* Ajusta el ancho de la sección */
+  height: 2.5em; /* Ajustamos la altura */
+  font-size: 5vw; /* Reducimos el tamaño de las palabras */
+  padding-left: 0.1em;
+  padding-right: 0.1em;
+  overflow: hidden; /* Oculta el contenido fuera del contenedor */
+  right: 10%;
+  top: 30%;
+}
+
+.looping-words__list {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  transition: transform 1s ease-out;
+}
+
+.looping-words__list-item {
+  text-align: center;
+  text-transform: uppercase;
+  font-family: PP Neue Corp, sans-serif;
+  font-weight: 700;
+  min-height: 2.5em; /* Ajusta la altura para que solo se vea una palabra */
 }
 </style>
 
