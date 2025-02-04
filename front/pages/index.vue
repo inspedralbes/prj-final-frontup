@@ -1,139 +1,132 @@
 <template>
   <div class="todo">
-    <!-- Header -->
-    <header :class="theme">
-      <div class="header-left">
-        <!-- Buscador -->
-        <input class="search-box" type="text" placeholder="Buscar...">
-      </div>
-      <div class="header-right">
-        <button @click="toggleTheme" class="btn" :class="theme">{{ themeIcon }}</button>
-        <button class="btn" :class="theme">{{ registerText }}</button>
-        <button class="btn" :class="theme">{{ loginText }}</button>
-      </div>
-    </header>
-
-    <!-- Main Content -->
     <div class="main-container">
       <!-- Body Content -->
       <div class="body-content">
-        <h2>The best place to build <br>
-           test, and discover front- <br>end code.</h2>
-        <p>CodeCod is a social development environment for front-end<br> 
-          designers and developers. Build and deploy a website, show off your <br>
-          work, build test cases to learn and debug, and find inspiration.</p>
+        <h2>El lloc ideal per crear, provar i explorar codi web.</h2>
+        <p>Aquesta plataforma és un entorn interactiu per a desenvolupadors i dissenyadors front-end. Crea i experimenta amb projectes, comparteix les teves creacions, prova les teves idees i troba inspiració per continuar aprenent.
+        </p>
+      </div>
+      <div class="looping-words">
+        <div class="looping-words__containers">
+          <ul class="looping-words__list">
+            <li class="looping-words__list-item">HTML</li>
+            <li class="looping-words__list-item">CSS</li>
+            <li class="looping-words__list-item">JAVASCRIPT</li>
+            <li class="looping-words__list-item">HTML</li>
+            <li class="looping-words__list-item">CSS</li>
+            <li class="looping-words__list-item">JAVASCRIPT</li>
+          </ul>
+        </div>
       </div>
       <br><br><br>
       <!-- Card Container -->
       <div class="card-container">
-        <div class="card" :class="theme">
-          <h3 :class="theme">Build & Test</h3>
-          <p :class="theme">
-            Get work done quicker by building out entire projects or isolating
-            code to test features and animations.
+        <div class="card">
+          <h3>Crea i Experimenta</h3>
+          <p>
+            Dóna vida a les teves idees construint projectes complets o provant funcions i animacions específiques.
           </p>
-          <button :class="theme">Try the Editor</button>
+          <button>Prova l'Editor</button>
         </div>
-        <div class="card" :class="theme">
-          <h3 :class="theme">Learn & Discover</h3>
-          <p :class="theme">
-            Want to upgrade your skills and get noticed? Participating in
-            CodePen Challenges is a great way to try something new.
+        <div class="card">
+          <h3>Practica els teus coneixements</h3>
+          <p>
+            Vols provar-te fent uns exercicis per veure quin nivell tens?
           </p>
-          <button :class="theme">Join this Week's Challenge</button>
+          <button>Participa els reptes que et proposem</button>
         </div>
-        <div class="card" :class="theme">
-          <h3 :class="theme">Share Your Work</h3>
-          <p :class="theme">
-            Become a part of the most active front-end community in the world
-            by sharing work.
+        <div class="card">
+          <h3>Comparteix els Teus Projectes</h3>
+          <p>
+            Uneix-te a la comunitat global de desenvolupadors front-end compartint les teves creacions i inspirant
+            altres.
           </p>
-          <button :class="theme">Explore Trending</button>
+          <button>Descobreix el Més Popular</button>
         </div>
+
       </div>
+      <br><br>
+      <!-- Footer -->
     </div>
-    <br><br>
-    <!-- Footer -->
   </div>
-<footer>
-  <p>© 2025 FrontUp</p>
-</footer>
+  <footer>
+    <p>© 2025 FrontUp</p>
+  </footer>
 </template>
 
 <script>
 export default {
-  name: 'HomePage',
-  data() {
-    return {
-      theme: '',
-      themeIcon: '☀️',
-      footerText: '© 2025 FrontUp',
-      registerText: 'Registro',
-      loginText: 'Login',
-    };
-  },
-  methods: {
-    toggleTheme() {
-      if (this.theme === '') {
-        this.theme = 'light-mode';
-        this.themeIcon = '🌙';
-      } else {
-        this.theme = '';
-        this.themeIcon = '☀️';
-      }
-      document.body.className = this.theme;
-    },
-    navigateToLliure() {
-      this.$router.push('/lliure'); 
-    },
-    navigateToNiveles() {
-      this.$router.push('/niveles'); 
-    },
+  name: 'Index',
+  mounted() {
+    setTimeout(() => {
+      const wordList = document.querySelector('.looping-words__list');
+      const words = Array.from(wordList.children);
+      const wordHeight = 100 / words.length;
+
+      const moveWords = () => {
+        wordList.style.transition = 'transform 1s ease-out';
+        wordList.style.transform = `translateY(-${wordHeight}%)`;
+
+        setTimeout(() => {
+          wordList.appendChild(words[0]); // Mueve la primera palabra al final
+          wordList.style.transition = 'none';
+          wordList.style.transform = 'translateY(0)';
+
+          words.push(words.shift()); // Reorganiza el array en memoria
+        }, 1000); // Tiempo suficiente para completar la animación
+      };
+
+      setInterval(moveWords, 2000);
+    }, 500);
   },
 };
+
 </script>
 
 <style scoped>
-
-.todo{
-  background-color: rgb(177, 162, 162);
+.todo {
+  background-color: #121212;
   height: 100vh;
+  color: #e0e0e0;
 }
+
 .main-container {
   margin-top: 80px;
   margin-left: 200px;
-  padding: 20px;
-  flex-direction: column;
+  padding: 10px;
+  flex-direction: flex;
   justify-content: space-between;
+  background-color: #121212;
 }
 
 .body-content {
   text-align: left;
-  margin-bottom: 40px;
+  width: 50%;
 }
 
 .body-content h2 {
-  font-size: 2em;
+  font-size: 3em;
   margin-bottom: 20px;
+  color: #fff;
 }
 
 .body-content p {
   font-size: 1em;
-  color: #666;
+  color: #b0b0b0;
 }
 
 .card-container {
   display: flex;
   justify-content: space-around;
-  gap: 20px;
-  margin-right: 30px;
+  gap: 10px;
 }
 
 .card {
-  background-color: #4b4747;
-  padding: 20px;
+  background-color: #1e1e1e;
+  padding: 10px;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   width: 300px;
   text-align: center;
 }
@@ -141,6 +134,7 @@ export default {
 .card h3 {
   margin-bottom: 15px;
   font-size: 25px;
+  color: #fff;
 }
 
 .card p {
@@ -152,15 +146,50 @@ export default {
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
-  background-color: rgb(161, 152, 152);
-  color: black;
+  background-color: #333;
+  color: #fff;
   cursor: pointer;
+  bottom: 0;
 }
 
+.card button:hover {
+  background-color: #555;
+}
+
+
 footer {
-  background-color: #404040;
+  background-color: #000000;
   text-align: center;
   padding: 10px 20px;
   color: white;
+}
+
+.looping-words {
+  position: absolute;
+  width: 30%; 
+  height: 3.5em;
+  font-size: 5vw; 
+  padding-left: 0.1em;
+  padding-right: 0.1em;
+  overflow: hidden;
+  right: 10%;
+  top: 20%;
+}
+
+.looping-words__list {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  transition: transform 1s ease-out;
+}
+
+.looping-words__list-item {
+  text-align: center;
+  text-transform: uppercase;
+  font-family: PP Neue Corp, sans-serif;
+  font-weight: 700;
+  min-height: 0em;
 }
 </style>

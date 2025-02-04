@@ -4,8 +4,8 @@
 
     <div class="left-section">
       <h2>FrontUp</h2>
+      <button class="btn btn-crear" @click="navigateToLliure">Crear projecte</button>
       <button class="btn">Els meus projectes</button>
-      <button class="btn" @click="navigateToLliure">Lliure</button>
       <button class="btn" @click="navigateToNiveles">Nivells</button>
       <button class="btn">Projectes favorits</button>
     </div>
@@ -78,6 +78,12 @@ const navigateProjects = () => {
 body {
   margin: 0;
   font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+h2{
+  padding: 10px;
 }
 
 .left-section {
@@ -86,19 +92,38 @@ body {
   left: 0;
   width: 180px;
   height: 100%;
-  background-color: #404040;
-  padding: 15px;
+  background-color: #1e1e1e;
   box-sizing: border-box;
+  text-align: center;
 }
 
 .left-section .btn {
-  padding: 10px 15px;
-  background-color: #333;
+  background-color: #1e1e1e;
   color: #fff;
+  border: none;
+  padding: 10px 15px;
+  width: 100%;
   cursor: pointer;
   text-transform: uppercase;
   border-radius: 4px;
 }
+
+.left-section .btn:hover {
+  background-color: #141414;
+}
+
+.left-section .btn-crear {
+  background-color: #000; 
+  font-weight: bold;
+  border: 2px solid;
+  border-radius: 6px;
+  width: 80%;
+}
+
+.left-section .btn-crear:hover {
+  background-color: #000;
+}
+
 
 .left-section button {
   margin-bottom: 15px;
@@ -114,7 +139,7 @@ header {
   left: 180px;
   right: 0;
   height: 80px;
-  background-color: black;
+  background-color: #000000;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -134,21 +159,24 @@ header {
 .search-box {
   padding: 8px;
   width: 300px;
-  border: 1px solid #ddd;
+  border: 1px solid #555;
   border-radius: 4px;
+  background-color: #333;
+  color: #fff;
 }
 
 .header-right .btn {
   padding: 10px 15px;
-  background-color: #333;
+  background-color: #444;
   color: #fff;
   cursor: pointer;
   text-transform: uppercase;
   border-radius: 4px;
+  border: none;
 }
 
 .header-right .btn:hover {
-  background-color: #0056b3;
+  background-color: #555;
 }
 
 .light-mode {
