@@ -50,6 +50,27 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Update user level.
+     */
+
+    public function updateLevel(Request $request, $id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
+
+        $request->validate([
+            'nivel' => 'required|integer|min:1'
+        ]);
+
+        $user->nivel = $request->nivel;
+        $user->save();
+
+        return response()->json(['message' => 'Nivel actualizado', 'nivel' => $user->nivel]);
+    }
     
     /**
      * Display a listing of the resource.

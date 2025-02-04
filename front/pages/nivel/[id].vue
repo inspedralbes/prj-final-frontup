@@ -83,7 +83,7 @@ export default {
   }
 };
 
-    const validateExercise = () => {
+const validateExercise = async () => {
   if (!question.value) {
     alert("No se ha cargado una pregunta.");
     return;
@@ -103,19 +103,33 @@ export default {
   if (faltantes.length === 0) {
     alert("¡Está bien! Has completado el ejercicio.");
 
-    const nextLevelId = parseInt(nivelId.value) + 1; 
+    const nextLevelId = parseInt(nivelId.value) + 1;
+    const userId = 1; 
 
-    html.value = '';
-    css.value = '';
-    js.value = '';
-    question.value = ''; 
+    try {
+      const response = await fetch(`http://localhost:8000/api/users/${userId}/update-level`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}` 
+        },
+        body: JSON.stringify({ nivel: nextLevelId })
+      });
 
-    router.push(`/nivel/${nextLevelId}`); 
+      if (!response.ok) throw new Error("Error al actualizar el nivel");
+
+      router.push(`/nivel/${nextLevelId}`);
+
+    } catch (error) {
+      console.error("Error al actualizar el nivel:", error);
+    }
 
   } else {
     alert(`Faltan las siguientes etiquetas: ${faltantes.join(", ")}`);
   }
 };
+
+
 
 
 watch(() => route.params.id, (newNivelId) => {
