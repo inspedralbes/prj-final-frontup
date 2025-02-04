@@ -44,7 +44,9 @@
     </div>
 
     <!-- Chat IA flotante -->
-    <div v-if="isChatVisible" class="chat-container">
+    <div v-if="isChatVisible" class="chat-container" 
+     :style="{ transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)` }"
+     @mousedown="startDrag">
       <button class="close-chat-button" @click="toggleChat">✖</button>
       <h2 class="chat-title">Chat con Gemini</h2>
       <div class="messages-container" ref="messagesContainer">
@@ -112,8 +114,9 @@ export default {
     const router = useRouter();
     const { guardarProyectoDB, chatIA, state } = useCommunicationManager();
     const lliureStore = useLliureStore();
-
-    // Estados
+    const isDragging = ref(false);
+    const chatPosition = ref({ x: 20, y: 20 });
+    const dragStartPosition = ref({ x: 0, y: 0 });
     const title = ref("Untitled");
     const html = ref("");
     const css = ref("");
@@ -137,7 +140,28 @@ export default {
     const jsEditor = ref(null);
 
     let htmlEditorInstance, cssEditorInstance, jsEditorInstance;
-
+    const startDrag = (event) => {
+      isDragging.value = true;
+      dragStartPosition.value = {
+        x: event.clientX - chatPosition.value.x,
+        y: event.clientY - chatPosition.value.y,
+      };
+      document.addEventListener("mousemove", onDrag);
+      document.addEventListener("mouseup", stopDrag);
+    };
+    const onDrag = (event) => {
+      if (isDragging.value) {
+        chatPosition.value = {
+          x: event.clientX - dragStartPosition.value.x,
+          y: event.clientY - dragStartPosition.value.y,
+        };
+      }
+    };
+    const stopDrag = () => {
+      isDragging.value = false;
+      document.removeEventListener("mousemove", onDrag);
+      document.removeEventListener("mouseup", stopDrag);
+    };
     // Ciclo de vida
     onMounted(() => {
       lliureStore.toggleLliure();
@@ -189,7 +213,7 @@ export default {
 
       const userMessage = newMessage.value;
       newMessage.value = "";
-      
+
       // Agregar mensaje del usuario
       messages.value.push({
         type: 'user',
@@ -203,7 +227,7 @@ export default {
       });
 
       try {
-        const response = await chatIA(userMessage,html.value,css.value,js.value);
+        const response = await chatIA(userMessage, html.value, css.value, js.value);
         messages.value.pop();
         messages.value.push({
           type: 'ai',
@@ -289,6 +313,11 @@ export default {
       closeSettingsModal,
       saveSettings,
       guardarProyecto,
+      isDragging,
+      chatPosition,
+      startDrag,
+      onDrag,
+      stopDrag,
       output: computed(() => {
         let jsContent = js.value;
         let scriptContent = `
@@ -512,6 +541,11 @@ export default {
   padding: 15px;
   z-index: 1001;
   color: #fff;
+  cursor: grab;
+}
+
+.chat-container:active {
+  cursor: grabbing;
 }
 
 .chat-title {
