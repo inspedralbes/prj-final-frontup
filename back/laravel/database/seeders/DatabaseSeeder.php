@@ -9,9 +9,20 @@ class DatabaseSeeder extends Seeder
 {
     
     public function run(): void
-    {
-        $this->call([
-            ProjectsTableSeeder::class,
-        ]);
-    }
+{
+    User::factory()->create([
+        'id' => 1,
+        'name' => 'Usuari 1',
+        'email' => 'usuari1@example.com',
+    ]);
+
+    User::factory()->create([
+        'id' => 2,
+        'name' => 'Usuari 2',
+        'email' => 'usuari2@example.com',
+    ]);
+
+    $this->call(ProjectsTableSeeder::class);
+}
+
 }
