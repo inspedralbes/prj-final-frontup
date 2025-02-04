@@ -13,6 +13,9 @@
             <li class="looping-words__list-item">HTML</li>
             <li class="looping-words__list-item">CSS</li>
             <li class="looping-words__list-item">JAVASCRIPT</li>
+            <li class="looping-words__list-item">HTML</li>
+            <li class="looping-words__list-item">CSS</li>
+            <li class="looping-words__list-item">JAVASCRIPT</li>
           </ul>
         </div>
       </div>
@@ -56,36 +59,29 @@
 export default {
   name: 'Index',
   mounted() {
-    // Espera un poco para comenzar la animación después de que se haya renderizado el HTML
     setTimeout(() => {
       const wordList = document.querySelector('.looping-words__list');
       const words = Array.from(wordList.children);
-      let currentIndex = 0;
-      const totalWords = words.length;
-      const wordHeight = 100 / totalWords;
+      const wordHeight = 100 / words.length;
 
       const moveWords = () => {
-        currentIndex++; 
-        
-        // Cuando llegamos al final, reseteamos directamente al primer elemento.
-        if (currentIndex >= totalWords) {
-          currentIndex = 0; // Reseteamos al primer índice
-          wordList.style.transition = 'none'; // Desactivamos la transición
-          wordList.style.transform = `translateY(0%)`; // Reseteamos inmediatamente
+        wordList.style.transition = 'transform 1s ease-out';
+        wordList.style.transform = `translateY(-${wordHeight}%)`;
 
-          // Forzamos una pequeña re-dibujada para hacer el cambio de animación
-          setTimeout(() => {
-            wordList.style.transition = 'transform 1s ease-out'; // Volvemos a activar la transición
-          }, 50);
-        } else {
-          wordList.style.transform = `translateY(-${wordHeight * currentIndex}%)`; 
-        }
+        setTimeout(() => {
+          wordList.appendChild(words[0]); // Mueve la primera palabra al final
+          wordList.style.transition = 'none';
+          wordList.style.transform = 'translateY(0)';
+
+          words.push(words.shift()); // Reorganiza el array en memoria
+        }, 1000); // Tiempo suficiente para completar la animación
       };
 
-      setInterval(moveWords, 2000); // Mueve las palabras cada 2 segundos
-    }, 500); // Retrasar la animación 500ms después de que la página haya cargado
+      setInterval(moveWords, 2000);
+    }, 500);
   },
 };
+
 </script>
 
 <style scoped>
@@ -113,7 +109,6 @@ export default {
   font-size: 3em;
   margin-bottom: 20px;
   color: #fff;
-  font-family: Georgia, 'Times New Roman', Times, serif;
 }
 
 .body-content p {
@@ -171,14 +166,14 @@ footer {
 
 .looping-words {
   position: absolute;
-  width: 20%; /* Ajusta el ancho de la sección */
-  height: 2.5em; /* Ajustamos la altura */
-  font-size: 5vw; /* Reducimos el tamaño de las palabras */
+  width: 30%; 
+  height: 3.5em;
+  font-size: 5vw; 
   padding-left: 0.1em;
   padding-right: 0.1em;
-  overflow: hidden; /* Oculta el contenido fuera del contenedor */
+  overflow: hidden;
   right: 10%;
-  top: 30%;
+  top: 20%;
 }
 
 .looping-words__list {
@@ -195,7 +190,7 @@ footer {
   text-transform: uppercase;
   font-family: PP Neue Corp, sans-serif;
   font-weight: 700;
-  min-height: 2.5em; /* Ajusta la altura para que solo se vea una palabra */
+  min-height: 0em;
 }
 </style>
 
