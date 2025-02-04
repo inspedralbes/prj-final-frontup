@@ -87,7 +87,7 @@ export default {
 <style scoped>
 .todo {
   background-color: #121212;
-  height: 100vh;
+  height: 100%;
   color: #e0e0e0;
 }
 
