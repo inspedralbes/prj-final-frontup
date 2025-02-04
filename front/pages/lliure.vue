@@ -400,7 +400,8 @@ export default {
   position: relative;
   transition: all 0.3s ease-in-out;
   background-color: white;
-  height: 28vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .output-container.expanded {
