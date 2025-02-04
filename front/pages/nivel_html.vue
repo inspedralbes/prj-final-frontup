@@ -1,6 +1,6 @@
 <template>
   <div class="level-container">
-    <button class="back-button" @click="irAtras">Atrás</button>
+
     <div v-for="level in levels" :key="level.id" class="level-button-container">
       <div
         class="level-button"
@@ -126,17 +126,17 @@ export default {
   transform: translate(-50%, -50%);
   font-size: 24px;
 }
+.level-button-container:nth-child(1) { top: 40%; left: 10%; }
+.level-button-container:nth-child(2) { top: 60%; left: 18%; }
+.level-button-container:nth-child(3) { top: 40%; left: 26%; }
+.level-button-container:nth-child(4) { top: 60%; left: 34%; }
+.level-button-container:nth-child(5) { top: 40%; left: 42%; }
+.level-button-container:nth-child(6) { top: 60%; left: 50%; }
+.level-button-container:nth-child(7) { top: 40%; left: 58%; }
+.level-button-container:nth-child(8) { top: 60%; left: 66%; }
+.level-button-container:nth-child(9) { top: 40%; left: 74%; }
+.level-button-container:nth-child(10) { top: 60%; left: 82%; }
 
-.level-button-container:nth-child(2) { top: 50%; left: 10%; }
-.level-button-container:nth-child(3) { top: 30%; left: 20%; }
-.level-button-container:nth-child(4) { top: 50%; left: 30%; }
-.level-button-container:nth-child(5) { top: 30%; left: 40%; }
-.level-button-container:nth-child(6) { top: 50%; left: 50%; }
-.level-button-container:nth-child(7) { top: 30%; left: 60%; }
-.level-button-container:nth-child(8) { top: 50%; left: 70%; }
-.level-button-container:nth-child(9) { top: 30%; left: 80%; }
-.level-button-container:nth-child(10) { top: 50%; left: 90%; }
-.level-button-container:nth-child(11) { top: 50%; left: 90%; }
 .back-button {
   position: absolute;
   top: 20px;
