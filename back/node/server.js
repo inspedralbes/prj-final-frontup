@@ -3,6 +3,7 @@ import cors from "cors";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const app = express();
+const PORT = 5000;
 
 app.use(cors());
 app.use(express.json());
@@ -16,7 +17,7 @@ app.post("/pregunta", async (req, res) => {
         const { html } = req.body;
         const { css } = req.body;
         const { js } = req.body;
-        let preguntaIA = 'Eres un programador frontend experto, responde a la siguiente pregunta '+pregunta;
+        let preguntaIA = 'Eres un programador frontend experto, responde a la siguiente pregunta teniendo en cuenta que la persona a la que le hablas es un desarrollador novato, '+pregunta;
         if(html!=""){
             preguntaIA += ' este es mi html '+html;
         }
@@ -45,4 +46,4 @@ app.post("/pregunta", async (req, res) => {
     }
 });
 
-app.listen(5000, () => console.log("Servidor en puerto 5000"));
+app.listen(PORT, () => console.log("Servidor corriendo en http://localhost:"+PORT));
