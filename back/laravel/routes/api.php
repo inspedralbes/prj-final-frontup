@@ -9,12 +9,13 @@ use App\Http\Controllers\PreguntaController;
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [UserController::class, 'getUser']);
     Route::post('/user/avatar', [UserController::class, 'updateAvatar']);
+    Route::get('/projects', [ProjectController::class, 'index']);   
 });
 Route::post('/projects', [ProjectController::class, 'store']);      
-Route::get('/projects', [ProjectController::class, 'index']);       
 Route::get('/projects/{id}', [ProjectController::class, 'show']);   
 Route::put('/projects/{id}', [ProjectController::class, 'update']); 
 Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
+
 
 Route::post('/register', [AuthenticatorController::class, 'register']);
 
