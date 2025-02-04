@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -6,9 +7,17 @@ use App\Models\Project;
 
 class ProjectController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $projects = Project::all();
+        $query = Project::query();
+
+        if ($search = $request->get('search')) {
+            $query->where('nombre', 'like', "%{$search}%");
+        }
+    
+        $projects = $query->get();  
+
         
         return view('projects.index', compact('projects'));
     }
