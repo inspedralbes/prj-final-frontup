@@ -1,6 +1,5 @@
 <template>
   <div class="todo">
-    <!-- Encabezado -->
     <header class="header">
       <button class="header-button" @click="goBack">Atrás</button>
       <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
@@ -12,14 +11,12 @@
       </div>
     </header>
 
-    <!-- Notificación -->
     <div v-if="notification" class="notification">
       <div class="notification-icon">❗</div>
       <span>{{ notification }}</span>
       <button class="notification-close" @click="clearNotification">X</button>
     </div>
 
-    <!-- Modal de Configuración -->
     <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
       <div class="modal-content" @click.stop>
         <h2>Configuración del Proyecto</h2>
@@ -42,7 +39,6 @@
       </div>
     </div>
 
-    <!-- Contenedor principal -->
     <div class="editor-container">
       <div class="editor-box">
         <div class="editor-label">HTML</div>
@@ -58,7 +54,6 @@
       </div>
     </div>
 
-    <!-- Salida del código -->
     <div class="output-container" :class="{ expanded: isExpanded }" ref="outputContainer">
       <button class="expand-button" @click="toggleExpand">
         <img v-if="!isExpanded" src="/assets/img/pantalla-grande.svg" alt="Pantalla Grande" width="30" />
@@ -88,7 +83,6 @@ export default {
     const { guardarProyectoDB } = useCommunicationManager();
     const lliureStore = useLliureStore();
 
-    // Reactive state
     const title = ref("Untitled");
     const html = ref("");
     const css = ref("");
@@ -106,7 +100,6 @@ export default {
 
     let htmlEditorInstance, cssEditorInstance, jsEditorInstance;
 
-    // Lifecycle hooks
     onMounted(() => {
       lliureStore.toggleLliure();
 
@@ -145,7 +138,6 @@ export default {
       lliureStore.toggleLliure();
     });
 
-    // Functions
     const toggleExpand = () => {
       isExpanded.value = !isExpanded.value;
     };
