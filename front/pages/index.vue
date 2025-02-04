@@ -119,10 +119,11 @@ export default {
 .card-container {
   display: flex;
   justify-content: space-around;
-  gap: 10px;
+  gap: 5vw;
 }
 
 .card {
+  margin-top: 10vh;
   background-color: #1e1e1e;
   padding: 10px;
   border-radius: 8px;
