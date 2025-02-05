@@ -96,7 +96,7 @@ const useCommunicationManager = () => {
   }
   const chatIA = async (mensaje, html, css, js) => {
     try {
-      const response = await fetch(`${nodeURLZ}/pregunta`, {
+      const response = await fetch(`${nodeURL}/pregunta`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
