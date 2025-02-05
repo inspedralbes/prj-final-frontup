@@ -52,11 +52,18 @@ class AuthenticatorController extends Controller
      */
     public function register(Request $request)
     {
-        $data = $request->validate([
-            'username' => 'required|string|min:3',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:4',
-        ]);
+        $name = $request->input('name'); 
+        $email = $request->input('email'); 
+        $password = $request->input('password'); 
+        $data = [];
+        $data['username'] = $name;
+        $data['email'] = $email;
+        $data['password'] = $password;
+        // $data = $request->validate([
+        //     'name' => 'required|string|min:3',
+        //     'email' => 'required|email|unique:users,email',
+        //     'password' => 'required|string|min:4',
+        // ]);
 
         try {
             $user = User::create([

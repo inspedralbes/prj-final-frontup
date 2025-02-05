@@ -33,9 +33,9 @@
         <p>Crear nou compte</p>
         <div class="field">
           <svg viewBox="0 0 19 19" fill="none" width="16" height="16" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5 21C5 17.134 8.13401 14 12 14C15.866 14 19 17.134 19 21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
-          <input type="text" class="input-field" id="username" placeholder="Nom d'usuari" v-model="formData.username"
-            @blur="validateUsername" />
-          <p class="error" v-if="errors.username">{{ errors.username }}</p>
+          <input type="text" class="input-field" id="name" placeholder="Nom d'usuari" v-model="formData.name"
+            @blur="validatename" />
+          <p class="error" v-if="errors.name">{{ errors.name }}</p>
         </div>
         <div class="field">
           <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -101,14 +101,14 @@ onMounted(() => {
 const formData = reactive({
   email: '',
   password: '',
-  username: '',
+  name: '',
   passwordRepeat: ''
 });
 
 const errors = reactive({
   email: '',
   password: '',
-  username: '',
+  name: '',
   passwordRepeat: ''
 });
 
@@ -123,8 +123,8 @@ const validateEmail = () => {
   errors.email = emailRegex.test(formData.email) ? '' : 'Correo inválido';
 };
 
-const validateUsername = () => {
-  errors.username = formData.username ? '' : 'El nombre de usuario es obligatorio';
+const validatename = () => {
+  errors.name = formData.name ? '' : 'El nombre de usuario es obligatorio';
 };
 
 const validatePassword = () => {
@@ -144,11 +144,11 @@ const isRegisterFormValid = () => {
   return (
     formData.email &&
     formData.password &&
-    formData.username &&
+    formData.name &&
     formData.passwordRepeat &&
     !errors.email &&
     !errors.password &&
-    !errors.username &&
+    !errors.name &&
     !errors.passwordRepeat
   );
 };
@@ -175,7 +175,7 @@ const login = async () => {
         appStore.setLoginInfo({
           loggedIn: true,
           token: data.token,
-          username: data.username,
+          name: data.name,
           email: data.email,
           nivel: data.nivel,
           avatar: data.avatar,
@@ -194,12 +194,12 @@ const login = async () => {
 
 const register = async () => {
   validateEmail();
-  validateUsername();
+  validatename();
   validatePassword();
   validatePasswordRepeat();
 
   if (isRegisterFormValid()) {
-    const avatarUrl = `https://api.multiavatar.com/${formData.username}.png`;
+    const avatarUrl = `https://api.multiavatar.com/${formData.name}.png`;
 
     try {
       const response = await fetch('http://127.0.0.1:8000/api/register', {
@@ -232,7 +232,7 @@ const register = async () => {
           appStore.setLoginInfo({
             loggedIn: true,
             token: loginData.token,
-            username: loginData.username,
+            name: loginData.name,
             email: loginData.email,
             nivel: loginData.nivel,
             avatar: avatarUrl,
