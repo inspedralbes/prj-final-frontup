@@ -9,19 +9,20 @@ class ProjectController extends Controller
 {
     public function index(Request $request)
     {
-        $projects = Project::all();
-        $query = Project::query();
+        $user = $request->user();
 
-        if ($search = $request->get('search')) {
-            $query->where('nombre', 'like', "%{$search}%");
+        if (!$user) {
+            return response()->json(['message' => 'Usuario no autenticado'], 401);
         }
-    
-        $projects = $query->get();  
+        $projects = Project::where('user_id', $user->id)->get();
 
-        
-        return view('projects.index', compact('projects'));
+        return response()->json([
+            'message' => 'Proyectos obtenidos con éxito',
+            'projects' => $projects,
+        ], 200);
     }
-    
+
+
     public function show($id)
     {
         $project = Project::find($id);
@@ -52,8 +53,7 @@ class ProjectController extends Controller
 
         $project = Project::create($validatedData);
 
-        return redirect()->route('projects.index')
-        ->with('success', 'Proyecto creado con éxito');
+        return response()->json(['success', 'Proyecto creado con éxito']);
 
     }
     
