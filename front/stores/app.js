@@ -23,7 +23,9 @@ export const useAppStore = defineStore('app', {
           token: '',
           name: '',
           email: '',
-          nivel: '',
+          nivel_html: '',
+          nivel_css: '',
+          nivel_javascript: '',
           avatar: typeof window !== 'undefined' ? localStorage.getItem('avatarUrl') || '' : '',
           imageId: '',
         },
@@ -36,7 +38,9 @@ export const useAppStore = defineStore('app', {
         token: '',
         name: '',
         email: '',
-        nivel: '',
+        nivel_html: '',
+        nivel_css: '',
+        nivel_javascript: '',
         avatar: '',
         imageId: '',
       };
@@ -47,8 +51,8 @@ export const useAppStore = defineStore('app', {
       }
     },
 
-    setLoginInfo({ loggedIn, token, name, email, nivel, avatar, imageId }) {
-      this.loginInfo = { loggedIn, token, name, email, nivel, avatar, imageId };
+    setLoginInfo({ loggedIn, token, name, email, nivel_html, nivel_css, nivel_javascript, avatar, imageId }) {
+      this.loginInfo = { loggedIn, token, name, email, nivel_html, nivel_css, nivel_javascript, avatar, imageId };
       if (typeof window !== 'undefined') {
         localStorage.setItem('loginInfo', JSON.stringify(this.loginInfo));
         localStorage.setItem('token', token);

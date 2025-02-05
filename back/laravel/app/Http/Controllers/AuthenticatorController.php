@@ -64,7 +64,9 @@ class AuthenticatorController extends Controller
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
                 'avatar' => 'https://api.multiavatar.com/' . urlencode($data['username']) . '.png',
-                'nivel' => 1,
+                'nivel_html' => 1,
+                'nivel_css' => 1,
+                'nivel_js' => 1,
             ]);
 
             $token = $user->createToken('auth_token')->plainTextToken;

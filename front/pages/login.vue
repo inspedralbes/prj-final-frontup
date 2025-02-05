@@ -173,14 +173,17 @@ const login = async () => {
 
       if (response.ok) {
         appStore.setLoginInfo({
-          loggedIn: true,
-          token: data.token,
-          username: data.username,
-          email: data.email,
-          nivel: data.nivel,
-          avatar: data.avatar,
-          imageId: data.imageId,
+            loggedIn: true,
+            token: data.token,
+            username: data.username,
+            email: data.email,
+            nivel_html: data.nivel_html,
+            nivel_css: data.nivel_css,
+            nivel_javascript: data.nivel_javascript,
+            avatar: data.avatar,
+            imageId: data.imageId,
         });
+
         router.push('/');
       } else {
         errorMessage.value = data.message || 'Credenciales inválidas';
@@ -230,12 +233,14 @@ const register = async () => {
         const loginData = await loginResponse.json();
         if (loginResponse.ok) {
           appStore.setLoginInfo({
-            loggedIn: true,
-            token: loginData.token,
-            username: loginData.username,
-            email: loginData.email,
-            nivel: loginData.nivel,
-            avatar: avatarUrl,
+              loggedIn: true,
+              token: loginData.token,
+              username: loginData.username,
+              email: loginData.email,
+              nivel_html: loginData.nivel_html,
+              nivel_css: loginData.nivel_css,
+              nivel_javascript: loginData.nivel_javascript,
+              avatar: avatarUrl,
           });
 
           router.push('/');
