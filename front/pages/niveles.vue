@@ -128,8 +128,8 @@ button:hover {
 }
 
 
-.HTML { background-image: url('/html.png'); }
-.boton_CSS { background-image: url('/css.png'); }
-.JAVA_SCRIP { background-image: url('/lion.png'); }
+.HTML { background-image: url('/html.png');}
+.boton_CSS { background-image: url('/css3.png');}
+.JAVA_SCRIP { background-image: url('/javascript.png');}
 
 </style>

@@ -1,6 +1,5 @@
 <template>
   <div class="level-container">
-    <button class="back-button" @click="irAtras">Atrás</button>
     <div
       v-for="level in levels"
       :key="level.id"
@@ -26,6 +25,7 @@ export default {
     return {
       levels: Array.from({ length: 10 }, (_, i) => ({
         id: i + 1,
+        locked: i > 0
       })),
       hoveredLevel: null,
     };
@@ -43,7 +43,7 @@ export default {
 
 <style>
 .level-container {
-  position: relative;
+  background-image: url('/fondo2.png');
   height: 99vh;
   width: 90%;
   margin-left: auto;
@@ -51,7 +51,6 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #202020;
   border: 1px solid #ddd;
   border-radius: 10px;
   background-size: cover;
@@ -69,7 +68,7 @@ export default {
 .level-button {
   width: 80px;
   height: 80px;
-  background-color: #3498db;
+  background-image: url('/boton.png');
   transform: scale(1.03);
   border-radius: 50%;
   display: flex;
@@ -83,19 +82,19 @@ export default {
 }
 
 .level-button:hover {
-  background-color: #2980b9;
+  background-image: url('/boton.png');
   transform: scale(1.1);
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* 🔒 Estilo para niveles bloqueados */
 .level-button.locked {
-  background-color: #7f8c8d;
+  background-image: url('/boton_lock.png');
   cursor: not-allowed;
 }
 
 .level-button.locked:hover {
-  background-color: #7f8c8d;
+  background-image: url('/boton_lock.png');
   transform: scale(1.03);
 }
 
@@ -107,32 +106,16 @@ export default {
   font-size: 24px;
 }
 
-.level-button-container:nth-child(2) { top: 50%; left: 10%; }
-.level-button-container:nth-child(3) { top: 30%; left: 20%; }
-.level-button-container:nth-child(4) { top: 50%; left: 30%; }
-.level-button-container:nth-child(5) { top: 30%; left: 40%; }
-.level-button-container:nth-child(6) { top: 50%; left: 50%; }
-.level-button-container:nth-child(7) { top: 30%; left: 60%; }
-.level-button-container:nth-child(8) { top: 50%; left: 70%; }
-.level-button-container:nth-child(9) { top: 30%; left: 80%; }
-.level-button-container:nth-child(10) { top: 50%; left: 90%; }
-.level-button-container:nth-child(11) { top: 50%; left: 90%; }
-.back-button {
-  position: absolute;
-  top: 20px;
-  left: 75%;
-  padding: 10px 20px;
-  background-color: #34495e;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s;
-  z-index: 10; /* Asegura que el botón esté por encima de otros elementos */
-}
 
-.back-button:hover {
-  background-color: #2c3e50;
-}
+.level-button-container:nth-child(1) { top: 40%; left: 10%; }
+.level-button-container:nth-child(2) { top: 60%; left: 18%; }
+.level-button-container:nth-child(3) { top: 40%; left: 26%; }
+.level-button-container:nth-child(4) { top: 60%; left: 34%; }
+.level-button-container:nth-child(5) { top: 40%; left: 42%; }
+.level-button-container:nth-child(6) { top: 60%; left: 50%; }
+.level-button-container:nth-child(7) { top: 40%; left: 58%; }
+.level-button-container:nth-child(8) { top: 60%; left: 66%; }
+.level-button-container:nth-child(9) { top: 40%; left: 74%; }
+.level-button-container:nth-child(10) { top: 60%; left: 82%; }
+
 </style>
