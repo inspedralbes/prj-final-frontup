@@ -12,12 +12,6 @@
       </div>
     </header>
 
-    <div v-if="notification" class="notification">
-      <div class="notification-icon">❗</div>
-      <span>{{ notification }}</span>
-      <button class="notification-close" @click="clearNotification">X</button>
-    </div>
-
     <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
       <div class="modal-content" @click.stop>
         <h2>Configuración del Proyecto</h2>
@@ -119,7 +113,6 @@ export default {
     const js = ref("");
     const isEditing = ref(false);
     const showSettingsModal = ref(false);
-    const notification = ref("");
     const modalTitle = ref("");
     const modalDescription = ref("");
     const isExpanded = ref(false);
@@ -273,12 +266,8 @@ export default {
           css_code: css.value || "",
           js_code: js.value || "",
         });
-        notification.value = "Proyecto guardado con éxito.";
       } catch (error) {
-        notification.value = "Error al guardar el proyecto.";
         console.error(error);
-      } finally {
-        setTimeout(() => (notification.value = ""), 3000);
       }
     };
 
@@ -292,7 +281,6 @@ export default {
       jsEditor,
       isEditing,
       showSettingsModal,
-      notification,
       modalTitle,
       modalDescription,
       isExpanded,
