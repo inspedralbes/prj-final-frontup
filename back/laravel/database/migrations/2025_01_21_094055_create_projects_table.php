@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->text('html_code');
-            $table->text('css_code');
-            $table->text('js_code');
+            $table->text('html_code')->nullable();
+            $table->text('css_code')->nullable();
+            $table->text('js_code')->nullable();
             $table->timestamps();
         });
     }
