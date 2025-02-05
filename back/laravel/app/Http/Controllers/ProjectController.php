@@ -53,8 +53,7 @@ class ProjectController extends Controller
 
         $project = Project::create($validatedData);
 
-        return redirect()->route('projects.index')
-        ->with('success', 'Proyecto creado con éxito');
+        return response()->json(['success', 'Proyecto creado con éxito']);
 
     }
     
