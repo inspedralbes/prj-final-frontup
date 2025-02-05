@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 21-01-2025 a las 12:33:43
+-- Tiempo de generación: 05-02-2025 a las 09:25:29
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -127,12 +127,14 @@ CREATE TABLE `migrations` (
 --
 
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
-(1, '0001_01_01_000000_create_users_table', 1),
-(2, '0001_01_01_000001_create_cache_table', 1),
-(3, '0001_01_01_000002_create_jobs_table', 1),
-(4, '2025_01_21_094055_create_projects_table', 1),
-(5, '2025_01_21_094159_create_puntuacions_table', 1),
-(6, '2025_01_21_094231_create_ejercicios_table', 1);
+(9, '0001_01_01_000000_create_users_table', 1),
+(10, '0001_01_01_000001_create_cache_table', 1),
+(11, '0001_01_01_000002_create_jobs_table', 1),
+(12, '2025_01_21_094055_create_projects_table', 1),
+(13, '2025_01_21_094159_create_puntuacions_table', 1),
+(14, '2025_01_21_094231_create_ejercicios_table', 1),
+(15, '2025_01_23_093257_create_personal_access_tokens_table', 1),
+(16, '2025_01_30_075221_create_preguntas_table', 1);
 
 -- --------------------------------------------------------
 
@@ -144,6 +146,42 @@ CREATE TABLE `password_reset_tokens` (
   `email` varchar(255) NOT NULL,
   `token` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `personal_access_tokens`
+--
+
+CREATE TABLE `personal_access_tokens` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `tokenable_type` varchar(255) NOT NULL,
+  `tokenable_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `abilities` text DEFAULT NULL,
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `preguntas`
+--
+
+CREATE TABLE `preguntas` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `pregunta` varchar(255) NOT NULL,
+  `resp_correcta` varchar(255) NOT NULL,
+  `resp_usuario` varchar(255) NOT NULL,
+  `nivel_id` varchar(255) NOT NULL,
+  `nivel_lenguage` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -162,6 +200,14 @@ CREATE TABLE `projects` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `projects`
+--
+
+INSERT INTO `projects` (`id`, `nombre`, `user_id`, `html_code`, `css_code`, `js_code`, `created_at`, `updated_at`) VALUES
+(1, 'Projecte HTML Bàsic', 1, '<h1>Hola, món!</h1>', 'h1 { color: blue; }', 'console.log(\'Hola, món!\');', '2024-02-03 23:00:00', '2024-02-03 23:00:00'),
+(2, 'Botó Interactiu', 2, '<button id=\"clickBtn\">Fes clic aquí</button>', '#clickBtn { background-color: green; color: white; padding: 10px; border: none; }', 'document.getElementById(\'clickBtn\').addEventListener(\'click\', function() { alert(\'Botó clicat!\'); });', '2024-02-03 23:00:00', '2024-02-03 23:00:00');
 
 -- --------------------------------------------------------
 
@@ -204,12 +250,22 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password` varchar(255) NOT NULL,
-  `avatar` varchar(255) NOT NULL,
-  `nivel` int(11) NOT NULL,
+  `avatar` varchar(255) DEFAULT NULL,
+  `nivel_html` int(11) NOT NULL DEFAULT 1,
+  `nivel_css` int(11) NOT NULL DEFAULT 1,
+  `nivel_js` int(11) NOT NULL DEFAULT 1,
   `remember_token` varchar(100) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `avatar`, `nivel_html`, `nivel_css`, `nivel_js`, `remember_token`, `created_at`, `updated_at`) VALUES
+(1, 'admin', 'admin@gmail.com', '2025-02-05 07:24:15', '$2y$12$kuahFhmRlx0dc1pTi.hLreZaC0Kuiubqwr9S7VuQobUDasWGuDfcW', NULL, 1, 1, 1, 'wEp0eEk0jw', '2025-02-05 07:24:15', '2025-02-05 07:24:15'),
+(2, 'juan', 'juan@gmail.com', '2025-02-05 07:24:15', '$2y$12$VyuQKv0BmBm8fCmS9adQHug.HNAPiDxtGJVSOZCS46vwHW3tnICzG', NULL, 1, 1, 1, 'NNzzZtiCoD', '2025-02-05 07:24:15', '2025-02-05 07:24:15');
 
 --
 -- Índices para tablas volcadas
@@ -266,6 +322,20 @@ ALTER TABLE `password_reset_tokens`
   ADD PRIMARY KEY (`email`);
 
 --
+-- Indices de la tabla `personal_access_tokens`
+--
+ALTER TABLE `personal_access_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
+  ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`);
+
+--
+-- Indices de la tabla `preguntas`
+--
+ALTER TABLE `preguntas`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `projects`
 --
 ALTER TABLE `projects`
@@ -320,13 +390,25 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT de la tabla `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT de la tabla `personal_access_tokens`
+--
+ALTER TABLE `personal_access_tokens`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `preguntas`
+--
+ALTER TABLE `preguntas`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `projects`
 --
 ALTER TABLE `projects`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `puntuacions`
@@ -338,7 +420,7 @@ ALTER TABLE `puntuacions`
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Restricciones para tablas volcadas
