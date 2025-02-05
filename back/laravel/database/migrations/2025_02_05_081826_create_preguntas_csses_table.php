@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('preguntas', function (Blueprint $table) {
+        Schema::create('preguntas_css', function (Blueprint $table) {
             $table->id();
             $table->string('pregunta');
             $table->string('resp_correcta');
@@ -20,11 +20,12 @@ return new class extends Migration
             $table->timestamps();
         });
     }
+
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('preguntas');
+        Schema::dropIfExists('preguntas_css');
     }
 };

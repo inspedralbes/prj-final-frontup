@@ -1,17 +1,11 @@
 <template>
   <div class="level-container">
     <button class="back-button" @click="irAtras">Atrás</button>
-    <div
-      v-for="level in levels"
-      :key="level.id"
-      class="level-button-container"
-    >
+    <div v-for="level in levels" :key="level.id" class="level-button-container">
       <div
         class="level-button"
         :class="{ locked: level.locked }"
         @click="!level.locked && ir_nivel(level.id)"
-        @mouseenter="hoveredLevel = level.id"
-        @mouseleave="hoveredLevel = null"
       >
         {{ level.id }}
         <div v-if="level.locked" class="lock-icon">🔒</div>
@@ -26,20 +20,46 @@ export default {
     return {
       levels: Array.from({ length: 10 }, (_, i) => ({
         id: i + 1,
+        locked: true, 
       })),
-      hoveredLevel: null,
+      userLevel: 1, 
     };
   },
+  async created() {
+    await this.fetchUserLevel();
+  },
   methods: {
+    async fetchUserLevel() {
+      try {
+        const response = await fetch("http://localhost:8000/api/user", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        if (!response.ok) throw new Error("Error al obtener el nivel del usuario");
+
+        const data = await response.json();
+        this.userLevel = data.user.nivel;
+
+        this.levels = this.levels.map((level) => ({
+          ...level,
+          locked: level.id > this.userLevel, 
+        }));
+      } catch (error) {
+        console.error("Error al cargar el nivel del usuario:", error);
+      }
+    },
     ir_nivel(levelId) {
       this.$router.push(`/nivel/${levelId}`);
     },
     irAtras() {
       this.$router.push("/niveles");
-    }
+    },
   },
 };
 </script>
+
 
 <style>
 .level-container {
