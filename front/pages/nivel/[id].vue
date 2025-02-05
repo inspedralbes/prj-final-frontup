@@ -129,9 +129,6 @@ const validateExercise = async () => {
   }
 };
 
-
-
-
 watch(() => route.params.id, (newNivelId) => {
   nivelId.value = newNivelId;
   fetchQuestion(); 
@@ -148,7 +145,6 @@ const clearEditors = () => {
     htmlEditorInstance.setValue('');
   }
 };
-
 
     onMounted(() => {
       lliureStore.toggleLliure();  
