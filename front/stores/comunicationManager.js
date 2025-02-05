@@ -1,8 +1,11 @@
 import { reactive } from 'vue';
 
-const baseURL = 'http://127.0.0.1:8000/api';
 
 const useCommunicationManager = () => {
+  const config = useRuntimeConfig();
+  const laravelURL = config.public.apiLaravelUrl;
+  const nodeURL = config.public.nodeUrl;
+
   const state = reactive({
     loading: false,
     error: null,
@@ -29,7 +32,7 @@ const useCommunicationManager = () => {
     }
 
     try {
-      const response = await fetch(`${baseURL}${url}`, options);
+      const response = await fetch(`${laravelURL}${url}`, options);
       const result = await response.json();
 
       if (!response.ok) {
@@ -71,7 +74,7 @@ const useCommunicationManager = () => {
     }
   };
   const guardarProyectoDB = async (proyecto) => {
-    fetch('http://localhost:8000/api/projects', {
+    fetch(`${laravelURL}/projects`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -93,7 +96,7 @@ const useCommunicationManager = () => {
   }
   const chatIA = async (mensaje, html, css, js) => {
     try {
-      const response = await fetch('http://localhost:5000/pregunta', {
+      const response = await fetch(`${nodeURLZ}/pregunta`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
