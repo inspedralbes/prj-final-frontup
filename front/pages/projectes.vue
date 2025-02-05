@@ -96,6 +96,7 @@ export default {
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
   margin-top: 20px;
+  margin-left: 190px;
 }
 
 .project-card {
