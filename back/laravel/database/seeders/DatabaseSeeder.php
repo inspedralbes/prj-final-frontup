@@ -12,14 +12,16 @@ class DatabaseSeeder extends Seeder
 {
     User::factory()->create([
         'id' => 1,
-        'name' => 'Usuari 1',
-        'email' => 'usuari1@example.com',
+        'name' => 'admin',
+        'email' => 'admin@gmail.com',
+        'password' => '1234'
     ]);
-
+    
     User::factory()->create([
         'id' => 2,
-        'name' => 'Usuari 2',
-        'email' => 'usuari2@example.com',
+        'name' => 'juan',
+        'email' => 'juan@gmail.com',
+        'password' => '1234'
     ]);
 
     $this->call(ProjectsTableSeeder::class);
