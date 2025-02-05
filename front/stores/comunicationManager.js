@@ -1,8 +1,10 @@
 import { reactive } from 'vue';
 
+
 const useCommunicationManager = () => {
   const config = useRuntimeConfig();
-  const baseURL = config.public.apiBaseUrl;
+  const laravelURL = config.public.apiLaravelUrl;
+  const nodeURL = config.public.nodeUrl;
 
   const state = reactive({
     loading: false,
@@ -19,6 +21,7 @@ const useCommunicationManager = () => {
       'Authorization': state.token ? `Bearer ${state.token}` : '',
     };
 
+
     const options = {
       method,
       headers,
@@ -29,7 +32,7 @@ const useCommunicationManager = () => {
     }
 
     try {
-      const response = await fetch(`${baseURL}${url}`, options);
+      const response = await fetch(`${laravelURL}${url}`, options);
       const result = await response.json();
 
       if (!response.ok) {
@@ -70,21 +73,30 @@ const useCommunicationManager = () => {
       return false;
     }
   };
-
   const guardarProyectoDB = async (proyecto) => {
-    try {
-      const response = await request('/projects', 'POST', proyecto);
-      console.log('Respuesta del servidor:', response);
-      return response;
-    } catch (error) {
-      console.error('Hubo un problema con la solicitud:', error);
-      throw error;
-    }
-  };
-
+    fetch(`${laravelURL}/projects`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(proyecto),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error en la solicitud: ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Respuesta del servidor:', data);
+      })
+      .catch(error => {
+        console.error('Hubo un problema con el fetch:', error);
+      });
+  }
   const chatIA = async (mensaje, html, css, js) => {
     try {
-      const response = await fetch(config.public.iaApiUrl, {
+      const response = await fetch(`${nodeURLZ}/pregunta`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +120,6 @@ const useCommunicationManager = () => {
       throw error;
     }
   };
-
   const logoutUser = async () => {
     try {
       await request('/logout', 'POST');
