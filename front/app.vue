@@ -5,7 +5,7 @@
     <div class="left-section">
       <h2>FrontUp</h2>
       <button class="btn btn-crear" @click="navigateToLliure">Crear projecte</button>
-      <button class="btn">Els meus projectes</button>
+      <button class="btn"@click="navigateToMeusProjectes">Els meus projectes</button>
       <button class="btn" @click="navigateToNiveles">Nivells</button>
       <button class="btn">Projectes favorits</button>
     </div>
@@ -16,7 +16,6 @@
       </div>
       <div class="header-right">
         <button @click="toggleTheme" class="btn">{{ themeIcon }}</button>
-        <button class="btn" @click="navigateProjects" v-if="appStore.isLoggedIn">Projectes</button>
         <button class="btn" @click="navigateToProfile" v-if="appStore.isLoggedIn">Mi Perfil</button>
         <button class="btn" @click="navigateToLogin" v-else>{{ loginText }}</button>
 
@@ -69,7 +68,7 @@ const navigateToProfile = () => {
   router.push('/perfil')
 }
 
-const navigateProjects = () => {
+const navigateToMeusProjectes= () => {
   router.push('/projectes')
 }
 </script>
@@ -107,7 +106,7 @@ h2{
   text-transform: uppercase;
   border-radius: 4px;
 }
-
+  
 .left-section .btn:hover {
   background-color: #141414;
 }
