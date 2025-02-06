@@ -98,9 +98,12 @@ import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
 import "codemirror/mode/javascript/javascript";
 import useCommunicationManager from "@/stores/comunicationManager";
+import { useAppStore } from '@/stores/app';
 
 export default {
   setup() {
+    const appStore = useAppStore();
+    
     const router = useRouter();
     const { guardarProyectoDB, chatIA, state } = useCommunicationManager();
     const lliureStore = useLliureStore();
@@ -261,7 +264,7 @@ export default {
       try {
         await guardarProyectoDB({
           nombre: title.value || "",
-          user_id: 1 || null,
+          user_id: appStore.loginInfo.id || null,
           html_code: html.value || "",
           css_code: css.value || "",
           js_code: js.value || "",
