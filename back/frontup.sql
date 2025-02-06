@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 05-02-2025 a las 09:25:29
+-- Tiempo de generación: 06-02-2025 a las 11:44:04
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -127,14 +127,14 @@ CREATE TABLE `migrations` (
 --
 
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
-(9, '0001_01_01_000000_create_users_table', 1),
-(10, '0001_01_01_000001_create_cache_table', 1),
-(11, '0001_01_01_000002_create_jobs_table', 1),
-(12, '2025_01_21_094055_create_projects_table', 1),
-(13, '2025_01_21_094159_create_puntuacions_table', 1),
-(14, '2025_01_21_094231_create_ejercicios_table', 1),
-(15, '2025_01_23_093257_create_personal_access_tokens_table', 1),
-(16, '2025_01_30_075221_create_preguntas_table', 1);
+(17, '0001_01_01_000000_create_users_table', 1),
+(18, '0001_01_01_000001_create_cache_table', 1),
+(19, '0001_01_01_000002_create_jobs_table', 1),
+(20, '2025_01_21_094055_create_projects_table', 1),
+(21, '2025_01_21_094159_create_puntuacions_table', 1),
+(22, '2025_01_21_094231_create_ejercicios_table', 1),
+(23, '2025_01_23_093257_create_personal_access_tokens_table', 1),
+(24, '2025_01_30_075221_create_preguntas_table', 1);
 
 -- --------------------------------------------------------
 
@@ -194,9 +194,9 @@ CREATE TABLE `projects` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `nombre` varchar(255) NOT NULL,
   `user_id` bigint(20) UNSIGNED NOT NULL,
-  `html_code` text NOT NULL,
-  `css_code` text NOT NULL,
-  `js_code` text NOT NULL,
+  `html_code` text DEFAULT NULL,
+  `css_code` text DEFAULT NULL,
+  `js_code` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -264,8 +264,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `avatar`, `nivel_html`, `nivel_css`, `nivel_js`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'admin', 'admin@gmail.com', '2025-02-05 07:24:15', '$2y$12$kuahFhmRlx0dc1pTi.hLreZaC0Kuiubqwr9S7VuQobUDasWGuDfcW', NULL, 1, 1, 1, 'wEp0eEk0jw', '2025-02-05 07:24:15', '2025-02-05 07:24:15'),
-(2, 'juan', 'juan@gmail.com', '2025-02-05 07:24:15', '$2y$12$VyuQKv0BmBm8fCmS9adQHug.HNAPiDxtGJVSOZCS46vwHW3tnICzG', NULL, 1, 1, 1, 'NNzzZtiCoD', '2025-02-05 07:24:15', '2025-02-05 07:24:15');
+(1, 'admin', 'admin@gmail.com', '2025-02-06 09:42:06', '$2y$12$qZ.9WFnLxsfGmAHd496KgO6GdTdmV7ZUcwJwMAG5.mTld.1uxl.by', NULL, 1, 1, 1, 'bYCJCGWB1p', '2025-02-06 09:42:07', '2025-02-06 09:42:07'),
+(2, 'juan', 'juan@gmail.com', '2025-02-06 09:42:07', '$2y$12$pCxqMMLNwSQbLfsI3bcKLeHx9EF6mlcdZoNNkoOPeqWPjwo4HY4/q', NULL, 1, 1, 1, '3qebMKgYn2', '2025-02-06 09:42:08', '2025-02-06 09:42:08');
 
 --
 -- Índices para tablas volcadas
@@ -390,7 +390,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT de la tabla `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT de la tabla `personal_access_tokens`
