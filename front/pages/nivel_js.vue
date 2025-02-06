@@ -43,7 +43,7 @@ export default {
 
 <style>
 .level-container {
-  background-image: url('/fondo3.png');
+  background-image: url('/fondo3.svg');
   position: relative;
   height: 99vh;
   width: 90%;

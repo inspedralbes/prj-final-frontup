@@ -1,6 +1,9 @@
 <template>
   <div class="selector">
     <h1>Vamos a practicar</h1>
+
+    
+
     <div class="botones">
       <div class="boton-container" style="flex: 1;" @mouseenter="hovered = 'HTML'" @mouseleave="hovered = ''">
         <button class="boton HTML" @click="html_ejercicios"></button>
@@ -82,6 +85,7 @@ h1 {
 }
 
 button {
+  background-color: #202020;
   width: 100%;
   height: 100%;
   font-size: 1.5rem;
@@ -128,8 +132,8 @@ button:hover {
 }
 
 
-.HTML { background-image: url('/html.png');}
-.boton_CSS { background-image: url('/css3.png');}
-.JAVA_SCRIP { background-image: url('/javascript.png');}
+.HTML { background-image: url('/html.svg');}
+.boton_CSS { background-image: url('/css.svg');}
+.JAVA_SCRIP { background-image: url('/js.svg');}
 
 </style>
