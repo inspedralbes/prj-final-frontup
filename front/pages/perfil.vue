@@ -7,7 +7,10 @@
         <img :src="user.avatar" alt="Avatar d'Usuari" class="avatar-image" />
         <p><strong>Nom: </strong> &nbsp;{{ user.name }}</p>
         <p><strong>Correu Electrònic: </strong> &nbsp;{{ user.email }}</p>
-        <p><strong>Nivell:</strong> &nbsp;{{ user.nivel }}</p>
+        <p><strong>Nivel HTML:</strong> &nbsp;{{ user.nivel_html }}</p>
+        <p><strong>Nivel CSS:</strong> &nbsp;{{ user.nivel_css }}</p>
+        <p><strong>Nivel JavaScript:</strong> &nbsp;{{ user.nivel_js }}</p>
+
         
         <form @submit.prevent="updateAvatar">
           <input v-model="newAvatar" type="text" placeholder="Nom del nou avatar" class="input-field" />
