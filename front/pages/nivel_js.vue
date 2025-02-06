@@ -70,7 +70,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #202020;
+  background-image: url('/fondo.svg');
   border: 1px solid #ddd;
   border-radius: 10px;
   background-size: cover;
