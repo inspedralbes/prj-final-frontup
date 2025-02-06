@@ -7,6 +7,8 @@ use App\Models\Project;
 
 class ProjectController extends Controller
 {
+
+    
     public function indexAll(Request $request)
     {
         $projects = Project::get();
@@ -16,20 +18,23 @@ class ProjectController extends Controller
             'projects' => $projects,
         ], 200);
     }
+
     public function index(Request $request)
     {
-        $user = $request->user();
-
-        if (!$user) {
-            return response()->json(['message' => 'Usuario no autenticado'], 401);
+        $search = $request->input('search');
+        
+        if ($search) {
+            $projects = Project::where('nombre', 'like', "%$search%")->get();
+        } else {
+            $projects = Project::all();
         }
-        $projects = Project::where('user_id', $user->id)->get();
 
-        return response()->json([
-            'message' => 'Proyectos obtenidos con éxito',
-            'projects' => $projects,
-        ], 200);
+        return view('projects.index', compact('projects'));
     }
+
+    
+
+
 
     public function show($id)
     {
