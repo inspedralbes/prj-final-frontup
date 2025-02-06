@@ -38,7 +38,6 @@
   
           const response = await fetch("http://localhost:8000/api/projects", {
             headers: {
-              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           });
@@ -50,6 +49,8 @@
   
           const data = await response.json();
           this.projects = data.projects;
+          console.log('proyectos',this.projects);
+          
           this.loading = false;
         } catch (error) {
           this.error = error.message; 

@@ -7,6 +7,15 @@ use App\Models\Project;
 
 class ProjectController extends Controller
 {
+    public function indexAll(Request $request)
+    {
+        $projects = Project::get();
+
+        return response()->json([
+            'message' => 'Proyectos obtenidos con éxito',
+            'projects' => $projects,
+        ], 200);
+    }
     public function index(Request $request)
     {
         $user = $request->user();
@@ -21,7 +30,6 @@ class ProjectController extends Controller
             'projects' => $projects,
         ], 200);
     }
-
 
     public function show($id)
     {
