@@ -82,185 +82,189 @@
  </template>
  
 
-<script setup>
-import { reactive, ref, onUnmounted } from 'vue';
-import { useRouter } from 'nuxt/app';
-import { useAppStore } from '@/stores/app';
-import { useLliureStore } from '~/stores/app'
-
-const lliureStore = useLliureStore();
-const router = useRouter();
-const appStore = useAppStore();
-
-onUnmounted(() => {
-  lliureStore.toggleLliure()
-});
-onMounted(() => {
-  lliureStore.toggleLliure()
-});
-const formData = reactive({
-  email: '',
-  password: '',
-  name: '',
-  passwordRepeat: ''
-});
-
-const errors = reactive({
-  email: '',
-  password: '',
-  name: '',
-  passwordRepeat: ''
-});
-
-const errorMessage = ref('');
-const showRegister = ref(false);
-const toggleRegister = () => {
-  showRegister.value = !showRegister.value;
-};
-
-const validateEmail = () => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  errors.email = emailRegex.test(formData.email) ? '' : 'Correo inválido';
-};
-
-const validatename = () => {
-  errors.name = formData.name ? '' : 'El nombre de usuario es obligatorio';
-};
-
-const validatePassword = () => {
-  errors.password = formData.password ? '' : 'La contraseña es obligatoria';
-};
-
-const validatePasswordRepeat = () => {
-  errors.passwordRepeat =
-    formData.passwordRepeat === formData.password ? '' : 'Las contraseñas no coinciden';
-};
-
-const isLoginFormValid = () => {
-  return formData.email && formData.password && !errors.email && !errors.password;
-};
-
-const isRegisterFormValid = () => {
-  return (
-    formData.email &&
-    formData.password &&
-    formData.name &&
-    formData.passwordRepeat &&
-    !errors.email &&
-    !errors.password &&
-    !errors.name &&
-    !errors.passwordRepeat
-  );
-};
-
-const login = async () => {
-  validateEmail();
-  validatePassword();
-  if (isLoginFormValid()) {
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        }),
-      });
-
-      const data = await response.json();
-      console.log('data',data);
-      
-      if (response.ok) {
-        appStore.setLoginInfo({
-            loggedIn: true,
-            id: data.user.id,
-            token: data.token,
-            name: data.user.name,
-            email: data.user.email,
-            nivel_html: data.user.nivel_html,
-            nivel_css: data.user.nivel_css,
-            nivel_js: data.user.nivel_js,
-            avatar: data.user.avatar,
-        });
-        console.log('logininfo',data.user.id);
-        
-        router.push('/');
-      } else {
-        errorMessage.value = data.message || 'Credenciales inválidas';
-      }
-    } catch (error) {
-      console.error('Error durante el login:', error);
-      errorMessage.value = 'Error de red. No se pudo conectar al servidor.';
-    }
-  }
-};
-
-const register = async () => {
-  validateEmail();
-  validatename();
-  validatePassword();
-  validatePasswordRepeat();
-
-  if (isRegisterFormValid()) {
-    const avatarUrl = `https://api.multiavatar.com/${formData.name}.png`;
-
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          avatar: avatarUrl,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        const loginResponse = await fetch('http://127.0.0.1:8000/api/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-          }),
-        });
-
-        const loginData = await loginResponse.json();
-        if (loginResponse.ok) {
-          appStore.setLoginInfo({
-              loggedIn: true,
-              token: loginData.token,
-              id: loginData.id,
-              username: loginData.username,
-              email: loginData.email,
-              nivel_html: loginData.nivel_html,
-              nivel_css: loginData.nivel_css,
-              nivel_js: loginData.nivel_js,
-              avatar: avatarUrl,
-          });
-
-          router.push('/');
-        } else {
-          errorMessage.value = loginData.message || 'Error al iniciar sesión automáticamente';
-        }
-      } else {
-        errorMessage.value = data.message || 'Error al crear la cuenta';
-      }
-    } catch (error) {
-      console.error('Error durante el registro:', error);
-      errorMessage.value = 'Error de red. No se pudo conectar al servidor.';
-    }
-  }
-};
-
-</script>
+ <script setup>
+ import { reactive, ref, onMounted, onUnmounted } from 'vue';
+ import { useRouter } from 'nuxt/app';
+ import { useAppStore } from '@/stores/app';
+ import { useLliureStore } from '~/stores/app';
+ 
+ const lliureStore = useLliureStore();
+ const router = useRouter();
+ const appStore = useAppStore();
+ 
+ onUnmounted(() => {
+   lliureStore.toggleLliure();
+ });
+ onMounted(() => {
+   lliureStore.toggleLliure();
+ });
+ 
+ const formData = reactive({
+   email: '',
+   password: '',
+   name: '',
+   passwordRepeat: ''
+ });
+ 
+ const errors = reactive({
+   email: '',
+   password: '',
+   name: '',
+   passwordRepeat: ''
+ });
+ 
+ const errorMessage = ref('');
+ const showRegister = ref(false);
+ const toggleRegister = () => {
+   showRegister.value = !showRegister.value;
+ };
+ 
+ const validateEmail = () => {
+   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+   errors.email = emailRegex.test(formData.email) ? '' : 'Correo inválido';
+ };
+ 
+ const validatename = () => {
+   errors.name = formData.name ? '' : 'El nombre de usuario es obligatorio';
+ };
+ 
+ const validatePassword = () => {
+   errors.password = formData.password ? '' : 'La contraseña es obligatoria';
+ };
+ 
+ const validatePasswordRepeat = () => {
+   errors.passwordRepeat =
+     formData.passwordRepeat === formData.password ? '' : 'Las contraseñas no coinciden';
+ };
+ 
+ const isLoginFormValid = () => {
+   return formData.email && formData.password && !errors.email && !errors.password;
+ };
+ 
+ const isRegisterFormValid = () => {
+   return (
+     formData.email &&
+     formData.password &&
+     formData.name &&
+     formData.passwordRepeat &&
+     !errors.email &&
+     !errors.password &&
+     !errors.name &&
+     !errors.passwordRepeat
+   );
+ };
+ 
+ const login = async () => {
+   validateEmail();
+   validatePassword();
+   if (isLoginFormValid()) {
+     try {
+       const response = await fetch('http://127.0.0.1:8000/api/login', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({
+           email: formData.email,
+           password: formData.password
+         }),
+       });
+ 
+       const data = await response.json();
+       console.log('data', data);
+       
+       if (response.ok) {
+         appStore.setLoginInfo({
+           loggedIn: true,
+           id: data.user.id,
+           token: data.token,
+           name: data.user.name,
+           email: data.user.email,
+           nivel_html: data.user.nivel_html,
+           nivel_css: data.user.nivel_css,
+           nivel_js: data.user.nivel_js,
+           avatar: data.user.avatar,
+         });
+         console.log('logininfo', data.user.id);
+         
+         router.push('/');
+       } else {
+         errorMessage.value = data.message || 'Credenciales inválidas';
+       }
+     } catch (error) {
+       console.error('Error durante el login:', error);
+       errorMessage.value = 'Error de red. No se pudo conectar al servidor.';
+     }
+   }
+ };
+ 
+ const register = async () => {
+   validateEmail();
+   validatename();
+   validatePassword();
+   validatePasswordRepeat();
+ 
+   if (isRegisterFormValid()) {
+     // Genera la URL del avatar basado en el nombre de usuario
+     const avatarUrl = `https://api.multiavatar.com/${formData.name}.png`;
+ 
+     try {
+       // Llamada al endpoint de registro
+       const response = await fetch('http://127.0.0.1:8000/api/register', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({
+           ...formData,
+           avatar: avatarUrl,
+         }),
+       });
+ 
+       const data = await response.json();
+ 
+       if (response.ok) {
+         // Luego de registrarse, se inicia sesión automáticamente
+         const loginResponse = await fetch('http://127.0.0.1:8000/api/login', {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json',
+           },
+           body: JSON.stringify({
+             email: formData.email,
+             password: formData.password,
+           }),
+         });
+ 
+         const loginData = await loginResponse.json();
+         if (loginResponse.ok) {
+           // Guarda en Pinia y en localStorage la misma información que en el login
+           appStore.setLoginInfo({
+             loggedIn: true,
+             id: loginData.user.id,
+             token: loginData.token,
+             name: loginData.user.name,
+             email: loginData.user.email,
+             nivel_html: loginData.user.nivel_html,
+             nivel_css: loginData.user.nivel_css,
+             nivel_js: loginData.user.nivel_js,
+             avatar: avatarUrl,
+           });
+ 
+           router.push('/');
+         } else {
+           errorMessage.value = loginData.message || 'Error al iniciar sesión automáticamente';
+         }
+       } else {
+         errorMessage.value = data.message || 'Error al crear la cuenta';
+       }
+     } catch (error) {
+       console.error('Error durante el registro:', error);
+       errorMessage.value = 'Error de red. No se pudo conectar al servidor.';
+     }
+   }
+ };
+ </script> 
 
 <style scoped>
 .todo {
