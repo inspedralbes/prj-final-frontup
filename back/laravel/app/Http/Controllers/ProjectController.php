@@ -21,6 +21,19 @@ class ProjectController extends Controller
 
     public function index(Request $request)
     {
+        if ($request->is('api/*')){
+            $user = $request->user();
+    
+            if (!$user) {
+                return response()->json(['message' => 'Usuario no autenticado'], 401);
+            }
+            $projects = Project::where('user_id', $user->id)->get();
+    
+            return response()->json([
+                'message' => 'Proyectos obtenidos con éxito',
+                'projects' => $projects,
+            ], 200);
+        }
         $search = $request->input('search');
         
         if ($search) {
