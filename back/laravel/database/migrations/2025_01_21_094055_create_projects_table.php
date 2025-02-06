@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('html_code')->nullable();
             $table->text('css_code')->nullable();
             $table->text('js_code')->nullable();
+            $table->integer('valoracio')->nullable();
             $table->timestamps();
         });
     }
