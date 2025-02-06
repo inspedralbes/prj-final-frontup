@@ -6,22 +6,24 @@
 
     <div v-else-if="projects.length === 0" class="no-projects">
       No tienes proyectos aún.
-      <br><br>
+      <br /><br />
       <button class="btn" @click="navigateToLliure">Crear el teu primer projecte</button>
     </div>
 
     <div v-else class="projects-list">
-      <div v-for="project in projects" :key="project.id" class="project-card">
-        <h2>{{ project.nombre }}</h2> 
-        <p><strong>ID:</strong> {{ project.id }}</p>
-        <p><strong>Creado en:</strong> {{ new Date(project.created_at).toLocaleDateString() }}</p>
-      </div>
+      <Item v-for="project in projects" :key="project.id" :project="project" />
     </div>
   </div>
 </template>
 
 <script>
+import Item from '@/pages/item.vue'; 
+
 export default {
+  name: "Projectes",
+  components: {
+    Item,
+  },
   data() {
     return {
       projects: [],
@@ -51,16 +53,17 @@ export default {
         }
 
         const data = await response.json();
+
         this.projects = data.projects;
         this.loading = false;
       } catch (error) {
-        this.error = error.message; 
-        this.loading = false; 
+        this.error = error.message;
+        this.loading = false;
       }
     },
     navigateToLliure() {
       this.$router.push("/lliure");
-    }
+    },
   },
 };
 </script>
@@ -91,42 +94,11 @@ export default {
 }
 
 .projects-list {
-  margin-left: vh;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
   margin-top: 20px;
-  margin-left: 190px;
-}
-
-.project-card {
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #f9f9f9;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.project-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-}
-
-.project-card h2 {
-  font-size: 22px;
-  color: #333;
-  margin-bottom: 10px;
-}
-
-.project-card p {
-  font-size: 16px;
-  color: #555;
-  margin: 5px 0;
-}
-
-.project-card strong {
-  color: #333;
+  margin-left: 180px;
 }
 
 .btn {
