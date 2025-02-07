@@ -7,15 +7,16 @@ use App\Models\Project;
 
 class ProjectController extends Controller
 {
-    public function indexAll(Request $request)
-    {
-        $projects = Project::get();
+    public function indexAllPaginado(Request $request)
+{
+    $projects = Project::orderBy('valoracio', 'desc')->paginate(10);
 
-        return response()->json([
-            'message' => 'Proyectos obtenidos con éxito',
-            'projects' => $projects,
-        ], 200);
-    }
+    return response()->json([
+        'message' => 'Proyectos obtenidos con éxito',
+        'projects' => $projects,
+    ], 200);
+}
+
     public function index(Request $request)
     {
         $user = $request->user();
