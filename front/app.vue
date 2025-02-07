@@ -1,45 +1,67 @@
 <template>
   <NuxtPage />
   <div id="app" v-if="!lliureStore.lliure">
-
     <div class="left-section">
       <h2>FrontUp</h2>
       <button class="btn btn-crear" @click="navigateToLliure">Crear projecte</button>
-      <button class="btn"@click="navigateToMeusProjectes">Els meus projectes</button>
+      <button class="btn" @click="navigateToMeusProjectes">Els meus projectes</button>
       <button class="btn" @click="navigateToNiveles">Nivells</button>
       <button class="btn">Projectes favorits</button>
     </div>
 
     <header>
       <div class="header-left">
-        <input class="search-box" type="text" placeholder="Buscar...">
+        <template v-if="buscadorStore.mostrarBuscador">
+          <input class="search-box" type="text" placeholder="Buscar...">
+        </template>
+        <template v-else>
+          <button class="btn volver-btn" @click="navigateToHome">Tornar al Home</button>
+        </template>
       </div>
       <div class="header-right">
         <button @click="toggleTheme" class="btn">{{ themeIcon }}</button>
         <button class="btn" @click="navigateToProfile" v-if="appStore.isLoggedIn">Mi Perfil</button>
         <button class="btn" @click="navigateToLogin" v-else>{{ loginText }}</button>
-
       </div>
     </header>
-
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { useLliureStore } from '~/stores/app' 
-import { useRouter } from 'vue-router' 
-import { useAppStore } from '@/stores/app';
 
+<script setup>
+import { ref, watch, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useLliureStore } from '~/stores/app'
+import { useAppStore } from '@/stores/app'
+import { useBuscadorStore } from '@/stores/app'
 
 const theme = ref('')
 const themeIcon = ref('☀️')
 const loginText = ref('Login')
 
-const appStore = useAppStore();
+const appStore = useAppStore()
 const lliureStore = useLliureStore()
+const buscadorStore = useBuscadorStore()
 
 const router = useRouter()
+const route = useRoute()
+
+const updateBuscadorState = () => {
+  if (route.path === '/' || route.name === 'index') {
+    buscadorStore.activarBuscador();
+  } else {
+    buscadorStore.desactivarBuscador();
+  }
+}
+
+onMounted(() => {
+  updateBuscadorState()
+})
+
+// Observar cambios en la ruta para actualizar el estado automáticamente
+watch(() => route.path, () => {
+  updateBuscadorState()
+})
 
 const toggleTheme = () => {
   if (theme.value === '') {
@@ -68,10 +90,15 @@ const navigateToProfile = () => {
   router.push('/perfil')
 }
 
-const navigateToMeusProjectes= () => {
+const navigateToMeusProjectes = () => {
   router.push('/projectes')
 }
+
+const navigateToHome = () => {
+  router.push('/')
+}
 </script>
+
 
 <style scoped>
 body {
@@ -214,7 +241,24 @@ header {
   border: 1px solid #ddd;
   color: #333;
 }
+
+.volver-btn {
+  padding: 10px 15px;
+  background-color: #444;
+  color: #fff;
+  cursor: pointer;
+  text-transform: uppercase;
+  border-radius: 4px;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.volver-btn:hover {
+  background-color: #555;
+}
+
 </style>
+
 <style>
 body{
   background-color: #2d2d2d;

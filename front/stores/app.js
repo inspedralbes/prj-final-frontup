@@ -68,3 +68,17 @@ export const useAppStore = defineStore('app', {
     getLoginInfo: (state) => state.loginInfo,
   },
 });
+
+export const useBuscadorStore = defineStore('buscador', {
+  state: () => ({
+    mostrarBuscador: false,
+  }),
+  actions: {
+    activarBuscador() {
+      this.mostrarBuscador = true;
+    },
+    desactivarBuscador() {
+      this.mostrarBuscador = false;
+    }
+  }
+});

@@ -1,10 +1,13 @@
+<!-- index.vue -->
 <template>
   <div class="todo">
     <div class="main-container">
-      <!-- Body Content -->
+      <!-- Contenido de la Home -->
       <div class="body-content">
         <h2>El lloc ideal per crear, provar i explorar codi web.</h2>
-        <p>Aquesta plataforma és un entorn interactiu per a desenvolupadors i dissenyadors front-end. Crea i experimenta amb projectes, comparteix les teves creacions, prova les teves idees i troba inspiració per continuar aprenent.
+        <p>
+          Aquesta plataforma és un entorn interactiu per a desenvolupadors i dissenyadors front-end.
+          Crea i experimenta amb projectes, comparteix les teves creacions, prova les teves idees i troba inspiració per continuar aprenent.
         </p>
       </div>
       <div class="looping-words">
@@ -39,12 +42,10 @@
         <div class="card">
           <h3>Comparteix els Teus Projectes</h3>
           <p>
-            Uneix-te a la comunitat global de desenvolupadors front-end compartint les teves creacions i inspirant
-            altres.
+            Uneix-te a la comunitat global de desenvolupadors front-end compartint les teves creacions i inspirant altres.
           </p>
           <button>Descobreix el Més Popular</button>
         </div>
-
       </div>
       <br><br>
       <!-- Footer -->
@@ -56,9 +57,11 @@
 </template>
 
 <script>
+
 export default {
   name: 'Index',
   mounted() {
+
     setTimeout(() => {
       const wordList = document.querySelector('.looping-words__list');
       const words = Array.from(wordList.children);
@@ -81,8 +84,8 @@ export default {
     }, 500);
   },
 };
-
 </script>
+
 
 <style scoped>
 .todo {
