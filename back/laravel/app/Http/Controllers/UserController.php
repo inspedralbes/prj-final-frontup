@@ -16,7 +16,7 @@ class UserController extends Controller
         $user = $request->user();
 
         if (!filter_var($user->avatar, FILTER_VALIDATE_URL)) {
-            $user->avatar = 'https://api.multiavatar.com/' . urlencode($user->name) . '.png';
+            $user->avatar = 'https://api.dicebear.com/9.x/personas/svg?seed=' . urlencode($user->name) . '.png';
         }
 
         return response()->json([

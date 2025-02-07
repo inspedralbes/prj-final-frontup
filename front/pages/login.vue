@@ -199,7 +199,7 @@ const register = async () => {
   validatePasswordRepeat();
 
   if (isRegisterFormValid()) {
-    const avatarUrl = `https://api.multiavatar.com/${formData.name}.png`;
+    const avatarUrl = `https://api.dicebear.com/9.x/personas/svg?seed=${formData.name}`;
 
     try {
       const response = await fetch('http://127.0.0.1:8000/api/register', {
