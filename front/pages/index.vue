@@ -93,7 +93,7 @@ export default {
 
 .main-container {
   margin-top: 80px;
-  margin-left: 200px;
+  margin-left: 180px;
   padding: 10px;
   flex-direction: flex;
   justify-content: space-between;
