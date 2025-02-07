@@ -3,7 +3,7 @@
   <div id="app" v-if="!lliureStore.lliure">
     <!-- Barra lateral y barra superior -->
     <div class="left-section">
-      <h2>FrontUp</h2>
+      <button class="btn-home" @click="navigateToHome"><h2>FrontUp</h2></button>
       <button class="btn btn-crear" @click="navigateToLliure">Crear projecte</button>
       <button class="btn">Els meus projectes</button>
       <button class="btn" @click="navigateToNiveles">Nivells</button>
@@ -77,6 +77,10 @@ const navigateToProfile = () => {
 const navigateProjects = () => {
   router.push('/projectes')
 }
+
+const navigateToHome = () => {
+  router.push('/')
+}
 </script>
 
 <style scoped>
@@ -129,6 +133,17 @@ h2{
   background-color: #000;
 }
 
+.left-section .btn-home {
+  background-color: #1e1e1e; 
+  height: 80px;
+  border: none;
+  padding: 10px 15px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
 
 .left-section button {
   margin-bottom: 15px;
