@@ -1,5 +1,5 @@
 <template>
-  <router-view />
+  <NuxtPage />
   <div id="app" v-if="!lliureStore.lliure">
 
     <div class="left-section">
