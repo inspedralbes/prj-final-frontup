@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('resp_correcta');
             $table->string('resp_usuario');
             $table->string('nivel_id');
+            $table->string('language');
             $table->timestamps();
         });
     }

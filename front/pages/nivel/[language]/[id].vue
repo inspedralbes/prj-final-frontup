@@ -11,7 +11,7 @@
       </div>
     </header>
 
-    <div class="exercise-number">Ejercicio {{ nivelId }}</div>
+    <div class="exercise-number">Titulo {{ nivelId }}</div>
 
     <div class="exercise-instructions">
       <p><strong>Instrucciones:</strong></p>
@@ -22,7 +22,7 @@
 
     <div class="editor-output-wrapper">
       <div class="editor-box">
-        <div class="editor-label">HTML</div>
+        <div class="editor-label">Lenguaje: {{ language }}</div>
         <div ref="htmlEditor" class="code-editor"></div>
       </div>
 
@@ -36,7 +36,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import { ref, onMounted, computed, onUnmounted, watch } from "vue";
@@ -55,7 +54,7 @@ export default {
     const route = useRoute();
     const lliureStore = useLliureStore();
 
-    const title = computed(() => `Ejercicio ${nivelId.value}`);
+    const title = computed(() => `Ejercicio`);
     const html = ref("");
     const css = ref("");
     const js = ref("");
@@ -63,62 +62,78 @@ export default {
     const question = ref("");
     const loading = ref(true);
     const error = ref(false);
+    const language = ref(route.params.language);  
     const nivelId = ref(route.params.id);  
 
     const htmlEditor = ref(null);
     let htmlEditorInstance;
 
-    const fetchQuestion = async () => {
-  try {
-    loading.value = true;
-    const response = await fetch(`http://localhost:8000/api/preguntas/${nivelId.value}`);
-    if (!response.ok) throw new Error("Error al obtener la pregunta");
-    const data = await response.json();
-    question.value = data.question; 
-  } catch (err) {
-    console.error("Error en fetchQuestion:", err);
-    error.value = true;
-  } finally {
-    loading.value = false;
+    watch(() => route.params.language, (newLanguage) => {
+  if (newLanguage === 'html') {
+    nivelId.value = Math.max(1, Math.min(10, parseInt(route.params.id))); 
+  } else if (newLanguage === 'css') {
+    nivelId.value = Math.max(11, Math.min(20, parseInt(route.params.id))); 
+  } else if (newLanguage === 'js') {
+    nivelId.value = Math.max(21, Math.min(30, parseInt(route.params.id)));
   }
-};
+}, { immediate: true });
 
-const validateExercise = async () => {
+
+    const fetchQuestion = async () => {
+      try {
+        loading.value = true;
+        const response = await fetch(`http://localhost:8000/api/preguntas/${language.value}/${nivelId.value}`); 
+        if (!response.ok) throw new Error("Error al obtener la pregunta");
+        const data = await response.json();
+        question.value = data.question; 
+      } catch (err) {
+        console.error("Error en fetchQuestion:", err);
+        error.value = true;
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    const validateExercise = async () => {
   if (!question.value) {
     alert("No se ha cargado una pregunta.");
     return;
   }
 
   const etiquetasRequeridas = question.value.match(/<\s*(\w+)/g);
-
   if (!etiquetasRequeridas) {
     alert("No se han encontrado etiquetas en la pregunta.");
     return;
   }
 
   const etiquetasLimpias = etiquetasRequeridas.map(etiqueta => etiqueta.replace("<", "").trim());
-
   const faltantes = etiquetasLimpias.filter(etiqueta => !html.value.includes(`<${etiqueta}`));
 
   if (faltantes.length === 0) {
     alert("¡Está bien! Has completado el ejercicio.");
 
-    const nextLevelId = parseInt(nivelId.value) + 1;
-    const userId = 1; 
+    let nextLevelId = parseInt(nivelId.value) + 1;
+
+    if ((language.value === "html" && nextLevelId > 10) ||
+        (language.value === "css" && nextLevelId > 20) ||
+        (language.value === "js" && nextLevelId > 30)) {
+      alert("¡Felicidades! Has completado todas las preguntas de este lenguaje.");
+      return;
+    }
 
     try {
-      const response = await fetch(`http://localhost:8000/api/users/${userId}/update-level`, {
+      const response = await fetch(`http://localhost:8000/api/users/1/update-level`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}` 
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         body: JSON.stringify({ nivel: nextLevelId })
       });
 
       if (!response.ok) throw new Error("Error al actualizar el nivel");
 
-      router.push(`/nivel/${nextLevelId}`);
+      router.push(`/nivel/${language.value}/${nextLevelId}`);
 
     } catch (error) {
       console.error("Error al actualizar el nivel:", error);
@@ -129,22 +144,22 @@ const validateExercise = async () => {
   }
 };
 
-watch(() => route.params.id, (newNivelId) => {
-  nivelId.value = newNivelId;
-  fetchQuestion(); 
-  clearEditors();  
-});
 
-const clearEditors = () => {
-  
-  html.value = '';
-  css.value = '';
-  js.value = '';
+    watch(() => route.params.id, (newNivelId) => {
+      nivelId.value = newNivelId;
+      fetchQuestion(); 
+      clearEditors();  
+    });
 
-  if (htmlEditorInstance) {
-    htmlEditorInstance.setValue('');
-  }
-};
+    const clearEditors = () => {
+      html.value = '';
+      css.value = '';
+      js.value = '';
+
+      if (htmlEditorInstance) {
+        htmlEditorInstance.setValue('');
+      }
+    };
 
     onMounted(() => {
       lliureStore.toggleLliure();  

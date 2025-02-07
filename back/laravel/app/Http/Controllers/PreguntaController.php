@@ -8,24 +8,29 @@ use Illuminate\Http\Request;
 
 class PreguntaController extends Controller
 {
-    
-    public function getPreguntasPorNivel($nivelId)
-{
-    if (!is_numeric($nivelId)) {
-        return response()->json(['error' => 'Nivel ID inválido'], 400);
+   
+    public function getPreguntas($language, $nivelId)
+    {
+       
+        if (!is_numeric($nivelId)) {
+            return response()->json(['error' => 'Nivel ID inválido'], 400);
+        }
+
+        $lenguajesDisponibles = ['html', 'css', 'js']; 
+        if (!in_array($language, $lenguajesDisponibles)) {
+            return response()->json(['error' => 'Lenguaje no soportado'], 400);
+        }
+
+        $pregunta = Pregunta::where('nivel_id', $nivelId)->first();
+
+        if (!$pregunta) {
+            return response()->json(['message' => 'No hay preguntas para este nivel'], 404);
+        }
+
+        return response()->json([
+            'language' => $language,
+            'question' => $pregunta->pregunta,
+            'correctAnswer' => $pregunta->resp_correcta
+        ]);
     }
-
-    $pregunta = Pregunta::where('nivel_id', $nivelId)->first();
-
-    if (!$pregunta) {
-        return response()->json(['message' => 'No hay preguntas para este nivel'], 404);
-    }
-
-    return response()->json([
-        'question' => $pregunta->pregunta, 
-        'correctAnswer' => $pregunta->resp_correcta
-    ]);
-}
-
-
 }

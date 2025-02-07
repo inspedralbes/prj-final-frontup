@@ -17,11 +17,12 @@
 export default {
   data() {
     return {
+      language: 'css',
       levels: Array.from({ length: 10 }, (_, i) => ({
         id: i + 1,
         locked: true, 
       })),
-      userLevel: 1, 
+      userLevel: 1,
     };
   },
   async created() {
@@ -50,7 +51,7 @@ export default {
       }
     },
     ir_nivel(levelId) {
-      this.$router.push(`/nivel/${levelId}`);
+      this.$router.push(`/nivel/${this.language}/${levelId}`);
     },
     irAtras() {
       this.$router.push("/niveles");
@@ -58,7 +59,6 @@ export default {
   },
 };
 </script>
-
 
 <style>
 .level-container {
@@ -88,7 +88,7 @@ export default {
 .level-button {
   width: 80px;
   height: 80px;
-  background-color: #3498db;
+  background-image: url("/boton.png");
   transform: scale(1.03);
   border-radius: 50%;
   display: flex;
@@ -102,19 +102,19 @@ export default {
 }
 
 .level-button:hover {
-  background-color: #2980b9;
+  background-image: url("/boton.png");
   transform: scale(1.1);
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* 🔒 Estilo para niveles bloqueados */
 .level-button.locked {
-  background-color: #7f8c8d;
+  background-image: url("/boton_lock.png");
   cursor: not-allowed;
 }
 
 .level-button.locked:hover {
-  background-color: #7f8c8d;
+  background-image: url("/boton_lock.png");
   transform: scale(1.03);
 }
 

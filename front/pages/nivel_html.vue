@@ -17,11 +17,12 @@
 export default {
   data() {
     return {
+      language: 'html',
       levels: Array.from({ length: 10 }, (_, i) => ({
         id: i + 1,
         locked: true, 
       })),
-      userLevel: 1, 
+      userLevel: 1,
     };
   },
   async created() {
@@ -50,7 +51,7 @@ export default {
       }
     },
     ir_nivel(levelId) {
-      this.$router.push(`/nivel/${levelId}`);
+      this.$router.push(`/nivel/${this.language}/${levelId}`);
     },
     irAtras() {
       this.$router.push("/niveles");
@@ -58,7 +59,6 @@ export default {
   },
 };
 </script>
-
 
 <style>
 .level-container {

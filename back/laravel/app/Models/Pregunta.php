@@ -16,6 +16,7 @@ class Pregunta extends Model
         'descripcion',
         'nivel_id',
         'usuario_id',
+        'language',
     ]; 
 
     /**
@@ -32,5 +33,10 @@ class Pregunta extends Model
     public function nivel()
     {
         return $this->belongsTo(Nivel::class, 'nivel_id');
+    }
+
+    public function language($query, $language)
+    {
+        return $query->where('language', $language);
     }
 }

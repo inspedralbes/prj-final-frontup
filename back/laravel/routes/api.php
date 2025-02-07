@@ -20,8 +20,6 @@ Route::post('/register', [AuthenticatorController::class, 'register']);
 
 Route::post('/login', [AuthenticatorController::class, 'authenticate']);    
 
-Route::get('/preguntas/{nivelId}', [PreguntaController::class, 'getPreguntasPorNivel']);
-
-Route::get('/preguntas_css/{nivelId}', [PreguntaController::class, 'getPreguntasPorNivel']);
+Route::get('/preguntas/{language}/{nivelId}', [PreguntaController::class, 'getPreguntas']);
 
 Route::post('/users/{id}/update-level', [UserController::class, 'updateLevel']);
