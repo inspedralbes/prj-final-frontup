@@ -1,30 +1,77 @@
 <template>
-  <div class="todo"> 
-    <div class="profile-page">
-      <h1>Perfil d'Usuari</h1>
-    
-      <div v-if="user">
-        <img :src="user.avatar" alt="Avatar d'Usuari" class="avatar-image" />
-        <p><strong>Nom: </strong> &nbsp;{{ user.name }}</p>
-        <p><strong>Correu Electrònic: </strong> &nbsp;{{ user.email }}</p>
-        <p><strong>Nivel HTML:</strong> &nbsp;{{ user.nivel_html }}</p>
-        <p><strong>Nivel CSS:</strong> &nbsp;{{ user.nivel_css }}</p>
-        <p><strong>Nivel JavaScript:</strong> &nbsp;{{ user.nivel_js }}</p>
+  <div class="profile-container">
+    <div class="profile-card">
+      <div class="profile-header">
+        <h1>👤 Perfil d'Usuari</h1>
+        <button class="logout-btn" @click="logout">
+          <span class="icon">🚪</span>Tancar sessió
+        </button>
+      </div>
+      
+      <div v-if="user" class="profile-content">
+        <div class="avatar-section">
+          <img :src="user.avatar" alt="Avatar" class="avatar" />
+          <div class="avatar-overlay" @click="triggerAvatarInput">
+            📷 Canviar
+          </div>
+        </div>
 
-        
-        <form @submit.prevent="updateAvatar">
-          <input v-model="newAvatar" type="text" placeholder="Nom del nou avatar" class="input-field" />
-        <button type="submit">Actualitzar Avatar</button>
-      </form>
+        <div class="user-info">
+          <div class="info-item">
+            <label>Nom:</label>
+            <div class="info-value">{{ user.name }}</div>
+          </div>
+          <div class="info-item">
+            <label>Correu:</label>
+            <div class="info-value">{{ user.email }}</div>
+          </div>
+          
+          <div class="skill-levels">
+            <div class="skill">
+              <span class="skill-icon">🛠️</span>
+              <div class="skill-progress">
+                <div class="progress-bar html" :style="{width: (user.nivel_html * 10) + '%'}"></div>
+                <span>HTML {{ user.nivel_html * 10 }}%</span>
+              </div>
+            </div>
+            <div class="skill">
+              <span class="skill-icon">🎨</span>
+              <div class="skill-progress">
+                <div class="progress-bar css" :style="{width: (user.nivel_css * 10) + '%'}"></div>
+                <span>CSS {{ user.nivel_css * 10 }}%</span>
+              </div>
+            </div>
+            <div class="skill">
+              <span class="skill-icon">⚙️</span>
+              <div class="skill-progress">
+                <div class="progress-bar js" :style="{width: (user.nivel_js * 10) + '%'}"></div>
+                <span>JS {{ user.nivel_js * 10 }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <button class="logout" @click="logout">Tancar sessió</button>
-    </div>
-    <div v-else>
-      <p>No estàs autenticat.</p>
+        <form @submit.prevent="updateAvatar" class="avatar-form">
+          <input 
+            v-model="newAvatar" 
+            type="text" 
+            placeholder="Introdueix el nom per al nou avatar" 
+            class="avatar-input"
+          />
+          <button type="submit" class="submit-btn">
+            <span class="icon">🔄</span>Actualitzar Avatar
+          </button>
+        </form>
+      </div>
+      
+      <div v-else class="auth-message">
+        <p>❌ No estàs autenticat</p>
+        <router-link to="/login" class="login-link">Iniciar sessió</router-link>
+      </div>
     </div>
   </div>
-</div>
 </template>
+
 
 <script setup>
 import { ref, onMounted } from 'vue';
@@ -106,147 +153,226 @@ const logout = () => {
 </script>
 
 <style scoped>
-.todo{
-  width: 100%;
-  height: 115vh;
-  background-color: rgb(31, 29, 29);
-}
-.profile-page {
-  max-width: 600px;
-  margin: 2rem auto;
+.profile-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 2rem;
-  background-color: #1E1E1E;
-  border-radius: 8px;
-  box-shadow: 0px 4px 12px rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.87);
+}
+
+.profile-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 800px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 6rem;
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
 }
 
 h1 {
-  color: #90CAF9;
-  font-size: 2.125rem;
-  font-weight: 500;
-  margin-bottom: 2rem;
-  text-align: center;
-  transition: color 0.3s ease;
+  color: #fff;
+  font-size: 2.2rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.avatar-image {
-  width: 120px;
-  height: 120px;
+.avatar-section {
+  position: relative;
+  width: 150px;
+  margin: 0 auto 2rem;
+}
+
+.avatar {
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   object-fit: cover;
-  margin: 1rem auto;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
-  border: 3px solid #424242;
-  transition: transform 0.3s ease;
-  display: block;
-  margin: 1rem auto;
+  border: 3px solid #4CAF50;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
 }
 
-.avatar-image:hover {
-  transform: scale(1.05);
+.avatar-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 0.5rem;
+  text-align: center;
+  border-radius: 0 0 20px 20px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s ease;
 }
 
-p {
-  font-size: 1rem;
-  margin: 1rem 0;
-  color: rgba(255, 255, 255, 0.87);
-  display: flex;
-  transition: color 0.3s ease;
+.avatar-section:hover .avatar-overlay {
+  opacity: 1;
 }
 
-strong {
-  font-weight: 500;
-  color: #90CAF9;
-  margin-right: 0.5rem;
-}
-
-form {
-  margin: 2rem 0;
+.user-info {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
   padding: 1.5rem;
-  background-color: #2D2D2D;
+  margin-bottom: 2rem;
+}
+
+.info-item {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+label {
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.info-value {
+  color: #fff;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  transition: background-color 0.3s ease;
 }
 
-form:hover {
-  background-color: #424242;
+.skill-levels {
+  margin-top: 2rem;
 }
 
-.input-field {
-  width: 100%;
-  padding: 12px 16px;
-  margin: 8px 0;
+.skill {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.skill-progress {
+  flex-grow: 1;
+  background: rgba(255, 255, 255, 0.1);
+  height: 30px;
+  border-radius: 15px;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 15px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: width 0.5s ease;
+}
+
+.html { background: #E44D26; }
+.css { background: #264DE4; }
+.js { background: #cab31c; }
+
+.skill-progress span {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  padding-left: 1rem;
+  line-height: 30px;
+}
+
+.avatar-form {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.avatar-input {
+  flex-grow: 1;
+  background: rgba(255, 255, 255, 0.1);
   border: none;
-  border-bottom: 2px solid #616161;
-  background-color: transparent;
-  color: rgba(255, 255, 255, 0.87);
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  color: #fff;
   font-size: 1rem;
-  transition: border-color 0.3s ease;
 }
 
-.input-field:focus {
-  border-color: #90CAF9;
-  outline: none;
-}
-
-.input-field::placeholder {
+.avatar-input::placeholder {
   color: rgba(255, 255, 255, 0.6);
 }
 
-button {
-  padding: 12px 24px;
-  margin: 8px;
+.submit-btn, .logout-btn {
+  background: #4CAF50;
+  color: #fff;
   border: none;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
 }
 
-button[type="submit"] {
-  background-color: #1976D2;
-  color: white;
-  box-shadow: 0px 2px 4px rgba(25, 118, 210, 0.3);
+.submit-btn:hover, .logout-btn:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
 }
 
-button[type="submit"]:hover {
-  background-color: #1565C0;
-  box-shadow: 0px 4px 8px rgba(25, 118, 210, 0.3);
-  transform: scale(1.05);
+.logout-btn {
+  background: #f44336;
 }
 
-.logout {
-  background-color: #D32F2F;
-  color: white;
-  box-shadow: 0px 2px 4px rgba(211, 47, 47, 0.3);
+.logout-btn:hover {
+  background: #d32f2f;
+  box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
 }
 
-.logout:hover {
-  background-color: #C62828;
-  box-shadow: 0px 4px 8px rgba(211, 47, 47, 0.3);
-  transform: scale(1.05);}
+.auth-message {
+  text-align: center;
+  color: #fff;
+  font-size: 1.2rem;
+}
 
-@media (max-width: 600px) {
-  .profile-page {
-    width: 95%;
-    padding: 1rem;
+.login-link {
+  color: #4CAF50;
+  text-decoration: none;
+  margin-top: 1rem;
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .profile-card {
+    padding: 1.5rem;
   }
   
-  h1 {
-    font-size: 1.75rem;
-  }
-  
-  p {
+  .profile-header {
     flex-direction: column;
-    text-align: center;
+    gap: 1rem;
   }
   
-  strong {
-    margin-bottom: 0.5rem;
+  .info-item {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .avatar-form {
+    flex-direction: column;
+  }
+  
+  .avatar-input {
+    width: 100%;
   }
 }
 </style>
