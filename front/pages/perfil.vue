@@ -52,7 +52,7 @@
           <input 
             v-model="newAvatar" 
             type="text" 
-            placeholder="Introdueix el nom per al nou avatar" 
+            placeholder="Introdueix text per al nou avatar" 
             class="avatar-input"
           />
           <button type="submit" class="submit-btn">
