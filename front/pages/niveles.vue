@@ -82,6 +82,7 @@ h1 {
 }
 
 button {
+  background-color: #202020;
   width: 100%;
   height: 100%;
   font-size: 1.5rem;
@@ -95,7 +96,7 @@ button {
 }
 
 button:hover {
-  transform: scale(1.05); /* Aumenta el tamaño ligeramente */
+  transform: scale(1.10); /* Aumenta el tamaño ligeramente */
 }
 
 .hover-text {
@@ -128,8 +129,8 @@ button:hover {
 }
 
 
-.HTML { background-image: url('/html.png'); }
-.boton_CSS { background-image: url('/css.png'); }
-.JAVA_SCRIP { background-image: url('/lion.png'); }
+.HTML { background-image: url('/html.svg'); }       
+.boton_CSS { background-image: url('/css.svg'); }
+.JAVA_SCRIP { background-image: url('/js.svg'); }
 
 </style>
