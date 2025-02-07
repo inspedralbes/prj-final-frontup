@@ -120,6 +120,7 @@ export default {
   display: flex;
   justify-content: space-around;
   gap: 10px;
+  margin-top: 20px;
 }
 
 .card {
@@ -166,13 +167,13 @@ footer {
 
 .looping-words {
   position: absolute;
-  width: 30%; 
+  width: 35%; 
   height: 3.5em;
   font-size: 5vw; 
   padding-left: 0.1em;
   padding-right: 0.1em;
   overflow: hidden;
-  right: 10%;
+  right: 2%;
   top: 20%;
 }
 
