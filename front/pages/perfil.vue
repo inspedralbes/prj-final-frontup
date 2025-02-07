@@ -11,9 +11,6 @@
       <div v-if="user" class="profile-content">
         <div class="avatar-section">
           <img :src="user.avatar" alt="Avatar" class="avatar" />
-          <div class="avatar-overlay" @click="triggerAvatarInput">
-            📷 Canviar
-          </div>
         </div>
 
         <div class="user-info">

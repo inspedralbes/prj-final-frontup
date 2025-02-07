@@ -206,7 +206,7 @@
  
    if (isRegisterFormValid()) {
      // Genera la URL del avatar basado en el nombre de usuario
-     const avatarUrl = `https://api.multiavatar.com/${formData.name}.png`;
+     const avatarUrl = `https://api.dicebear.com/9.x/personas/svg?seed=${formData.name}`;
  
      try {
        // Llamada al endpoint de registro
