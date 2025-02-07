@@ -60,11 +60,6 @@
           </button>
         </form>
       </div>
-      
-      <div v-else class="auth-message">
-        <p>❌ No estàs autenticat</p>
-        <router-link to="/login" class="login-link">Iniciar sessió</router-link>
-      </div>
     </div>
   </div>
 </template>
@@ -157,6 +152,7 @@ const logout = () => {
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  margin-left: 180px;
 }
 
 .profile-card {
