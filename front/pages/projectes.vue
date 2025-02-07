@@ -62,8 +62,7 @@ export default {
       }
     },
     navigateToLibre() {
-      // Ajusta la ruta de creación si es necesario
-      this.$router.push("/libre");
+      this.$router.push("/lliure");
     },
   },
 };

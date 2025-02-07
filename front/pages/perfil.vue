@@ -121,7 +121,7 @@ const updateAvatar = async () => {
     let avatarUrl = newAvatar.value;
 
     if (!avatarUrl.startsWith('http')) {
-      avatarUrl = `https://api.multiavatar.com/${encodeURIComponent(avatarUrl)}.png`;
+      avatarUrl = `https://api.dicebear.com/9.x/personas/svg?seed=${encodeURIComponent(avatarUrl)}`;
     }
 
     const response = await fetch('http://127.0.0.1:8000/api/user/avatar', {
