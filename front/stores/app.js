@@ -9,11 +9,23 @@ export const useLliureStore = defineStore('lliure', {
       this.lliure = !this.lliure;
     },
     setLliure(value) {
-      this.lliure = value; 
+      this.lliure = value;
     },
   },
 });
-
+export const useIdProyectoActualStore = defineStore('idproyecto', {
+  state: () => ({
+    id: null,
+  }),
+  actions: {
+    actalizarId(idRecibido){
+      this.id = idRecibido;
+    },
+    vaciarId(){
+      this.id = null;
+    }
+  }
+});
 export const useAppStore = defineStore('app', {
   state: () => ({
     loginInfo: typeof window !== 'undefined' && localStorage.getItem('loginInfo')

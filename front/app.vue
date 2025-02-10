@@ -1,11 +1,13 @@
 <template>
   <router-view />
   <div id="app" v-if="!lliureStore.lliure">
-
+    <div v-if="show" class="alert">
+      {{ message }}
+    </div>
     <div class="left-section">
       <h2>FrontUp</h2>
       <button class="btn btn-crear" @click="navigateToLliure">Crear projecte</button>
-      <button class="btn"@click="navigateToMeusProjectes">Els meus projectes</button>
+      <button class="btn" @click="navigateToMeusProjectes">Els meus projectes</button>
       <button class="btn" @click="navigateToNiveles">Nivells</button>
       <button class="btn">Projectes favorits</button>
     </div>
@@ -26,20 +28,23 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useLliureStore } from '~/stores/app' 
-import { useRouter } from 'vue-router' 
+
+import { useLliureStore } from '~/stores/app'
+import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app';
+import useCommunicationManager from '@/stores/comunicationManager'
+import { useIdProyectoActualStore } from '@/stores/app'
 
-
+const idProyectoActualStore = useIdProyectoActualStore();
 const theme = ref('')
 const themeIcon = ref('☀️')
 const loginText = ref('Login')
-
+const comunicationManager = useCommunicationManager();
 const appStore = useAppStore();
-const lliureStore = useLliureStore()
-
+const lliureStore = useLliureStore();
 const router = useRouter()
+const show = ref(false)
+const message = ref('')
 
 const toggleTheme = () => {
   if (theme.value === '') {
@@ -51,25 +56,51 @@ const toggleTheme = () => {
   }
   document.body.className = theme.value
 }
-
-const navigateToLliure = () => {
-  router.push('/lliure')
+const showAlert = (alertMessage) => {
+  message.value = alertMessage
+  show.value = true
+  setTimeout(() => {
+    show.value = false
+  }, 3000)
+}
+const projecte = reactive({result:{}});
+const navigateToLliure = async () => {
+  if (appStore.loginInfo.id != null) {
+    try {
+        projecte.result= await comunicationManager.crearProyectoDB({
+        nombre: "untitled",
+        user_id: appStore.loginInfo.id,
+        html_code: "",
+        css_code: "",
+        js_code: "",
+      });
+      console.log("lo que devuelve")
+      console.log(projecte.result.id)
+    } catch (error) {
+      console.error(error);
+    }
+    let id = projecte.result.id;
+    idProyectoActualStore.actalizarId(id);
+    router.push(`/lliure/${id}`);
+  } else {
+    showAlert(`Registra't per crear un projecte`)
+  }
 }
 
 const navigateToNiveles = () => {
-  router.push('/niveles')
+  router.push('/niveles');
 }
 
 const navigateToLogin = () => {
-  router.push('/login')
+  router.push('/login');
 }
 
 const navigateToProfile = () => {
-  router.push('/perfil')
+  router.push('/perfil');
 }
 
-const navigateToMeusProjectes= () => {
-  router.push('/projectes')
+const navigateToMeusProjectes = () => {
+  router.push('/projectes');
 }
 </script>
 
@@ -81,8 +112,44 @@ body {
   color: #e0e0e0;
 }
 
-h2{
+h2 {
   padding: 10px;
+}
+.alert {
+  position: fixed;
+  font-size: larger;
+  top: 20px;
+  right: 20px;
+  padding: 4vh 4vw;
+  background: #ff4444;
+  color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  animation: movimiento 0.3s ease-out, opacidad 2s ease-in-out forwards;
+  z-index: 1000;
+}
+
+@keyframes movimiento {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 0.9;
+  }
+}
+
+@keyframes opacidad {
+  0% {
+    opacity: 0.9;
+  }
+  60%{
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 .left-section {
@@ -106,13 +173,13 @@ h2{
   text-transform: uppercase;
   border-radius: 4px;
 }
-  
+
 .left-section .btn:hover {
   background-color: #141414;
 }
 
 .left-section .btn-crear {
-  background-color: #000; 
+  background-color: #000;
   font-weight: bold;
   border: 2px solid;
   border-radius: 6px;
@@ -216,7 +283,7 @@ header {
 }
 </style>
 <style>
-body{
+body {
   background-color: #2d2d2d;
 }
 </style>

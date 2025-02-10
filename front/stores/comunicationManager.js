@@ -73,26 +73,54 @@ const useCommunicationManager = () => {
       return false;
     }
   };
-  const guardarProyectoDB = async (proyecto) => {
-    fetch(`${laravelURL}/projects`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(proyecto),
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Error en la solicitud: ' + response.status);
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log('Respuesta del servidor:', data);
-      })
-      .catch(error => {
-        console.error('Hubo un problema con el fetch:', error);
+  const crearProyectoDB = async (proyecto) => {
+    try {
+      const response = await fetch(`${laravelURL}/projects`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(proyecto),
       });
+  
+      if (!response.ok) {
+        throw new Error('Error en la solicitud: ' + response.status);
+      }
+      
+      const data = await response.json();
+      console.log('Respuesta del servidor:', data);
+      return data;
+      
+    } catch (error) {
+      console.error('Hubo un problema con el fetch:', error);
+      throw error;
+    }
+  }
+  const guardarProyectoDB = async (proyecto,id) => {
+    console.log('id pasado',id);
+    console.log('proyecto pasado',proyecto);
+    
+    try {
+      const response = await fetch(`${laravelURL}/projects/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(proyecto),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Error en la solicitud: ' + response.status);
+      }
+      
+      const data = await response.json();
+      console.log('Respuesta del servidor:', data);
+      return data;
+      
+    } catch (error) {
+      console.error('Hubo un problema con el fetch:', error);
+      throw error;
+    }
   }
   const chatIA = async (mensaje, html, css, js) => {
     try {
@@ -138,6 +166,7 @@ const useCommunicationManager = () => {
     logoutUser,
     guardarProyectoDB,
     chatIA,
+    crearProyectoDB,
   };
 };
 

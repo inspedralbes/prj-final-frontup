@@ -2,8 +2,7 @@
   <div class="todo">
     <header class="header">
       <button class="header-button" @click="goBack">Atrás</button>
-      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
-        :readonly="!isEditing" />
+      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false" :readonly="!isEditing" />
       <div class="header-actions">
         <button class="header-button" @click="toggleChat">Chat IA</button>
         <button class="header-button" @click="guardarProyecto">Guardar</button>
@@ -99,11 +98,12 @@ import "codemirror/mode/css/css";
 import "codemirror/mode/javascript/javascript";
 import useCommunicationManager from "@/stores/comunicationManager";
 import { useAppStore } from '@/stores/app';
+import { useIdProyectoActualStore } from '@/stores/app'
 
 export default {
   setup() {
     const appStore = useAppStore();
-    
+    const idProyectoActualStore = useIdProyectoActualStore();
     const router = useRouter();
     const { guardarProyectoDB, chatIA, state } = useCommunicationManager();
     const lliureStore = useLliureStore();
@@ -121,6 +121,7 @@ export default {
     const isExpanded = ref(false);
     const isChatVisible = ref(false);
     const newMessage = ref("");
+    const cambiadoSinGuardar = ref(false);
     const messages = ref([
       { type: 'ai', content: "¡Hola! ¿En qué puedo ayudarte hoy?" }
     ]);
@@ -130,7 +131,7 @@ export default {
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
     const jsEditor = ref(null);
-
+    
     let htmlEditorInstance, cssEditorInstance, jsEditorInstance;
     const startDrag = (event) => {
       isDragging.value = true;
@@ -141,6 +142,16 @@ export default {
       document.addEventListener("mousemove", onDrag);
       document.addEventListener("mouseup", stopDrag);
     };
+    const CambiosSinGuardarToTrue = () =>{
+      console.log('entrado en cambio a true',cambiadoSinGuardar.value);
+      
+      cambiadoSinGuardar.value = true
+    }
+    const CambiosSinGuardarToFalse = () =>{
+      
+      cambiadoSinGuardar.value = false
+      console.log('entrado a cambio a false',cambiadoSinGuardar.value);
+    }
     const onDrag = (event) => {
       if (isDragging.value) {
         chatPosition.value = {
@@ -154,7 +165,7 @@ export default {
       document.removeEventListener("mousemove", onDrag);
       document.removeEventListener("mouseup", stopDrag);
     };
-    // Ciclo de vida
+
     onMounted(() => {
       lliureStore.toggleLliure();
 
@@ -180,22 +191,25 @@ export default {
       // Handlers de cambios
       htmlEditorInstance.on("change", (instance) => {
         html.value = instance.getValue();
+        CambiosSinGuardarToTrue();
       });
 
       cssEditorInstance.on("change", (instance) => {
         css.value = instance.getValue();
+        CambiosSinGuardarToTrue();
       });
 
       jsEditorInstance.on("change", (instance) => {
         js.value = instance.getValue();
+        CambiosSinGuardarToTrue();
       });
     });
 
     onUnmounted(() => {
       lliureStore.toggleLliure();
+      idProyectoActualStore.vaciarId();
     });
 
-    // Funciones del chat
     const toggleChat = () => {
       isChatVisible.value = !isChatVisible.value;
     };
@@ -206,13 +220,11 @@ export default {
       const userMessage = newMessage.value;
       newMessage.value = "";
 
-      // Agregar mensaje del usuario
       messages.value.push({
         type: 'user',
         content: userMessage
       });
 
-      // Agregar mensaje de carga
       messages.value.push({
         type: 'loading',
         content: ''
@@ -239,13 +251,19 @@ export default {
       }
     };
 
-    // Funciones principales
     const toggleExpand = () => {
       isExpanded.value = !isExpanded.value;
     };
 
-    const goBack = () => router.push("/");
+    const goBack = () => {
+      console.log('!!!contrario de cambios sin guardar',cambiadoSinGuardar.value);
+      
+      if(!cambiadoSinGuardar.value){
+        router.push("/");
+      }else{
 
+      }
+    }
     const openSettingsModal = () => {
       showSettingsModal.value = true;
       modalTitle.value = title.value;
@@ -261,6 +279,7 @@ export default {
     };
 
     const guardarProyecto = async () => {
+      CambiosSinGuardarToFalse();
       try {
         await guardarProyectoDB({
           nombre: title.value || "",
@@ -268,7 +287,7 @@ export default {
           html_code: html.value || "",
           css_code: css.value || "",
           js_code: js.value || "",
-        });
+        },idProyectoActualStore.id);
       } catch (error) {
         console.error(error);
       }
@@ -305,6 +324,7 @@ export default {
       startDrag,
       onDrag,
       stopDrag,
+      CambiosSinGuardarToTrue,
       output: computed(() => {
         let jsContent = js.value;
         let scriptContent = `
