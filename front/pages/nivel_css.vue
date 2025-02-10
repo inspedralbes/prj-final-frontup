@@ -30,7 +30,7 @@ export default {
       hoveredLevel: null,
     };
   },
-  methods: {
+  methods: {  
     ir_nivel(levelId) {
       this.$router.push(`/nivel/${levelId}`);
     },

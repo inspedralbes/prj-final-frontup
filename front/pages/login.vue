@@ -1,5 +1,7 @@
 <template>
   <div class="todo">
+    
+
     <div v-if="!showRegister" class="auth-page">
       <form class="form" @submit.prevent="login">
         <p id="heading">Login</p>
@@ -70,14 +72,18 @@
     
     <transition name="slide-to-right">
       <div v-if="!showRegister" class="register">
+    <button class="left_atras"back-button @click="iratras">atras</button>
         <img src="../public/desk-4222025_1920.jpg" alt="Registre" @click="toggleRegister">
       </div>
     </transition>
     <transition name="slide-to-left">
       <div v-if="showRegister" class="login">
+    <button class="right_atras"back-button @click="iratras">atras</button>
         <img src="../public/desk-4222025_1920.jpg" alt="Login" @click="toggleRegister">
       </div>
     </transition>
+
+     
   </div>
  </template>
  
@@ -98,6 +104,13 @@
  onMounted(() => {
    lliureStore.toggleLliure();
  });
+
+
+  /* funcion ir atras */
+
+  function iratras(){
+    router.push("/");
+  }
  
  const formData = reactive({
    email: '',
@@ -121,20 +134,20 @@
  
  const validateEmail = () => {
    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-   errors.email = emailRegex.test(formData.email) ? '' : 'Correo inválido';
+   errors.email = emailRegex.test(formData.email) ? '' : '*';
  };
  
  const validatename = () => {
-   errors.name = formData.name ? '' : 'El nombre de usuario es obligatorio';
+   errors.name = formData.name ? '' : ' *';
  };
  
  const validatePassword = () => {
-   errors.password = formData.password ? '' : 'La contraseña es obligatoria';
+   errors.password = formData.password ? '' : ' *';
  };
  
  const validatePasswordRepeat = () => {
    errors.passwordRepeat =
-     formData.passwordRepeat === formData.password ? '' : 'Las contraseñas no coinciden';
+     formData.passwordRepeat === formData.password ? '' : '*';
  };
  
  const isLoginFormValid = () => {
@@ -268,12 +281,21 @@
 
 <style scoped>
 .todo {
+ position: relative;
  height: 100vh;
  width: 100%;
- background-color: #1c1c1c;
  display: flex;
  justify-content: center;
  align-items: center;
+ background: linear-gradient(to bottom,white, #202020, white);
+ font-weight: bold;
+ color: white;
+ text-shadow: 2px 2px 5px black;
+ box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.3);
+ transition: box-shadow 0.5s ease-in-out;
+ overflow-x: hidden;
+
+ 
 }
 
 .slide-to-right-enter-active {
@@ -346,7 +368,9 @@ img {
  padding-left: 2em;
  padding-right: 2em;
  padding-bottom: 0.4em;
- background-color: #171717;
+ background: url("https://doc-08-2c-docs.googleusercontent.com/docs/securesc/68c90smiglihng9534mvqmq1946dmis5/fo0picsp1nhiucmc0l25s29respgpr4j/1631524275000/03522360960922298374/03522360960922298374/1Sx0jhdpEpnNIydS4rnN4kHSJtU1EyWka?e=view&authuser=0&nonce=gcrocepgbb17m&user=03522360960922298374&hash=tfhgbs86ka6divo3llbvp93mg4csvb38") no-repeat center/ cover;
+	border-radius: 10px;
+	box-shadow: 10px 20px 50px black;
  border-radius: 25px;
  transition: .4s ease-in-out;
 }
@@ -359,7 +383,7 @@ img {
 #heading {
  text-align: center;
  margin: 2em;
- color: rgb(255, 255, 255);
+ color: white;
  font-size: 1.2em;
 }
 
@@ -372,17 +396,17 @@ img {
  padding: 0.6em;
  border: none;
  outline: none;
- color: white;
- background-color: #171717;
+ color: black;
+ background-color: white;
  box-shadow: inset 2px 5px 10px rgb(5, 5, 5);
 }
 
 .input-field {
- background: none;
+ background: transparent;
  border: none;
  outline: none;
  width: 100%;
- color: #d3d3d3;
+ color: black;
 }
 
 .button1 {
@@ -394,30 +418,61 @@ img {
  border: none;
  outline: none;
  transition: .4s ease-in-out;
- background-color: #252525;
- color: white;
+ background: linear-gradient(to bottom, gray, white, gray);
+ color: black;
 }
 
 .input-icon {
  height: 1.3em;
  width: 1.3em;
- fill: white;
+ fill: black;
 }
 
-button:disabled {
- background: #555;
+button:disabled { 
+  color: black;
+ background: gray;
  cursor: not-allowed;
 }
 
 
 .error {
  color: red;
- font-size: 0.9rem;
+ font-size: 0.8rem;
 }
 
 .error-message {
  color: red;
  font-size: 1rem;
  margin-top: 10px;
+}
+/* boto de gabriel 2 */
+.left_atras{
+  border: none;
+  position: absolute;
+  top: 20px;
+  left: -90%;
+  border-radius: 25px;
+  padding: 5px 15px;
+  background: linear-gradient(to bottom, gray);
+
+  transition: .4s ease-in-out;
+}
+/* boton atras derecho */
+.right_atras{
+  border: none;
+  position: absolute;
+  top: 20px;
+  left: 180%;
+  border-radius: 15px;
+  padding: 5px 15px;
+  background: linear-gradient(to bottom, gray, white, gray);
+  transition: .4s ease-in-out;
+}
+.left_atras:hover{
+  transform: scale(1.20);
+}
+
+.right_atras:hover{
+  transform: scale(1.20);
 }
 </style>
