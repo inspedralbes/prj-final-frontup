@@ -2,8 +2,7 @@
   <div class="todo">
     <header class="header">
       <button class="header-button" @click="goBack">Atrás</button>
-      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
-        :readonly="!isEditing" />
+      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false" :readonly="!isEditing" />
       <div class="header-actions">
         <button class="header-button" @click="toggleChat">Chat IA</button>
         <button class="header-button" @click="guardarProyecto">Guardar</button>
@@ -11,12 +10,6 @@
         <button class="header-button">💡</button>
       </div>
     </header>
-
-    <div v-if="notification" class="notification">
-      <div class="notification-icon">❗</div>
-      <span>{{ notification }}</span>
-      <button class="notification-close" @click="clearNotification">X</button>
-    </div>
 
     <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
       <div class="modal-content" @click.stop>
@@ -93,119 +86,266 @@
     </div>
   </div>
 </template>
+<script>
+import { ref, onMounted, computed, onUnmounted, nextTick } from "vue";
+import { useRouter } from "vue-router";
+import CodeMirror from "codemirror";
+import { useLliureStore } from "~/stores/app";
+import "codemirror/lib/codemirror.css";
+import "codemirror/theme/dracula.css";
+import "codemirror/mode/htmlmixed/htmlmixed";
+import "codemirror/mode/css/css";
+import "codemirror/mode/javascript/javascript";
+import useCommunicationManager from "@/stores/comunicationManager";
+import { useAppStore } from '@/stores/app';
+import { useIdProyectoActualStore } from '@/stores/app'
 
+export default {
+  setup() {
+    const appStore = useAppStore();
+    const idProyectoActualStore = useIdProyectoActualStore();
+    const router = useRouter();
+    const { guardarProyectoDB, chatIA, state } = useCommunicationManager();
+    const lliureStore = useLliureStore();
+    const isDragging = ref(false);
+    const chatPosition = ref({ x: 20, y: 20 });
+    const dragStartPosition = ref({ x: 0, y: 0 });
+    const title = ref("Untitled");
+    const html = ref("");
+    const css = ref("");
+    const js = ref("");
+    const isEditing = ref(false);
+    const showSettingsModal = ref(false);
+    const modalTitle = ref("");
+    const modalDescription = ref("");
+    const isExpanded = ref(false);
+    const isChatVisible = ref(false);
+    const newMessage = ref("");
+    const cambiadoSinGuardar = ref(false);
+    const messages = ref([
+      { type: 'ai', content: "¡Hola! ¿En qué puedo ayudarte hoy?" }
+    ]);
+    const messagesContainer = ref(null);
 
-<script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import CodeMirror from 'codemirror';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/dracula.css';
-import 'codemirror/mode/htmlmixed/htmlmixed';
-import 'codemirror/mode/css/css';
-import 'codemirror/mode/javascript/javascript';
-
-const route = useRoute();
-const projectId = route.params.id;
-
-// Variables reactivas (igual que en lliure.vue)
-const title = ref('Cargando...');
-const html = ref('');
-const css = ref('');
-const js = ref('');
-
-// Editores CodeMirror
-let htmlEditor, cssEditor, jsEditor;
-
-onMounted(async () => {
-  // 1. Cargar proyecto existente
-  await loadProject();
-  
-  // 2. Inicializar editores (igual que en lliure.vue)
-  htmlEditor = CodeMirror(document.querySelector('.html-editor'), {
-    value: html.value,
-    mode: 'htmlmixed',
-    theme: 'dracula',
-    lineNumbers: true
-  });
-  
-  cssEditor = CodeMirror(document.querySelector('.css-editor'), {
-    value: css.value,
-    mode: 'css',
-    theme: 'dracula',
-    lineNumbers: true
-  });
-  
-  jsEditor = CodeMirror(document.querySelector('.js-editor'), {
-    value: js.value,
-    mode: 'javascript',
-    theme: 'dracula',
-    lineNumbers: true
-  });
-  
-  // 3. Configurar listeners para cambios
-  htmlEditor.on('change', (instance) => {
-    html.value = instance.getValue();
-  });
-  
-  cssEditor.on('change', (instance) => {
-    css.value = instance.getValue();
-  });
-  
-  jsEditor.on('change', (instance) => {
-    js.value = instance.getValue();
-  });
-});
-
-// Función para cargar el proyecto
-const loadProject = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:8000/api/projects/${projectId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
+    // Referencias de los editores
+    const htmlEditor = ref(null);
+    const cssEditor = ref(null);
+    const jsEditor = ref(null);
+    
+    let htmlEditorInstance, cssEditorInstance, jsEditorInstance;
+    const startDrag = (event) => {
+      isDragging.value = true;
+      dragStartPosition.value = {
+        x: event.clientX - chatPosition.value.x,
+        y: event.clientY - chatPosition.value.y,
+      };
+      document.addEventListener("mousemove", onDrag);
+      document.addEventListener("mouseup", stopDrag);
+    };
+    const CambiosSinGuardarToTrue = () =>{
+      console.log('entrado en cambio a true',cambiadoSinGuardar.value);
+      
+      cambiadoSinGuardar.value = true
+    }
+    const CambiosSinGuardarToFalse = () =>{
+      
+      cambiadoSinGuardar.value = false
+      console.log('entrado a cambio a false',cambiadoSinGuardar.value);
+    }
+    const onDrag = (event) => {
+      if (isDragging.value) {
+        chatPosition.value = {
+          x: event.clientX - dragStartPosition.value.x,
+          y: event.clientY - dragStartPosition.value.y,
+        };
       }
-    });
-    
-    const project = await response.json();
-    
-    title.value = project.nombre;
-    html.value = project.html_code;
-    css.value = project.css_code;
-    js.value = project.js_code;
-    
-  } catch (error) {
-    console.error('Error cargando proyecto:', error);
-  }
-};
+    };
+    const stopDrag = () => {
+      isDragging.value = false;
+      document.removeEventListener("mousemove", onDrag);
+      document.removeEventListener("mouseup", stopDrag);
+    };
 
-// Función de guardado modificada para actualizar
-const guardarProyecto = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:8000/api/projects/${projectId}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        nombre: title.value,
-        html_code: html.value,
-        css_code: css.value,
-        js_code: js.value
-      })
+    onMounted(() => {
+      lliureStore.toggleLliure();
+
+      // Configurar editores
+      htmlEditorInstance = CodeMirror(htmlEditor.value, {
+        mode: "htmlmixed",
+        theme: "dracula",
+        lineNumbers: true,
+      });
+
+      cssEditorInstance = CodeMirror(cssEditor.value, {
+        mode: "css",
+        theme: "dracula",
+        lineNumbers: true,
+      });
+
+      jsEditorInstance = CodeMirror(jsEditor.value, {
+        mode: "javascript",
+        theme: "dracula",
+        lineNumbers: true,
+      });
+
+      // Handlers de cambios
+      htmlEditorInstance.on("change", (instance) => {
+        html.value = instance.getValue();
+        CambiosSinGuardarToTrue();
+      });
+
+      cssEditorInstance.on("change", (instance) => {
+        css.value = instance.getValue();
+        CambiosSinGuardarToTrue();
+      });
+
+      jsEditorInstance.on("change", (instance) => {
+        js.value = instance.getValue();
+        CambiosSinGuardarToTrue();
+      });
     });
-    
-    if (!response.ok) throw new Error('Error al guardar');
-    notification.value = 'Proyecto actualizado correctamente!';
-    
-  } catch (error) {
-    notification.value = 'Error al guardar: ' + error.message;
-  }
+
+    onUnmounted(() => {
+      lliureStore.toggleLliure();
+      idProyectoActualStore.vaciarId();
+    });
+
+    const toggleChat = () => {
+      isChatVisible.value = !isChatVisible.value;
+    };
+
+    const sendMessage = async () => {
+      if (!newMessage.value.trim() || state.loading) return;
+
+      const userMessage = newMessage.value;
+      newMessage.value = "";
+
+      messages.value.push({
+        type: 'user',
+        content: userMessage
+      });
+
+      messages.value.push({
+        type: 'loading',
+        content: ''
+      });
+
+      try {
+        const response = await chatIA(userMessage, html.value, css.value, js.value);
+        messages.value.pop();
+        messages.value.push({
+          type: 'ai',
+          content: response
+        });
+      } catch (error) {
+        messages.value.pop();
+        messages.value.push({
+          type: 'ai',
+          content: "❌ Error al obtener respuesta. Intenta nuevamente."
+        });
+      } finally {
+        await nextTick();
+        if (messagesContainer.value) {
+          messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+        }
+      }
+    };
+
+    const toggleExpand = () => {
+      isExpanded.value = !isExpanded.value;
+    };
+
+    const goBack = () => {
+      console.log('!!!contrario de cambios sin guardar',cambiadoSinGuardar.value);
+      
+      if(!cambiadoSinGuardar.value){
+        router.push("/");
+      }else{
+
+      }
+    }
+    const openSettingsModal = () => {
+      showSettingsModal.value = true;
+      modalTitle.value = title.value;
+    };
+
+    const closeSettingsModal = () => {
+      showSettingsModal.value = false;
+    };
+
+    const saveSettings = () => {
+      title.value = modalTitle.value;
+      closeSettingsModal();
+    };
+
+    const guardarProyecto = async () => {
+      CambiosSinGuardarToFalse();
+      try {
+        await guardarProyectoDB({
+          nombre: title.value || "",
+          user_id: appStore.loginInfo.id || null,
+          html_code: html.value || "",
+          css_code: css.value || "",
+          js_code: js.value || "",
+        },idProyectoActualStore.id);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    return {
+      title,
+      html,
+      css,
+      js,
+      htmlEditor,
+      cssEditor,
+      jsEditor,
+      isEditing,
+      showSettingsModal,
+      modalTitle,
+      modalDescription,
+      isExpanded,
+      isChatVisible,
+      newMessage,
+      messages,
+      messagesContainer,
+      state,
+      toggleChat,
+      sendMessage,
+      toggleExpand,
+      goBack,
+      openSettingsModal,
+      closeSettingsModal,
+      saveSettings,
+      guardarProyecto,
+      isDragging,
+      chatPosition,
+      startDrag,
+      onDrag,
+      stopDrag,
+      CambiosSinGuardarToTrue,
+      output: computed(() => {
+        let jsContent = js.value;
+        let scriptContent = `
+          try {
+            ${jsContent}
+          } catch (e) {
+            console.error('Error in JavaScript:', e);
+          }
+        `;
+        return `
+          <html>
+            <head><style>${css.value}</style></head>
+            <body>${html.value}
+              <script>${scriptContent}<\/script>
+            </body>
+          </html>`;
+      }),
+    };
+  },
 };
 </script>
-
 <style scoped>
 .todo {
   display: flex;
