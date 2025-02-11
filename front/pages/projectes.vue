@@ -2,17 +2,26 @@
   <div class="container">
     <h1 class="title">Mis Proyectos</h1>
     
-    <div v-if="loading" class="loading">Cargando proyectos...</div>
+    <!-- Selector de ordenación con nuevo estilo -->
+    <div class="sort-container">
+      <label for="sort" class="sort-label">Ordenar per:</label>
+      <select id="sort" v-model="sortCriteria" class="sort-select">
+        <option value="default">Destacats</option>
+        <option value="date_asc">Data: Més antics primer</option>
+        <option value="date_desc">Data: Méss recents primer</option>
+      </select>
+    </div>
 
-    <div v-else-if="projects.length === 0" class="no-projects">
-      No tienes proyectos aún.
+    <div v-if="loading" class="loading">Cargant projectes...</div>
+
+    <div v-else-if="sortedProjects.length === 0" class="no-projects">
+      No tens projectes encara.
       <br /><br />
       <button class="btn" @click="navigateToLibre">Crear el teu primer projecte</button>
     </div>
 
     <div v-else class="projects-list">
-      <!-- Se utiliza el componente Item para cada proyecto -->
-      <Item v-for="project in projects" :key="project.id" :project="project" />
+      <Item v-for="project in sortedProjects" :key="project.id" :project="project" />
     </div>
   </div>
 </template>
@@ -30,7 +39,21 @@ export default {
       projects: [],
       loading: true,
       error: null,
+      sortCriteria: "default",
     };
+  },
+  computed: {
+    sortedProjects() {
+      let sorted = [...this.projects];
+
+      if (this.sortCriteria === "date_asc") {
+        return sorted.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      } 
+      if (this.sortCriteria === "date_desc") {
+        return sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      }
+      return sorted;
+    }
   },
   async mounted() {
     await this.fetchProjects();
@@ -63,10 +86,11 @@ export default {
     },
     navigateToLibre() {
       this.$router.push("/lliure");
-    },
+    }
   },
 };
 </script>
+
 
 <style scoped>
 .container {
@@ -112,4 +136,37 @@ export default {
   background-color: #3d3d3d;
   transform: scale(1.05);
 }
+
+.sort-container {
+  display: flex;
+  justify-content: flex-end; 
+  align-items: center;
+  margin-bottom: 15px;
+  padding-right: 20px;
+}
+
+.sort-label {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ddd;
+  margin-right: 10px;
+}
+
+.sort-select {
+  background-color: #292929;
+  color: #ffffff;
+  border: 2px solid #444;
+  padding: 10px 15px;
+  font-size: 14px;
+  font-weight: bold; 
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sort-select:hover {
+  background-color: #3d3d3d;
+  transform: scale(1.05);
+}
+
 </style>
