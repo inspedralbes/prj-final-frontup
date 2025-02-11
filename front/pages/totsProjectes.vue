@@ -62,7 +62,7 @@ export default {
             } else if (this.sortCriteria === "date_asc") {
                 return filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
             } else {
-                return filtered; // "Destacats" no aplica cap ordre específic
+                return filtered; 
             }
         },
         totalPages() {
@@ -148,8 +148,8 @@ h1 {
   border-radius: 5px;
   border: none;
   outline: none;
-  background-color: #3a3a3a; /* Color més clar per millor contrast */
-  color: #ddd; /* Color lleugerament més clar que blanc pur */
+  background-color: #3a3a3a;
+  color: #ddd;
   text-align: left;
 }
 
