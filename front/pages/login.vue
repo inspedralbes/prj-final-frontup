@@ -20,7 +20,7 @@
           <input type="password" class="input-field" id="password" placeholder="Contrasenya" v-model="formData.password" />
           <p class="error" v-if="errors.password">{{ errors.password }}</p>
         </div>
-        <button type="submit" :disabled="!isLoginFormValid()">Ingresar</button>
+        <button class="button" type="submit" :disabled="!isLoginFormValid()">Ingresar</button>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         <p>¿No tens compte?</p>
         <div :class="{ active: showRegister }">
@@ -72,13 +72,13 @@
     
     <transition name="slide-to-right">
       <div v-if="!showRegister" class="register">
-    <button class="left_atras"back-button @click="iratras">atras</button>
+    <button class="left_atras"back-button @click="iratras">frontUp</button>
         <img src="../public/desk-4222025_1920.jpg" alt="Registre" @click="toggleRegister">
       </div>
     </transition>
     <transition name="slide-to-left">
       <div v-if="showRegister" class="login">
-    <button class="right_atras"back-button @click="iratras">atras</button>
+    <button class="right_atras"back-button @click="iratras">frontUp</button>
         <img src="../public/desk-4222025_1920.jpg" alt="Login" @click="toggleRegister">
       </div>
     </transition>
@@ -287,19 +287,17 @@
  display: flex;
  justify-content: center;
  align-items: center;
- background: linear-gradient(to bottom,white, #202020, white);
+ background: linear-gradient(145deg, #302b63, #24243e, #302b63);
  font-weight: bold;
  color: white;
  text-shadow: 2px 2px 5px black;
  box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.3);
  transition: box-shadow 0.5s ease-in-out;
- overflow-x: hidden;
-
- 
+ overflow: hidden;
 }
 
 .slide-to-right-enter-active {
- transition: transform 1s ease;
+ transition: transform 2s ease;
 }
 
 .slide-to-right-enter-from {
@@ -307,7 +305,7 @@
 }
 
 .slide-to-left-enter-active {
- transition: transform 1s ease;
+ transition: transform 2s ease;
 }
 
 .slide-to-left-enter-from {
@@ -349,16 +347,17 @@
  width: 50%;
  height: 100%;
  background-color: #303030;
- box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+ box-shadow: 0 4px 6px black;
  position: absolute;
  margin-top: 0;
  left: 0;
- background: linear-gradient(135deg, #3a3a3a, #1c1c1c);
+ background: linear-gradient(145deg, black, gray, black);
 }
 
 img {
- height: 100%;
+ height: 100vh;
  width: 100%;
+ border-radius: 5px 0px 0px 5px;
 }
 
 .form {
@@ -388,17 +387,16 @@ img {
 }
 
 .field {
- display: flex;
- align-items: center;
- justify-content: center;
- gap: 0.5em;
- border-radius: 25px;
- padding: 0.6em;
- border: none;
- outline: none;
- color: black;
- background-color: white;
- box-shadow: inset 2px 5px 10px rgb(5, 5, 5);
+  width: 65%;
+	height: 15px;
+	background: #e0dede;
+	justify-content: center;
+	display: flex;
+	margin: 10px auto;
+	padding: 10px;
+	border: none;
+	outline: none;
+	border-radius: 5px;
 }
 
 .input-field {
@@ -410,16 +408,25 @@ img {
 }
 
 .button1 {
- padding: 0.5em;
- padding-left: 1.1em;
- padding-right: 1.1em;
- border-radius: 5px;
- margin-right: 0.5em;
- border: none;
- outline: none;
- transition: .4s ease-in-out;
- background: linear-gradient(to bottom, gray, white, gray);
- color: black;
+  width: 45%;
+	height: 35px;
+	margin: 10px auto;
+	justify-content: center;
+	display: block;
+	color: #fff;
+	background: #573b8a;
+	font-size: 1em;
+	font-weight: bold;
+	outline: none;
+	border: none;
+	border-radius: 5px;
+	transition: .2s ease-in;
+	cursor: pointer;
+ 
+}
+.button1:hover{
+  background: #6d44b8;
+  color: white;
 }
 
 .input-icon {
@@ -427,9 +434,26 @@ img {
  width: 1.3em;
  fill: black;
 }
+.button{
+  width: 45%;
+	height: 35px;
+	margin: 10px auto;
+	justify-content: center;
+	display: block;
+	color: #fff;
+	background: #573b8a;
+	font-size: 1em;
+	font-weight: bold;
+	outline: none;
+	border: none;
+	border-radius: 5px;
+	transition: .2s ease-in;
+	cursor: pointer;
+}
 
 button:disabled { 
-  color: black;
+ margin: 10px auto ;
+ color: black;
  background: gray;
  cursor: not-allowed;
 }
@@ -447,26 +471,39 @@ button:disabled {
 }
 /* boto de gabriel 2 */
 .left_atras{
+  font-weight: bold;
   border: none;
   position: absolute;
   top: 20px;
-  left: -90%;
-  border-radius: 25px;
+  left: -95%;
+  border-radius: 15px;
   padding: 5px 15px;
-  background: linear-gradient(to bottom, gray);
-
-  transition: .4s ease-in-out;
+	justify-content: center;
+	display: block;
+	color: #fff;
+	background: #573b8a;
+	font-size: 1em;
+  outline: none;
+	transition: .2s ease-in;
+	cursor: pointer;
 }
 /* boton atras derecho */
 .right_atras{
+  font-weight: bold;
   border: none;
   position: absolute;
   top: 20px;
-  left: 180%;
+  left: 185%;
   border-radius: 15px;
   padding: 5px 15px;
-  background: linear-gradient(to bottom, gray, white, gray);
-  transition: .4s ease-in-out;
+	justify-content: center;
+	display: block;
+	color: #fff;
+	background: #573b8a;
+	font-size: 1em;
+  outline: none;
+	transition: .2s ease-in;
+	cursor: pointer;
 }
 .left_atras:hover{
   transform: scale(1.20);
