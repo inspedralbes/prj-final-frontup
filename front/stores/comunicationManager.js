@@ -122,6 +122,33 @@ const useCommunicationManager = () => {
       throw error;
     }
   }
+  const borrarProyectoDB = async (proyecto,id) => {
+    console.log('id pasado',id);
+    console.log('proyecto pasado',proyecto);
+    
+    try {
+      const response = await fetch(`${laravelURL}/projects/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(proyecto),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Error en la solicitud: ' + response.status);
+      }
+      
+      const data = await response.json();
+      console.log('Respuesta del servidor:', data);
+      return data;
+      
+    } catch (error) {
+      console.error('Hubo un problema con el fetch:', error);
+      throw error;
+    }
+  }
+
   const chatIA = async (mensaje, html, css, js) => {
     try {
       const response = await fetch(`${nodeURL}/pregunta`, {
@@ -167,6 +194,7 @@ const useCommunicationManager = () => {
     guardarProyectoDB,
     chatIA,
     crearProyectoDB,
+    borrarProyectoDB,
   };
 };
 
