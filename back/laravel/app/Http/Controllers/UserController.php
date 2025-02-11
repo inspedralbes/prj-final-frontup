@@ -63,7 +63,9 @@ class UserController extends Controller
         }
 
         $request->validate([
-            'nivel' => 'required|integer|min:1'
+            'nivel' => 'required|integer|min:1',
+            'nivel_css' => 'required|integer|min:1',
+            'nivel_js' => 'required|integer|min:1'
         ]);
 
         $user->nivel = $request->nivel;
@@ -100,6 +102,8 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
             'avatar' => $request->avatar,
             'nivel' => $request->nivel ?? 1,
+            'nivel_css' => $request->nivel_css ?? 11,
+            'nivel_js' => $request->nivel_js ?? 21,
         ]);
 
         return redirect()->route('users.index');

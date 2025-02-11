@@ -71,7 +71,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-image: url('/fondo.svg');
+  background-image: url('/fondo.png');
   border: 1px solid #ddd;
   border-radius: 10px;
   background-size: cover;
