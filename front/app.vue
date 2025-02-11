@@ -7,6 +7,7 @@
       <button class="btn" @click="navigateToMeusProjectes">Els meus projectes</button>
       <button class="btn" @click="navigateToNiveles">Nivells</button>
       <button class="btn">Projectes favorits</button>
+      <button class="btn" @click="navigateToTotsProjectes">Tots els projectes</button>
     </div>
 
     <header>
@@ -96,6 +97,9 @@ const navigateToMeusProjectes = () => {
 
 const navigateToHome = () => {
   router.push('/')
+}
+const navigateToTotsProjectes = () => {
+  router.push("/totsProjectes"); 
 }
 </script>
 
