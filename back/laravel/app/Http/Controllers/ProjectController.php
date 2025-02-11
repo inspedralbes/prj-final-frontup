@@ -8,7 +8,7 @@ use App\Models\Project;
 class ProjectController extends Controller
 {
 
-    
+
     public function indexAll(Request $request)
     {
         $projects = Project::get();
@@ -21,21 +21,21 @@ class ProjectController extends Controller
 
     public function index(Request $request)
     {
-        if ($request->is('api/*')){
+        if ($request->is('api/*')) {
             $user = $request->user();
-    
+
             if (!$user) {
                 return response()->json(['message' => 'Usuario no autenticado'], 401);
             }
             $projects = Project::where('user_id', $user->id)->get();
-    
+
             return response()->json([
                 'message' => 'Proyectos obtenidos con éxito',
                 'projects' => $projects,
             ], 200);
         }
         $search = $request->input('search');
-        
+
         if ($search) {
             $projects = Project::where('nombre', 'like', "%$search%")->get();
         } else {
@@ -45,7 +45,7 @@ class ProjectController extends Controller
         return view('projects.index', compact('projects'));
     }
 
-    
+
 
 
 
@@ -58,7 +58,7 @@ class ProjectController extends Controller
                 'message' => 'Proyecto no encontrado',
             ], 404);
         }
-        
+
         return view('projects.show', compact('project'));
     }
 
@@ -79,68 +79,68 @@ class ProjectController extends Controller
 
         $project = Project::create($validatedData);
 
-        return response()->json(['success'=> 'Proyecto creado con éxito', 'id'=> $project->id]);
-
+        return response()->json(['success' => 'Proyecto creado con éxito', 'id' => $project->id]);
     }
-    
+
     public function edit(Project $project)
-{
-    if (request()->expectsJson()) {
-        $project->update(request()->all());
+    {
+        if (request()->expectsJson()) {
+            $project->update(request()->all());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Proyecto actualizado correctamente'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Proyecto actualizado correctamente'
+            ]);
+        }
+
+        return view('projects.edit', compact('project'));
     }
-
-    return view('projects.edit', compact('project'));
-}
 
 
     public function update(Request $request, $id)
     {
+        if ($request->is('api/*')) {
+            $project = Project::find($id);
+
+            if (!$project) {
+                return response()->json([
+                    'message' => 'Proyecto no encontrado'
+                ], 404);
+            }
+
+            $validatedData = $request->validate([
+                'nombre'   => 'required|string|max:255',
+                'html_code' => 'nullable|string',
+                'css_code' => 'nullable|string',
+                'js_code'  => 'nullable|string',
+            ]);
+
+            $project->update($validatedData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Proyecto actualizado con éxito',
+                'project' => $project,
+            ], 200);
+        }
         $project = Project::find($id);
 
-    if (!$project) {
-        return response()->json([
-            'message' => 'Proyecto no encontrado'
-        ], 404);
-    }
+            if (!$project) {
+                return response()->json([
+                    'message' => 'Proyecto no encontrado',
+                ], 404);
+            }
 
-    $validatedData = $request->validate([
-        'nombre'   => 'required|string|max:255',
-        'html_code'=> 'nullable|string',
-        'css_code' => 'nullable|string',
-        'js_code'  => 'nullable|string',
-    ]);
+            $validatedData = $request->validate([
+                'nombre' => 'required|string|max:255',
+                'html_code' => 'nullable|string',
+                'css_code' => 'nullable|string',
+                'js_code' => 'nullable|string',
+            ]);
 
-    $project->update($validatedData);
+            $project->update($validatedData);
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Proyecto actualizado con éxito',
-        'project' => $project,
-    ], 200);
-    // $project = Project::find($id);
-
-    //     if (!$project) {
-    //         return response()->json([
-    //             'message' => 'Proyecto no encontrado',
-    //         ], 404);
-    //     }
-
-    //     $validatedData = $request->validate([
-    //         'nombre' => 'required|string|max:255',
-    //         'html_code' => 'nullable|string',
-    //         'css_code' => 'nullable|string',
-    //         'js_code' => 'nullable|string',
-    //     ]);
-
-    //     $project->update($validatedData);
-
-    //     return redirect()->route('projects.index')
-    //                      ->with('success', 'Proyecto actualizado con éxito');
+            return redirect()->route('projects.index')->with('success', 'Proyecto actualizado con éxito');
     }
 
     public function destroy($id)
@@ -154,8 +154,8 @@ class ProjectController extends Controller
         }
 
         $project->delete();
-
-        return redirect()->route('projects.index')
-        ->with('success', 'Proyecto eliminado con éxito');
+        
+        return response()->json(['success', 'Proyecto eliminado']);
+        //return redirect()->route('projects.index')->with('success', 'Proyecto eliminado con éxito');
     }
 }

@@ -2,7 +2,8 @@
   <div class="todo">
     <header class="header">
       <button class="header-button" @click="goBack">Atrás</button>
-      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false" :readonly="!isEditing" />
+      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
+        :readonly="!isEditing" />
       <div class="header-actions">
         <button class="header-button" @click="toggleChat">Chat IA</button>
         <button class="header-button" @click="guardarProyecto">Guardar</button>
@@ -32,13 +33,22 @@
         </form>
       </div>
     </div>
-
+    <div v-if="guardarParaSalir" class="modal-overlay" @click="closeGuardarParaSalir">
+      <div class="modal-content" @click.stop>
+        <h2>Vols guardar aquest projecte?</h2>
+        <form @submit.prevent="guardarProyecto2">
+          <div class="modal-actions">
+            <button type="submit" class="modal-button">Guardar</button>
+            <button type="button" class="modal-button cancel" @click="volverHome">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
     <!-- Chat IA flotante -->
-    <div v-if="isChatVisible" class="chat-container" 
-     :style="{ transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)` }"
-     @mousedown="startDrag">
+    <div v-if="isChatVisible" class="chat-container"
+      :style="{ transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)` }" @mousedown="startDrag">
       <button class="close-chat-button" @click="toggleChat">✖</button>
-      <h2 class="chat-title">Chat con Gemini</h2>
+      <h2 class="chat-title">IA FrontUp</h2>
       <div class="messages-container" ref="messagesContainer">
         <div v-for="(msg, index) in messages" :key="index" class="message" :class="{
           'user': msg.type === 'user',
@@ -105,7 +115,7 @@ export default {
     const appStore = useAppStore();
     const idProyectoActualStore = useIdProyectoActualStore();
     const router = useRouter();
-    const { guardarProyectoDB, chatIA, state } = useCommunicationManager();
+    const { guardarProyectoDB, chatIA, state, borrarProyectoDB } = useCommunicationManager();
     const lliureStore = useLliureStore();
     const isDragging = ref(false);
     const chatPosition = ref({ x: 20, y: 20 });
@@ -126,12 +136,12 @@ export default {
       { type: 'ai', content: "¡Hola! ¿En qué puedo ayudarte hoy?" }
     ]);
     const messagesContainer = ref(null);
+    const guardarParaSalir = ref(false);
 
-    // Referencias de los editores
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
     const jsEditor = ref(null);
-    
+
     let htmlEditorInstance, cssEditorInstance, jsEditorInstance;
     const startDrag = (event) => {
       isDragging.value = true;
@@ -142,15 +152,15 @@ export default {
       document.addEventListener("mousemove", onDrag);
       document.addEventListener("mouseup", stopDrag);
     };
-    const CambiosSinGuardarToTrue = () =>{
-      console.log('entrado en cambio a true',cambiadoSinGuardar.value);
-      
+    const CambiosSinGuardarToTrue = () => {
+      console.log('entrado en cambio a true', cambiadoSinGuardar.value);
+
       cambiadoSinGuardar.value = true
     }
-    const CambiosSinGuardarToFalse = () =>{
-      
+    const CambiosSinGuardarToFalse = () => {
+
       cambiadoSinGuardar.value = false
-      console.log('entrado a cambio a false',cambiadoSinGuardar.value);
+      console.log('entrado a cambio a false', cambiadoSinGuardar.value);
     }
     const onDrag = (event) => {
       if (isDragging.value) {
@@ -160,12 +170,18 @@ export default {
         };
       }
     };
+    const volverHome = async () => {
+      console.log('css.value',css.value);
+      router.push("/");
+    }
     const stopDrag = () => {
       isDragging.value = false;
       document.removeEventListener("mousemove", onDrag);
       document.removeEventListener("mouseup", stopDrag);
     };
-
+    const closeGuardarParaSalir = () => {
+      guardarParaSalir.value = false;
+    }
     onMounted(() => {
       lliureStore.toggleLliure();
 
@@ -175,7 +191,6 @@ export default {
         theme: "dracula",
         lineNumbers: true,
       });
-
       cssEditorInstance = CodeMirror(cssEditor.value, {
         mode: "css",
         theme: "dracula",
@@ -188,7 +203,6 @@ export default {
         lineNumbers: true,
       });
 
-      // Handlers de cambios
       htmlEditorInstance.on("change", (instance) => {
         html.value = instance.getValue();
         CambiosSinGuardarToTrue();
@@ -204,12 +218,17 @@ export default {
         CambiosSinGuardarToTrue();
       });
     });
-
+   
     onUnmounted(() => {
       lliureStore.toggleLliure();
       idProyectoActualStore.vaciarId();
     });
 
+    const guardarProyecto2 = () => {
+      guardarProyecto();
+      guardarParaSalir.value = false;
+      router.push('/');
+    }
     const toggleChat = () => {
       isChatVisible.value = !isChatVisible.value;
     };
@@ -255,13 +274,16 @@ export default {
       isExpanded.value = !isExpanded.value;
     };
 
-    const goBack = () => {
-      console.log('!!!contrario de cambios sin guardar',cambiadoSinGuardar.value);
-      
-      if(!cambiadoSinGuardar.value){
+    const goBack = async () => {
+      if (!cambiadoSinGuardar.value) {
+        if (html.value == "" && css.value == "" && js.value == "") {
+          await borrarProyectoDB(idProyectoActualStore.id);
+        }
         router.push("/");
-      }else{
-
+      } else {
+        guardarParaSalir.value = true;
+        console.log('se enseña el guardar para salir?',guardarParaSalir.value);
+        
       }
     }
     const openSettingsModal = () => {
@@ -287,7 +309,7 @@ export default {
           html_code: html.value || "",
           css_code: css.value || "",
           js_code: js.value || "",
-        },idProyectoActualStore.id);
+        }, idProyectoActualStore.id);
       } catch (error) {
         console.error(error);
       }
@@ -311,12 +333,16 @@ export default {
       messages,
       messagesContainer,
       state,
+      guardarParaSalir,
+      guardarProyecto2,
+      volverHome,
       toggleChat,
       sendMessage,
       toggleExpand,
       goBack,
       openSettingsModal,
       closeSettingsModal,
+      closeGuardarParaSalir,
       saveSettings,
       guardarProyecto,
       isDragging,

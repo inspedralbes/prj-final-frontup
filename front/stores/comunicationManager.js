@@ -122,17 +122,12 @@ const useCommunicationManager = () => {
       throw error;
     }
   }
-  const borrarProyectoDB = async (proyecto,id) => {
+  const borrarProyectoDB = async (id) => {
     console.log('id pasado',id);
-    console.log('proyecto pasado',proyecto);
     
     try {
       const response = await fetch(`${laravelURL}/projects/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(proyecto),
       });
   
       if (!response.ok) {
