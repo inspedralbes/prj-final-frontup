@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('puntuacions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
-            $table->integer('calificacion');
-            $table->timestamps();
+            $table->integer('likes')->default(0);
+            $table->tinyInteger('saved')->default(0); //0 = proyecto no favorito | 1 = proyecto favorito            $table->timestamps();
         });
     }
 
