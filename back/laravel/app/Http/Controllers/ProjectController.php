@@ -78,8 +78,11 @@ class ProjectController extends Controller
         ]);
 
         $project = Project::create($validatedData);
-
+        if ($request->is('api/*')) {
         return response()->json(['success' => 'Proyecto creado con éxito', 'id' => $project->id]);
+        }
+        $projects = Project::all();
+        return view('projects.index', compact('projects'));
     }
 
     public function edit(Project $project)
