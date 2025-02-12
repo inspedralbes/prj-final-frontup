@@ -20,8 +20,11 @@ html {
  * Remove the margin in all browsers.
  */
 
-body {
+
+ body {
   margin: 0;
+  background-color: #121212;
+  font-family: 'Work Sans', sans-serif;
 }
 
 /**
