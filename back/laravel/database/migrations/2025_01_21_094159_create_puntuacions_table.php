@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('puntuacions', function (Blueprint $table) {
+        Schema::create('likes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
-            $table->integer('likes')->default(0);
-            $table->tinyInteger('saved')->default(0); //0 = proyecto no favorito | 1 = proyecto favorito            $table->timestamps();
+            $table->tinyInteger('like')->default(0); 
+            $table->tinyInteger('saved')->default(0); //0 = proyecto no favorito | 1 = proyecto favorito           
+            $table->timestamps();
         });
     }
 
