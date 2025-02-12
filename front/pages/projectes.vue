@@ -94,11 +94,13 @@ export default {
 
 <style scoped>
 .container {
-  max-width: 1200px;
+  max-width: 1200px;  
   margin: auto;
   padding: 20px;
   text-align: center;
+  background-color: #252323;
 }
+
 .title {
   font-size: 28px;
   margin-bottom: 30px;
