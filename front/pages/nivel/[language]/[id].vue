@@ -11,7 +11,7 @@
       </div>
     </header>
 
-    <div class="exercise-number">Titulo {{ nivelId }}</div>
+    <div class="exercise-number">Titulo {{ id }}</div>
 
     <div class="exercise-instructions">
       <p><strong>Instrucciones:</strong></p>
@@ -31,7 +31,7 @@
       </div>
 
       <div class="output-container">
-        <iframe class="output" :srcdoc="output"></iframe>
+        <iframe class="output" :srcdoc="output" sandbox="allow-scripts"></iframe>
       </div>
     </div>
   </div>
@@ -59,94 +59,84 @@ export default {
     const css = ref("");
     const js = ref("");
     const isEditing = ref(false);
-    const question = ref("");
+    const question = ref(""); 
     const loading = ref(true);
     const error = ref(false);
     const language = ref(route.params.language);  
-    const nivelId = ref(route.params.id);  
+    const id = ref(route.params.id);  
 
     const htmlEditor = ref(null);
     let htmlEditorInstance;
 
     watch(() => route.params.language, (newLanguage) => {
   if (newLanguage === 'html') {
-    nivelId.value = Math.max(1, Math.min(10, parseInt(route.params.id))); 
+    id.value = Math.max(1, Math.min(10, parseInt(route.params.id))); 
   } else if (newLanguage === 'css') {
-    nivelId.value = Math.max(11, Math.min(20, parseInt(route.params.id))); 
+    id.value = Math.max(11, Math.min(20, parseInt(route.params.id))); 
   } else if (newLanguage === 'js') {
-    nivelId.value = Math.max(21, Math.min(30, parseInt(route.params.id)));
+    id.value = Math.max(21, Math.min(30, parseInt(route.params.id)));
   }
 }, { immediate: true });
 
+const fetchQuestion = async () => {
+  try {
+    loading.value = true;
+    error.value = false; 
 
-    const fetchQuestion = async () => {
-      try {
-        loading.value = true;
-        const response = await fetch(`http://localhost:8000/api/preguntas/${language.value}/${nivelId.value}`); 
-        if (!response.ok) throw new Error("Error al obtener la pregunta");
-        const data = await response.json();
-        question.value = data.question; 
-      } catch (err) {
-        console.error("Error en fetchQuestion:", err);
-        error.value = true;
-      } finally {
-        loading.value = false;
-      }
-    };
+    const response = await fetch(`http://localhost:8000/api/preguntas/${language.value}/${id.value}`);
+    if (!response.ok) throw new Error("Error al obtener la pregunta");
 
-    const validateExercise = async () => {
+    const data = await response.json();
+    question.value = data.question;  
+  } catch (err) {
+    console.error("Error en fetchQuestion:", err);
+    error.value = true;
+  } finally {
+    loading.value = false;
+  }
+};
+
+const validateExercise = async () => {
   if (!question.value) {
     alert("No se ha cargado una pregunta.");
     return;
   }
 
-  const etiquetasRequeridas = question.value.match(/<\s*(\w+)/g);
-  if (!etiquetasRequeridas) {
-    alert("No se han encontrado etiquetas en la pregunta.");
-    return;
-  }
+  try {
+    const response = await fetch(`http://localhost:8000/api/preguntas/${language.value}/${id.value}`); 
+    if (!response.ok) throw new Error("Error al obtener la respuesta correcta");
 
-  const etiquetasLimpias = etiquetasRequeridas.map(etiqueta => etiqueta.replace("<", "").trim());
-  const faltantes = etiquetasLimpias.filter(etiqueta => !html.value.includes(`<${etiqueta}`));
+    const data = await response.json();
+    const respuestaCorrecta = data.resp_correcta ? data.resp_correcta.trim() : "";
+    console.log("Respuesta Correcta: ", respuestaCorrecta);
 
-  if (faltantes.length === 0) {
-    alert("¡Está bien! Has completado el ejercicio.");
+    const respuestaUsuario = html.value.trim().toLowerCase();
+    console.log("Respuesta del Usuario: ", respuestaUsuario);
 
-    let nextLevelId = parseInt(nivelId.value) + 1;
+    if (respuestaUsuario === respuestaCorrecta) {
+      alert("¡Está bien! Has completado el ejercicio.");
 
-    if ((language.value === "html" && nextLevelId > 10) ||
-        (language.value === "css" && nextLevelId > 20) ||
-        (language.value === "js" && nextLevelId > 30)) {
-      alert("¡Felicidades! Has completado todas las preguntas de este lenguaje.");
-      return;
+      let nextId = parseInt(id.value) + 1; 
+
+      if ((language.value === "html" && nextId > 10) ||
+          (language.value === "css" && nextId > 20) ||
+          (language.value === "js" && nextId > 30)) {
+        alert("¡Felicidades! Has completado todas las preguntas de este lenguaje.");
+        return;
+      }
+
+      router.push(`/nivel/${language.value}/${nextId}`);
+    } else {
+      alert("Tu respuesta no es correcta. Intenta de nuevo.");
     }
 
-    try {
-      const response = await fetch(`http://localhost:8000/api/users/1/update-level`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
-        },
-        body: JSON.stringify({ nivel: nextLevelId })
-      });
-
-      if (!response.ok) throw new Error("Error al actualizar el nivel");
-
-      router.push(`/nivel/${language.value}/${nextLevelId}`);
-
-    } catch (error) {
-      console.error("Error al actualizar el nivel:", error);
-    }
-
-  } else {
-    alert(`Faltan las siguientes etiquetas: ${faltantes.join(", ")}`);
+  } catch (error) {
+    console.error("Error al validar el ejercicio:", error);
   }
 };
 
-
-    watch(() => route.params.id, (newNivelId) => {
-      nivelId.value = newNivelId;
+    watch(() => route.params.id, (newId) => {
+      id.value = newId;
       fetchQuestion(); 
       clearEditors();  
     });
@@ -178,7 +168,10 @@ export default {
     const goBack = () => router.push("/"); 
 
     onUnmounted(() => {
-      lliureStore.toggleLliure(); 
+      lliureStore.toggleLliure();
+      if (htmlEditorInstance) {
+    htmlEditorInstance.toTextArea(); 
+      }
     });
 
     return {

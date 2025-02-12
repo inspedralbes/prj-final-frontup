@@ -9,6 +9,7 @@ use App\Http\Controllers\PreguntaController;
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [UserController::class, 'getUser']);
     Route::post('/user/avatar', [UserController::class, 'updateAvatar']);
+
 });
 Route::post('/projects', [ProjectController::class, 'store']);      
 Route::get('/projects', [ProjectController::class, 'index']);       
@@ -20,6 +21,8 @@ Route::post('/register', [AuthenticatorController::class, 'register']);
 
 Route::post('/login', [AuthenticatorController::class, 'authenticate']);    
 
-Route::get('/preguntas/{language}/{nivelId}', [PreguntaController::class, 'getPreguntas']);
+Route::patch('/users/{id}/nivel', [UserController::class, 'updateNivel']);
 
-Route::post('/users/{id}/update-level', [UserController::class, 'updateLevel']);
+Route::get('/preguntas/{language}/{id}', [PreguntaController::class, 'getPreguntas']);
+
+Route::post('/verificar-respuesta', [PreguntaController::class, 'verificarRespuesta']);

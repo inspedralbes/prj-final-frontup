@@ -20,6 +20,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'avatar',
+        'nivel',
+        'nivel_css',
+        'nivel_js'
     ];
 
     /**

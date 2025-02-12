@@ -22,7 +22,7 @@ export default {
         id: i + 1,
         locked: true, 
       })),
-      userLevel: 1,
+      userLevel: 21,
     };
   },
   async created() {

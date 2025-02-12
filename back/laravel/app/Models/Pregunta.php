@@ -14,7 +14,7 @@ class Pregunta extends Model
     protected $fillable = [
         'titulo',
         'descripcion',
-        'nivel_id',
+        'id',
         'usuario_id',
         'language',
     ]; 
@@ -32,7 +32,7 @@ class Pregunta extends Model
      */
     public function nivel()
     {
-        return $this->belongsTo(Nivel::class, 'nivel_id');
+        return $this->belongsTo(Nivel::class, 'id');
     }
 
     public function language($query, $language)
