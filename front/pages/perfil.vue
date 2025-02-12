@@ -7,8 +7,14 @@
           <span class="icon">🚪</span>Tancar sessió
         </button>
       </div>
-      
-      <div v-if="user" class="profile-content">
+
+      <div v-if="loading" class="loading-container">
+        <div class="loading-content">
+          <img src="assets/img/loading2.gif" alt="Cargando..." />
+        </div>
+      </div>
+
+      <div v-if="user && !loading" class="profile-content">
         <div class="avatar-section">
           <img :src="user.avatar" alt="Avatar" class="avatar" />
         </div>
@@ -22,7 +28,7 @@
             <label>Correu:</label>
             <div class="info-value">{{ user.email }}</div>
           </div>
-          
+
           <div class="skill-levels">
             <div class="skill">
               <span class="skill-icon">🛠️</span>
@@ -64,7 +70,6 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
@@ -72,6 +77,7 @@ import { useAppStore } from '../stores/app';
 
 const user = ref(null);
 const newAvatar = ref('');
+const loading = ref(true);  // Esta variable controla el estado de carga
 const router = useRouter();
 const appStore = useAppStore();
 
@@ -85,26 +91,32 @@ onMounted(() => {
 
 const fetchUserData = async (token) => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/user', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+    // Simula una carga de 2 segundos
+    setTimeout(async () => {
+      const response = await fetch('http://127.0.0.1:8000/api/user', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      if (data.user) {
-        user.value = data.user;
+      if (response.ok) {
+        const data = await response.json();
+        if (data.user) {
+          user.value = data.user;
+        } else {
+          console.error('No es va trobar informació d\'usuari');
+        }
       } else {
-        console.error('No es va trobar informació d\'usuari');
+        console.error('No se pudo obtener los detalles del usuario');
       }
-    } else {
-      console.error('No se pudo obtener los detalles del usuario');
-    }
+      loading.value = false;  // Detiene el gif después de obtener los datos
+    }, 2000); // 2 segundos de espera
+
   } catch (error) {
     console.error('Error al obtener los datos del usuario:', error);
+    loading.value = false;  // Detiene el gif si ocurre un error
   }
 };
 
@@ -136,7 +148,6 @@ const updateAvatar = async () => {
     console.error('Error al enviar la solicitud:', error);
   }
 };
-
 
 const logout = () => {
   appStore.logout();
@@ -367,5 +378,28 @@ label {
   .avatar-input {
     width: 100%;
   }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.loading-content {
+  text-align: center;
+}
+
+.loading-container img {
+  width: 10vw;
+  height: 20vh;
 }
 </style>
