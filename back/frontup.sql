@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 06-02-2025 a las 11:44:04
+-- Tiempo de generación: 12-02-2025 a las 10:47:01
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -113,6 +113,21 @@ CREATE TABLE `job_batches` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `likes`
+--
+
+CREATE TABLE `likes` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `project_id` bigint(20) UNSIGNED NOT NULL,
+  `like` tinyint(4) NOT NULL DEFAULT 0,
+  `saved` tinyint(4) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `migrations`
 --
 
@@ -127,14 +142,14 @@ CREATE TABLE `migrations` (
 --
 
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
-(17, '0001_01_01_000000_create_users_table', 1),
-(18, '0001_01_01_000001_create_cache_table', 1),
-(19, '0001_01_01_000002_create_jobs_table', 1),
-(20, '2025_01_21_094055_create_projects_table', 1),
-(21, '2025_01_21_094159_create_puntuacions_table', 1),
-(22, '2025_01_21_094231_create_ejercicios_table', 1),
-(23, '2025_01_23_093257_create_personal_access_tokens_table', 1),
-(24, '2025_01_30_075221_create_preguntas_table', 1);
+(9, '0001_01_01_000000_create_users_table', 1),
+(10, '0001_01_01_000001_create_cache_table', 1),
+(11, '0001_01_01_000002_create_jobs_table', 1),
+(12, '2025_01_21_094055_create_projects_table', 1),
+(13, '2025_01_21_094159_create_puntuacions_table', 1),
+(14, '2025_01_21_094231_create_ejercicios_table', 1),
+(15, '2025_01_23_093257_create_personal_access_tokens_table', 1),
+(16, '2025_01_30_075221_create_preguntas_table', 1);
 
 -- --------------------------------------------------------
 
@@ -178,7 +193,6 @@ CREATE TABLE `preguntas` (
   `pregunta` varchar(255) NOT NULL,
   `resp_correcta` varchar(255) NOT NULL,
   `resp_usuario` varchar(255) NOT NULL,
-  `nivel_id` varchar(255) NOT NULL,
   `nivel_lenguage` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -197,6 +211,7 @@ CREATE TABLE `projects` (
   `html_code` text DEFAULT NULL,
   `css_code` text DEFAULT NULL,
   `js_code` text DEFAULT NULL,
+  `statuts` tinyint(4) NOT NULL DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -205,23 +220,9 @@ CREATE TABLE `projects` (
 -- Volcado de datos para la tabla `projects`
 --
 
-INSERT INTO `projects` (`id`, `nombre`, `user_id`, `html_code`, `css_code`, `js_code`, `created_at`, `updated_at`) VALUES
-(1, 'Projecte HTML Bàsic', 1, '<h1>Hola, món!</h1>', 'h1 { color: blue; }', 'console.log(\'Hola, món!\');', '2024-02-03 23:00:00', '2024-02-03 23:00:00'),
-(2, 'Botó Interactiu', 2, '<button id=\"clickBtn\">Fes clic aquí</button>', '#clickBtn { background-color: green; color: white; padding: 10px; border: none; }', 'document.getElementById(\'clickBtn\').addEventListener(\'click\', function() { alert(\'Botó clicat!\'); });', '2024-02-03 23:00:00', '2024-02-03 23:00:00');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `puntuacions`
---
-
-CREATE TABLE `puntuacions` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `project_id` bigint(20) UNSIGNED NOT NULL,
-  `calificacion` int(11) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT INTO `projects` (`id`, `nombre`, `user_id`, `html_code`, `css_code`, `js_code`, `statuts`, `created_at`, `updated_at`) VALUES
+(1, 'Projecte HTML Bàsic', 1, '<h1>Hola, món!</h1>', 'h1 { color: blue; }', 'console.log(\'Hola, món!\');', 0, '2024-02-03 23:00:00', '2024-02-03 23:00:00'),
+(2, 'Botó Interactiu', 2, '<button id=\"clickBtn\">Fes clic aquí</button>', '#clickBtn { background-color: green; color: white; padding: 10px; border: none; }', 'document.getElementById(\'clickBtn\').addEventListener(\'click\', function() { alert(\'Botó clicat!\'); });', 0, '2024-02-03 23:00:00', '2024-02-03 23:00:00');
 
 -- --------------------------------------------------------
 
@@ -264,8 +265,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `avatar`, `nivel_html`, `nivel_css`, `nivel_js`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'admin', 'admin@gmail.com', '2025-02-06 09:42:06', '$2y$12$qZ.9WFnLxsfGmAHd496KgO6GdTdmV7ZUcwJwMAG5.mTld.1uxl.by', NULL, 1, 1, 1, 'bYCJCGWB1p', '2025-02-06 09:42:07', '2025-02-06 09:42:07'),
-(2, 'juan', 'juan@gmail.com', '2025-02-06 09:42:07', '$2y$12$pCxqMMLNwSQbLfsI3bcKLeHx9EF6mlcdZoNNkoOPeqWPjwo4HY4/q', NULL, 1, 1, 1, '3qebMKgYn2', '2025-02-06 09:42:08', '2025-02-06 09:42:08');
+(1, 'admin', 'admin@gmail.com', '2025-02-12 08:45:23', '$2y$12$u5jF8PEC.naxp1/ZJo10zOItFTh9U2UYGkNJWuUTUR4ZdxFDVgCUG', NULL, 1, 1, 1, '48ygBeE0WP', '2025-02-12 08:45:23', '2025-02-12 08:45:23'),
+(2, 'juan', 'juan@gmail.com', '2025-02-12 08:45:24', '$2y$12$5Wfe9NocfKgobnXSPsrW5.sL.bVV90O5LgvwEtaUwpkXCUHSurSmu', NULL, 1, 1, 1, 'dI2yv6yM2a', '2025-02-12 08:45:24', '2025-02-12 08:45:24');
 
 --
 -- Índices para tablas volcadas
@@ -310,6 +311,13 @@ ALTER TABLE `job_batches`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `likes`
+--
+ALTER TABLE `likes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `likes_project_id_foreign` (`project_id`);
+
+--
 -- Indices de la tabla `migrations`
 --
 ALTER TABLE `migrations`
@@ -341,13 +349,6 @@ ALTER TABLE `preguntas`
 ALTER TABLE `projects`
   ADD PRIMARY KEY (`id`),
   ADD KEY `projects_user_id_foreign` (`user_id`);
-
---
--- Indices de la tabla `puntuacions`
---
-ALTER TABLE `puntuacions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `puntuacions_project_id_foreign` (`project_id`);
 
 --
 -- Indices de la tabla `sessions`
@@ -387,10 +388,16 @@ ALTER TABLE `jobs`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `likes`
+--
+ALTER TABLE `likes`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `personal_access_tokens`
@@ -411,12 +418,6 @@ ALTER TABLE `projects`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT de la tabla `puntuacions`
---
-ALTER TABLE `puntuacions`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
@@ -427,16 +428,16 @@ ALTER TABLE `users`
 --
 
 --
+-- Filtros para la tabla `likes`
+--
+ALTER TABLE `likes`
+  ADD CONSTRAINT `likes_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE;
+
+--
 -- Filtros para la tabla `projects`
 --
 ALTER TABLE `projects`
   ADD CONSTRAINT `projects_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Filtros para la tabla `puntuacions`
---
-ALTER TABLE `puntuacions`
-  ADD CONSTRAINT `puntuacions_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
