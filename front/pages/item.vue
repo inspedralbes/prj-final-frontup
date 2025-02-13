@@ -3,9 +3,13 @@
     <div class="project-card">
       <h2 class="project-title">{{ project.nombre }}</h2>
       <p class="project-date"><strong>Data de creació:</strong> {{ formattedDate }}</p>
+      <p class="project-status">
+        <strong>Status:</strong> {{ project.statuts === 0 ? 'Público' : 'Privado' }}
+      </p>
     </div>
   </router-link>
 </template>
+
 
 <script>
 export default {
