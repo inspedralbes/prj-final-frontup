@@ -19,7 +19,15 @@ class UserController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'user' => $user,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'avatar' => $user->avatar,
+                'nivel' => $user->nivel,  
+                'nivel_css' => $user->nivel_css,  
+                'nivel_js' => $user->nivel_js,  
+            ],
         ]);
     }
 
@@ -50,49 +58,6 @@ class UserController extends Controller
             ], 500);
         }
     }
-
-    /**
-     * Update user level.
-     */
-
-    // UserController.php
-public function updateNivel(Request $request, $id = null)
-{
-    try {
-        
-        $user = $id ? User::findOrFail($id) : $request->user();
-
-        $validated = $request->validate([
-            'nivel' => 'nullable|integer|min:1',
-            'nivel_css' => 'nullable|integer|min:11', 
-            'nivel_js' => 'nullable|integer|min:21', 
-        ]);
-
-        if (isset($validated['nivel'])) {
-            $user->nivel = $validated['nivel'];
-        }
-        if (isset($validated['nivel_css'])) {
-            $user->nivel_css = $validated['nivel_css'];
-        }
-        if (isset($validated['nivel_js'])) {
-            $user->nivel_js = $validated['nivel_js'];
-        }
-
-        $user->save();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Nivel actualizado correctamente',
-            'user' => $user
-        ]);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Error al actualizar el nivel: ' . $e->getMessage()
-        ], 500);
-    }
-}
 
     /**
      * Display a listing of the resource.

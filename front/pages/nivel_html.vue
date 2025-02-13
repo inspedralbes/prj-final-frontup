@@ -42,7 +42,6 @@ export default {
 
         const data = await response.json();
         this.userLevel = data.user.nivel;
-
         this.levels = this.levels.map((level) => ({
           ...level,
           locked: level.id > this.userLevel, 

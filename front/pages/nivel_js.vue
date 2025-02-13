@@ -19,7 +19,7 @@ export default {
     return {
       language: 'js',
       levels: Array.from({ length: 10 }, (_, i) => ({
-        id: i + 1,
+        id: i + 21, 
         locked: true, 
       })),
       userLevel: 21,
@@ -40,16 +40,16 @@ export default {
         if (!response.ok) throw new Error("Error al obtener el nivel del usuario");
 
         const data = await response.json();
-        this.userLevel = data.user.nivel;
-
+        this.userLevel = data.user.nivel_js;
         this.levels = this.levels.map((level) => ({
           ...level,
-          locked: level.id > this.userLevel, 
+          locked: level.id > this.userLevel,
         }));
       } catch (error) {
         console.error("Error al cargar el nivel del usuario:", error);
       }
     },
+
     ir_nivel(levelId) {
       this.$router.push(`/nivel/${this.language}/${levelId}`);
     },

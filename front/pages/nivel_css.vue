@@ -19,7 +19,7 @@ export default {
     return {
       language: 'css',
       levels: Array.from({ length: 10 }, (_, i) => ({
-        id: i + 1,
+        id: i + 11,
         locked: true, 
       })),
       userLevel: 11,
@@ -30,27 +30,28 @@ export default {
   },
   methods: {
     async fetchUserLevel() {
-      try {
-        const response = await fetch("http://localhost:8000/api/user", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+  try {
+    const response = await fetch("http://localhost:8000/api/user", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
-        if (!response.ok) throw new Error("Error al obtener el nivel del usuario");
+    if (!response.ok) throw new Error("Error al obtener el nivel del usuario");
 
-        const data = await response.json();
-        this.userLevel = data.user.nivel;
+    const data = await response.json();
 
-        this.levels = this.levels.map((level) => ({
-          ...level,
-          locked: level.id > this.userLevel, 
-        }));
-      } catch (error) {
-        console.error("Error al cargar el nivel del usuario:", error);
-      }
-    },
-    ir_nivel(levelId) {
+    this.userLevel = data.user.nivel_css; 
+
+    this.levels = this.levels.map((level) => ({
+      ...level,
+      locked: level.id > this.userLevel,
+    }));
+  } catch (error) {
+    console.error("Error al cargar el nivel del usuario:", error);
+  }
+}
+,ir_nivel(levelId) {
       this.$router.push(`/nivel/${this.language}/${levelId}`);
     },
     irAtras() {

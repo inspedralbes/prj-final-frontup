@@ -59,6 +59,32 @@ public function verificarRespuesta(Request $request)
     return response()->json(['correct' => false, 'message' => 'Respuesta incorrecta']);
 }
 
+public function actualizarNivel(Request $request)
+{
+    $request->validate([
+        'userId' => 'required|integer|exists:users,id',
+        'campo' => 'required|string|in:nivel,nivel_css,nivel_js',
+        'nivel' => 'required|integer',
+    ]);
+
+    try {
+        $user = \App\Models\User::findOrFail($request->userId);
+        $user->{$request->campo} = $request->nivel;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Nivel actualizado correctamente',
+            'user' => $user,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al actualizar el nivel',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
 
 
 }

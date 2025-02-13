@@ -21,8 +21,7 @@ Route::post('/register', [AuthenticatorController::class, 'register']);
 
 Route::post('/login', [AuthenticatorController::class, 'authenticate']);    
 
-Route::patch('/users/{id}/nivel', [UserController::class, 'updateNivel']);
 
 Route::get('/preguntas/{language}/{id}', [PreguntaController::class, 'getPreguntas']);
 
-Route::post('/verificar-respuesta', [PreguntaController::class, 'verificarRespuesta']);
+Route::post('/actualizar-nivel', [PreguntaController::class, 'actualizarNivel']);
