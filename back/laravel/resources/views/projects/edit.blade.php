@@ -30,7 +30,7 @@
         <select id="statuts" name="statuts" class="form-control">
             <option value="0" {{ old('statuts', $project->statuts) == 0 ? 'selected' : '' }}>Públic</option>
             <option value="1" {{ old('statuts', $project->statuts) == 1 ? 'selected' : '' }}>Privat</option>
-        </select>
+        </select><br>
 
 
         <button type="submit" class="btn btn-success">Actualtizar</button>

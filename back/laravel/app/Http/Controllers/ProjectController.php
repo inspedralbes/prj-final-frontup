@@ -20,7 +20,6 @@ class ProjectController extends Controller
         ], 200);
     }
 
-    //Mostra tots els projectes d'un usuari
     public function index(Request $request)
     {
         if ($request->is('api/*')) {
@@ -29,6 +28,7 @@ class ProjectController extends Controller
             if (!$user) {
                 return response()->json(['message' => 'Usuario no autenticado', 'status' => 401], 401);
             }
+
             $projects = Project::where('user_id', $user->id)->get();
 
             return response()->json([
@@ -37,34 +37,18 @@ class ProjectController extends Controller
                 'status' => 200,
             ], 200);
         }
+
         $search = $request->input('search');
 
         if ($search) {
-            $projects = Project::where('nombre', 'like', "%$search%")->where('statuts', 0) ->get();
+            $projects = Project::where('nombre', 'like', "%$search%")->get();
         } else {
-            $projects = Project::where('statuts', 0)->get();
+            $projects = Project::all();
         }
 
         return view('projects.index', compact('projects'));
     }
 
-    //Mostrar Tots els projectes tant com públic i privats (Per al crud)
-    public function indexAllProjects(Request $request)
-    {
-        $search = $request->input('search');
-        
-        if ($search) {
-            $projects = Project::where('nombre', 'like', "%$search%")->get(); 
-        } else {
-            $projects = Project::all();
-        }
-    
-        // Debugging: Mostra el nombre de projectes trobats
-        dd($projects->count(), $projects);
-    
-        return view('projects.all', compact('projects'));
-    }  
-    
 
     public function show($id)
     {
