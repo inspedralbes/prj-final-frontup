@@ -109,6 +109,7 @@ const navigateToLliure = async () => {
     }
     let id = projecte.result.id;
     idProyectoActualStore.actalizarId(id);
+    localStorage.setItem("idProyectoActual", id);
     router.push(`/lliure/${id}`);
   } else {
     showAlert(`Registra't per crear un projecte`)

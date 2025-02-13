@@ -171,7 +171,7 @@ export default {
       }
     };
     const volverHome = async () => {
-      console.log('css.value',css.value);
+      console.log('css.value', css.value);
       router.push("/");
     }
     const stopDrag = () => {
@@ -218,7 +218,7 @@ export default {
         CambiosSinGuardarToTrue();
       });
     });
-   
+
     onUnmounted(() => {
       lliureStore.toggleLliure();
       idProyectoActualStore.vaciarId();
@@ -276,16 +276,25 @@ export default {
 
     const goBack = async () => {
       if (!cambiadoSinGuardar.value) {
-        if (html.value == "" && css.value == "" && js.value == "") {
-          await borrarProyectoDB(idProyectoActualStore.id);
+        if (html.value === "" && css.value === "" && js.value === "") {
+          try {
+            let id = idProyectoActualStore?.id || Number(localStorage.getItem("idProyectoActual"));
+
+            if (id) {
+              await borrarProyectoDB(id);
+            }
+          } catch (error) {
+            console.error("Error al borrar el proyecto:", error);
+          }
         }
+
         router.push("/");
       } else {
         guardarParaSalir.value = true;
-        console.log('se enseña el guardar para salir?',guardarParaSalir.value);
-        
+        console.log('¿Se muestra el guardar para salir?', guardarParaSalir.value);
       }
-    }
+    };
+
     const openSettingsModal = () => {
       showSettingsModal.value = true;
       modalTitle.value = title.value;
