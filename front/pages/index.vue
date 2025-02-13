@@ -30,30 +30,30 @@
           <p>
             Dóna vida a les teves idees construint projectes complets o provant funcions i animacions específiques.
           </p>
-          <button>Prova l'Editor</button>
+          <button class="btn">Prova l'Editor</button>
         </div>
         <div class="card">
           <h3>Practica els teus coneixements</h3>
           <p>
             Vols provar-te fent uns exercicis per veure quin nivell tens?
           </p>
-          <button>Participa els reptes que et proposem</button>
+          <button class="btn">Participa els reptes que et proposem</button>
         </div>
         <div class="card">
           <h3>Comparteix els Teus Projectes</h3>
           <p>
             Uneix-te a la comunitat global de desenvolupadors front-end compartint les teves creacions i inspirant altres.
           </p>
-          <button>Descobreix el Més Popular</button>
+          <button class="btn">Descobreix el Més Popular</button>
         </div>
       </div>
       <br><br>
       <!-- Footer -->
     </div>
+    <footer>
+      <p>© 2025 FrontUp</p>
+    </footer>
   </div>
-  <footer>
-    <p>© 2025 FrontUp</p>
-  </footer>
 </template>
 
 <script>
@@ -146,17 +146,17 @@ export default {
   margin-bottom: 20px;
 }
 
-.card button {
-  padding: 10px 20px;
-  border: none;
+.btn {
+    border: none;
   border-radius: 4px;
   background-color: #333;
   color: #fff;
   cursor: pointer;
-  bottom: 0;
+  width: 20vw;
+  height: 10vh;
 }
 
-.card button:hover {
+.btn:hover{
   background-color: #555;
 }
 
