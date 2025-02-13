@@ -12,3 +12,4 @@ Route::get('/', function () {
 Route::resource('users', UserController::class);
 
 Route::resource('projects', ProjectController::class);
+Route::get('/projects/all', [ProjectController::class, 'indexAllProjects'])->name('projects.all');

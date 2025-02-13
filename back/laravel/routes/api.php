@@ -12,13 +12,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/projects', [ProjectController::class, 'index']);   
 });
 
-Route::get('/projects/all', [ProjectController::class, 'indexAll']); 
+Route::get('/projects/all', [ProjectController::class, 'indexAll']);//Front 
 Route::post('/projects', [ProjectController::class, 'store']);      
 Route::get('/projects/{id}', [ProjectController::class, 'show']);   
 Route::put('/projects/{id}', [ProjectController::class, 'update']); 
 Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
+Route::get('/projectsAllPaginado', [ProjectController::class, 'index']);//Front 
 
-Route::get('/projectsAllPaginado', [ProjectController::class, 'index']);
 
 Route::post('/register', [AuthenticatorController::class, 'register']);
 
