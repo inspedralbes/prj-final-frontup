@@ -88,6 +88,7 @@ export default {
       this.$router.push("/lliure");
     },
     navigateToProject(id) {
+      localStorage.setItem("idProyectoActual", id);
       this.$router.push(`/lliure/${id}`);
     }
   },

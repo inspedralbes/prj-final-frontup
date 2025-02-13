@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="`/proyecto/${project.id}`" class="project-card-link">
+  <router-link :to="`/lliure/${project.id}`" class="project-card-link">
     <div class="project-card">
       <h2 class="project-title">{{ project.nombre }}</h2>
       <p class="project-date"><strong>Data de creació:</strong> {{ formattedDate }}</p>

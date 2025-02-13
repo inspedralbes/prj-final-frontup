@@ -182,42 +182,77 @@ export default {
     const closeGuardarParaSalir = () => {
       guardarParaSalir.value = false;
     }
-    onMounted(() => {
+    onMounted(async () => {
       lliureStore.toggleLliure();
 
-      // Configurar editores
-      htmlEditorInstance = CodeMirror(htmlEditor.value, {
-        mode: "htmlmixed",
-        theme: "dracula",
-        lineNumbers: true,
-      });
-      cssEditorInstance = CodeMirror(cssEditor.value, {
-        mode: "css",
-        theme: "dracula",
-        lineNumbers: true,
-      });
+      // Obtener el id del proyecto actual
+      let id = idProyectoActualStore.id || Number(localStorage.getItem("idProyectoActual"));
 
-      jsEditorInstance = CodeMirror(jsEditor.value, {
-        mode: "javascript",
-        theme: "dracula",
-        lineNumbers: true,
-      });
+      if (id) {
+        try {
+          const proyecto = await obtenerProyectoPorId(id);
+          html.value = proyecto.html_code || "";
+          css.value = proyecto.css_code || "";
+          js.value = proyecto.js_code || "";
 
-      htmlEditorInstance.on("change", (instance) => {
-        html.value = instance.getValue();
-        CambiosSinGuardarToTrue();
-      });
+          // Usa nextTick para esperar a que el DOM se haya actualizado
+          await nextTick();
 
-      cssEditorInstance.on("change", (instance) => {
-        css.value = instance.getValue();
-        CambiosSinGuardarToTrue();
-      });
+          // Ahora que las referencias están disponibles, inicializa los editores
+          htmlEditorInstance = CodeMirror(htmlEditor.value, {
+            mode: "htmlmixed",
+            theme: "dracula",
+            lineNumbers: true,
+          });
 
-      jsEditorInstance.on("change", (instance) => {
-        js.value = instance.getValue();
-        CambiosSinGuardarToTrue();
-      });
+          cssEditorInstance = CodeMirror(cssEditor.value, {
+            mode: "css",
+            theme: "dracula",
+            lineNumbers: true,
+          });
+
+          jsEditorInstance = CodeMirror(jsEditor.value, {
+            mode: "javascript",
+            theme: "dracula",
+            lineNumbers: true,
+          });
+
+          htmlEditorInstance.setValue(html.value);
+          cssEditorInstance.setValue(css.value);
+          jsEditorInstance.setValue(js.value);
+
+          // Escucha los cambios en los editores
+          htmlEditorInstance.on("change", (instance) => {
+            html.value = instance.getValue();
+            CambiosSinGuardarToTrue();
+          });
+
+          cssEditorInstance.on("change", (instance) => {
+            css.value = instance.getValue();
+            CambiosSinGuardarToTrue();
+          });
+
+          jsEditorInstance.on("change", (instance) => {
+            js.value = instance.getValue();
+            CambiosSinGuardarToTrue();
+          });
+
+        } catch (error) {
+          console.error("Error al obtener el proyecto:", error);
+        }
+      }
     });
+
+    const obtenerProyectoPorId = async (id) => {
+      const response = await fetch(`http://localhost:8000/api/projects/${id}`);
+      if (!response.ok) {
+        throw new Error('Error al obtener el proyecto');
+      }
+
+      const proyecto = await response.json();
+      return proyecto;
+    };
+
 
     onUnmounted(() => {
       lliureStore.toggleLliure();

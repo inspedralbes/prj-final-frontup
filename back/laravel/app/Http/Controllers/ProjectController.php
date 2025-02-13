@@ -51,16 +51,29 @@ class ProjectController extends Controller
 
     public function show($id)
     {
+        // Buscar el proyecto por ID
         $project = Project::find($id);
-
+    
+        // Si no se encuentra el proyecto
         if (!$project) {
             return response()->json([
                 'message' => 'Proyecto no encontrado',
             ], 404);
         }
-
+    
+        // Verificar si la solicitud es API o web
+        if (request()->is('api/*')) {
+            // Responder con JSON para solicitudes API
+            return response()->json([
+                'message' => 'Proyecto encontrado',
+                'project' => $project,
+            ], 200);
+        }
+    
+        // Si no es una solicitud API, devolver la vista para solicitudes web
         return view('projects.show', compact('project'));
     }
+    
 
     public function create()
     {
