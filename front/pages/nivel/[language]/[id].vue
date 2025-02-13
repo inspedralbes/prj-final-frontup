@@ -176,7 +176,7 @@ export default {
     watch(() => route.params.id, (newId)=> {
       id.value = newId;
       fetchQuestion(); 
-      clearEditors();  
+      clearEditors();
     });
 
     const clearEditors = () => {
@@ -190,19 +190,40 @@ export default {
     };
 
     onMounted(() => {
-      lliureStore.toggleLliure();
+  lliureStore.toggleLliure();
 
-      fetchQuestion();  
-      htmlEditorInstance = CodeMirror(htmlEditor.value, {
-        mode: "htmlmixed",
-        theme: "dracula",
-        lineNumbers: true,
-      });
+  fetchQuestion();  
 
-      htmlEditorInstance.on("change", (instance) => {
-        html.value = instance.getValue();  
-      });
-    });
+  htmlEditorInstance = CodeMirror(htmlEditor.value, {
+    mode: "htmlmixed",
+    theme: "dracula",
+    lineNumbers: true,
+  });
+
+  htmlEditorInstance.on("change", (instance) => {
+    html.value = instance.getValue();  
+  });
+
+  if (language.value === "css") {
+    const basicHTML = `<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+
+
+
+</style>
+<body>
+    <h1>Hola, mundo</h1>
+    <p>Modifica el CSS para cambiar el estilo.</p>
+</body>
+</html>`;
+    htmlEditorInstance.setValue(basicHTML);
+    html.value = basicHTML;
+  }
+});
 
     const goBack = () => router.push("/"); 
 
