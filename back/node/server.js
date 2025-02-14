@@ -52,4 +52,4 @@ app.post("/pregunta", async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log("Servidor corriendo en http://api.frontup.cat/node:"+PORT));
+app.listen(PORT, () => console.log("Servidor corriendo en http://api.frontup.cat:"+PORT));
