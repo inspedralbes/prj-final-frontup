@@ -30,30 +30,30 @@
           <p>
             Dóna vida a les teves idees construint projectes complets o provant funcions i animacions específiques.
           </p>
-          <button>Prova l'Editor</button>
+          <button class="btn">Prova l'Editor</button>
         </div>
         <div class="card">
           <h3>Practica els teus coneixements</h3>
           <p>
             Vols provar-te fent uns exercicis per veure quin nivell tens?
           </p>
-          <button>Participa els reptes que et proposem</button>
+          <button class="btn">Participa els reptes que et proposem</button>
         </div>
         <div class="card">
           <h3>Comparteix els Teus Projectes</h3>
           <p>
             Uneix-te a la comunitat global de desenvolupadors front-end compartint les teves creacions i inspirant altres.
           </p>
-          <button>Descobreix el Més Popular</button>
+          <button class="btn">Descobreix el Més Popular</button>
         </div>
       </div>
       <br><br>
       <!-- Footer -->
     </div>
+    <footer>
+      <p>© 2025 FrontUp</p>
+    </footer>
   </div>
-  <footer>
-    <p>© 2025 FrontUp</p>
-  </footer>
 </template>
 
 <script>
@@ -122,7 +122,9 @@ export default {
 .card-container {
   display: flex;
   justify-content: space-around;
-  gap: 5vw;
+  gap: 10px;
+  margin-top: 20px;
+  align-items: stretch; 
 }
 
 .card {
@@ -133,6 +135,9 @@ export default {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   width: 300px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  height: 250px; 
 }
 
 .card h3 {
@@ -144,22 +149,23 @@ export default {
 .card p {
   color: #d4cece;
   margin-bottom: 20px;
+  flex-grow: 1; /* Hace que el texto ocupe el espacio disponible */
 }
 
-.card button {
-  padding: 10px 20px;
+.btn {
   border: none;
   border-radius: 4px;
   background-color: #333;
   color: #fff;
   cursor: pointer;
-  bottom: 0;
+  width: 100%; 
+  padding: 10px;
+  margin-top: auto; 
 }
 
-.card button:hover {
+.btn:hover {
   background-color: #555;
 }
-
 
 footer {
   background-color: #000000;

@@ -64,19 +64,19 @@ class UserController extends Controller
         }
 
         $request->validate([
-            'nivel_html' => 'required|integer|min:1',
+            'nivel' => 'required|integer|min:1',
             'nivel_css' => 'required|integer|min:1',
             'nivel_js' => 'required|integer|min:1',
         ]);
 
-        $user->nivel_html = $request->nivel_html;
+        $user->nivel = $request->nivel;
         $user->nivel_css = $request->nivel_css;
         $user->nivel_js = $request->nivel_js;
         $user->save();
 
         return response()->json([
             'message' => 'Niveles actualizados',
-            'nivel_html' => $user->nivel_html,
+            'nivel' => $user->nivel,
             'nivel_css' => $user->nivel_css,
             'nivel_js' => $user->nivel_js,
         ]);

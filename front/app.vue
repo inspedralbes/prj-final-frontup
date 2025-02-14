@@ -9,14 +9,14 @@
       <button class="btn btn-crear" @click="navigateToLliure">Crear projecte</button>
       <button class="btn" @click="navigateToMeusProjectes">Els meus projectes</button>
       <button class="btn" @click="navigateToNiveles">Nivells</button>
-      <button class="btn">Projectes favorits</button>
+      <!--<button class="btn">Projectes guardats</button>-->
       <button class="btn" @click="navigateToTotsProjectes">Tots els projectes</button>
     </div>
 
     <header>
       <div class="header-left">
         <template v-if="buscadorStore.mostrarBuscador">
-          <input class="search-box" type="text" placeholder="Buscar...">
+          <input class="search-box" type="text" placewholder="Cercar...">
         </template>
         <template v-else>
           <button class="btn volver-btn" @click="navigateToHome">Tornar al Home</button>
@@ -24,7 +24,7 @@
       </div>
       <div class="header-right">
         <button @click="toggleTheme" class="btn">{{ themeIcon }}</button>
-        <button class="btn" @click="navigateToProfile" v-if="appStore.isLoggedIn">Mi Perfil</button>
+        <button class="btn" @click="navigateToProfile" v-if="appStore.isLoggedIn">Perfil</button>
         <button class="btn" @click="navigateToLogin" v-else>{{ loginText }}</button>
       </div>
     </header>

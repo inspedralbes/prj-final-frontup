@@ -1,34 +1,34 @@
 <template>
   <div class="todo">
     <header class="header">
-      <button class="header-button" @click="goBack">Atrás</button>
+      <button class="header-button" @click="goBack">Home</button>
       <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
         :readonly="!isEditing" />
       <div class="header-actions">
-        <button class="header-button" @click="toggleChat">Chat IA</button>
+        <button class="header-button" @click="toggleChat">Xat IA</button>
         <button class="header-button" @click="guardarProyecto">Guardar</button>
-        <button class="header-button" @click="openSettingsModal">Configuración</button>
+        <button class="header-button" @click="openSettingsModal">Configuració</button>
         <button class="header-button">💡</button>
       </div>
     </header>
 
     <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
       <div class="modal-content" @click.stop>
-        <h2>Configuración del Proyecto</h2>
+        <h2>Configuració del Projecte</h2>
         <form @submit.prevent="saveSettings">
           <div class="input-group">
-            <label for="project-title">Título del Proyecto</label>
+            <label for="project-title">Títol del Projecte</label>
             <input type="text" id="project-title" v-model="modalTitle" class="modal-input"
-              placeholder="Escribe el título" />
+              placeholder="Escriu el títol" />
           </div>
           <div class="input-group">
-            <label for="project-description">Descripción</label>
+            <label for="project-description">Descripció</label>
             <textarea id="project-description" v-model="modalDescription" class="modal-textarea"
-              placeholder="Escribe la descripción del proyecto"></textarea>
+              placeholder="Escriu la descripció del projecte"></textarea>
           </div>
           <div class="modal-actions">
             <button type="submit" class="modal-button">Guardar</button>
-            <button type="button" class="modal-button cancel" @click="closeSettingsModal">Cancelar</button>
+            <button type="button" class="modal-button cancel" @click="closeSettingsModal">Cancel·lar</button>
           </div>
         </form>
       </div>
@@ -39,7 +39,7 @@
         <form @submit.prevent="guardarProyecto2">
           <div class="modal-actions">
             <button type="submit" class="modal-button">Guardar</button>
-            <button type="button" class="modal-button cancel" @click="volverHome">Cancelar</button>
+            <button type="button" class="modal-button cancel" @click="volverHome">Cancel·lar</button>
           </div>
         </form>
       </div>
@@ -62,10 +62,10 @@
         </div>
       </div>
       <div class="input-container">
-        <input type="text" v-model="newMessage" placeholder="Escribe tu mensaje..." class="chat-input"
+        <input type="text" v-model="newMessage" placeholder="Escriu el teu missatge ..." class="chat-input"
           @keyup.enter="sendMessage" :disabled="state.loading" />
         <button class="send-button" @click="sendMessage" :disabled="state.loading">
-          {{ state.loading ? 'Enviando...' : 'Enviar' }}
+          {{ state.loading ? 'Enviant...' : 'Enviar' }}
         </button>
       </div>
     </div>
@@ -88,8 +88,8 @@
 
     <div class="output-container" :class="{ expanded: isExpanded }" ref="outputContainer">
       <button class="expand-button" @click="toggleExpand">
-        <img v-if="!isExpanded" src="/assets/img/pantalla-grande.svg" alt="Pantalla Grande" width="30" />
-        <img v-if="isExpanded" src="/assets/img/pantalla-pequeña.svg" alt="Pantalla Pequeña" width="30" />
+        <img v-if="!isExpanded" src="/assets/img/pantalla-grande.svg" alt="Maximitzar" width="30" />
+        <img v-if="isExpanded" src="/assets/img/pantalla-pequeña.svg" alt="Minimitzar" width="30" />
       </button>
       <div class="resize-bar" @mousedown="startResize"></div>
       <iframe class="output" :srcdoc="output"></iframe>

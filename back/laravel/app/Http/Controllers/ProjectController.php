@@ -159,7 +159,7 @@ class ProjectController extends Controller
             return redirect()->route('projects.index')->with('success', 'Proyecto actualizado con éxito');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $project = Project::find($id);
 
@@ -170,8 +170,10 @@ class ProjectController extends Controller
         }
 
         $project->delete();
-        
-        return response()->json(['success', 'Proyecto eliminado']);
-        //return redirect()->route('projects.index')->with('success', 'Proyecto eliminado con éxito');
+        if ($request->is('api/*')) {
+            return response()->json(['success', 'Proyecto eliminado']);
+        }
+        $projects = Project::all();
+        return redirect()->route('projects.index')->with('success', 'Proyecto eliminado con éxito');
     }
 }
