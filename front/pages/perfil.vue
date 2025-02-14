@@ -40,16 +40,15 @@
             <div class="skill">
               <span class="skill-icon">🎨</span>
               <div class="skill-progress">
-                <div class="progress-bar css" :style="{ width: ((user.nivel_css - 11) / (20 - 11) * 90 + 10) + '%' }"></div>
-                <span>CSS {{ ((user.nivel_css - 11) / (20 - 11) * 90 + 10).toFixed(0) }}%</span>
+                <div class="progress-bar css" :style="{width: (user.nivel_css * 10) + '%'}"></div>
+                <span>CSS {{ user.nivel_css * 10 }}%</span>
               </div>
             </div>
-
             <div class="skill">
               <span class="skill-icon">⚙️</span>
               <div class="skill-progress">
-                <div class="progress-bar js" :style="{width: ((user.nivel_js - 21) / 9 * 90 + 10) + '%'}"></div>
-                <span>JS {{ ((user.nivel_js - 21) / 9 * 90 + 10).toFixed(0) }}%</span>
+                <div class="progress-bar js" :style="{width: (user.nivel_js * 10) + '%'}"></div>
+                <span>JS {{ user.nivel_js * 10 }}%</span>
               </div>
             </div>
           </div>
@@ -78,7 +77,7 @@ import { useAppStore } from '../stores/app';
 
 const user = ref(null);
 const newAvatar = ref('');
-const loading = ref(true); 
+const loading = ref(true);  // Esta variable controla el estado de carga
 const router = useRouter();
 const appStore = useAppStore();
 
@@ -92,7 +91,7 @@ onMounted(() => {
 
 const fetchUserData = async (token) => {
   try {
-   
+    // Simula una carga de 2 segundos
     setTimeout(async () => {
       const response = await fetch('http://127.0.0.1:8000/api/user', {
         method: 'GET',
@@ -112,12 +111,12 @@ const fetchUserData = async (token) => {
       } else {
         console.error('No se pudo obtener los detalles del usuario');
       }
-      loading.value = false; 
-    }, 2000); 
+      loading.value = false;  // Detiene el gif después de obtener los datos
+    }, 2000); // 2 segundos de espera
 
   } catch (error) {
     console.error('Error al obtener los datos del usuario:', error);
-    loading.value = false; 
+    loading.value = false;  // Detiene el gif si ocurre un error
   }
 };
 
