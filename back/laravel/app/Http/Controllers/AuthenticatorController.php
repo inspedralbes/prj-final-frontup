@@ -71,7 +71,7 @@ class AuthenticatorController extends Controller
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
                 'avatar' => 'https://api.dicebear.com/9.x/personas/svg?seed=' . urlencode($data['name']),
-                'nivel_html' => 1,
+                'nivel' => 1,
                 'nivel_css' => 1,
                 'nivel_js' => 1,
             ]);
