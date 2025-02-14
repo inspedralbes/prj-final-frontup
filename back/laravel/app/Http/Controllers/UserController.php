@@ -21,7 +21,15 @@ class UserController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'user' => $user,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'avatar' => $user->avatar,
+                'nivel' => $user->nivel,  
+                'nivel_css' => $user->nivel_css,  
+                'nivel_js' => $user->nivel_js,  
+            ],
         ]);
     }
 
@@ -108,6 +116,10 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'avatar' => $request->avatar,
+            'nivel' => $request->nivel ?? 1,
+            'nivel_css' => $request->nivel_css ?? 11,
+            'nivel_js' => $request->nivel_js ?? 21,
         ]);
 
         return redirect()->route('users.index')->with('success', 'Usuario creado correctamente.');

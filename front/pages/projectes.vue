@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1 class="title">Mis Proyectos</h1>
+    <h1 class="title">Els meus projectes</h1>
 
     <!-- Selector de ordenación con nuevo estilo -->
     <div class="sort-container">
@@ -8,7 +8,7 @@
       <select id="sort" v-model="sortCriteria" class="sort-select">
         <option value="default">Destacats</option>
         <option value="date_asc">Data: Més antics primer</option>
-        <option value="date_desc">Data: Méss recents primer</option>
+        <option value="date_desc">Data: Més recents primer</option>
       </select>
     </div>
 
