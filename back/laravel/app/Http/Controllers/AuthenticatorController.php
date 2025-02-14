@@ -56,7 +56,7 @@ class AuthenticatorController extends Controller
         // $email = $request->input('email'); 
         // $password = $request->input('password'); 
         // $data = [];
-        // $data['username'] = $name;
+        // $data['name'] = $name;
         // $data['email'] = $email;
         // $data['password'] = $password;
         $data = $request->validate([
@@ -67,11 +67,11 @@ class AuthenticatorController extends Controller
 
         try {
             $user = User::create([
-                'name' => $data['username'],
+                'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
-                'avatar' => 'https://api.dicebear.com/9.x/personas/svg?seed=' . urlencode($data['username']),
-                'nivel_html' => 1,
+                'avatar' => 'https://api.dicebear.com/9.x/personas/svg?seed=' . urlencode($data['name']),
+                'nivel' => 1,
                 'nivel_css' => 1,
                 'nivel_js' => 1,
             ]);

@@ -33,8 +33,8 @@
             <div class="skill">
               <span class="skill-icon">🛠️</span>
               <div class="skill-progress">
-                <div class="progress-bar html" :style="{width: (user.nivel_html * 10) + '%'}"></div>
-                <span>HTML {{ user.nivel_html * 10 }}%</span>
+                <div class="progress-bar html" :style="{width: (user.nivel * 10) + '%'}"></div>
+                <span>HTML {{ user.nivel * 10 }}%</span>
               </div>
             </div>
             <div class="skill">
