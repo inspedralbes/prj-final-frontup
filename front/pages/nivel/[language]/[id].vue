@@ -1,22 +1,22 @@
 <template>
   <div class="todo">
     <header class="header">
-      <button class="header-button" @click="goBack">Atrás</button>
+      <button class="header-button" @click="goBack">Enrere</button>
       <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
         :readonly="!isEditing" />
       <div class="header-actions">
-        <button class="header-button" @click="guardarProyecto">Guardar</button>
-        <button class="header-button" @click="openSettingsModal">Configuración</button>
+        <button class="header-button" @click="guardarProyecto">Desar</button>
+        <button class="header-button" @click="openSettingsModal">Configuració</button>
         <button class="header-button">💡</button>
       </div>
     </header>
 
-    <div class="exercise-number">Titulo {{ id }}</div>
+    <div class="exercise-number">Títol {{ id }}</div>
 
     <div class="exercise-instructions">
-      <p><strong>Instrucciones:</strong></p>
-      <p v-if="loading">Cargando pregunta...</p>
-      <p v-else-if="error">Error al cargar la pregunta</p>
+      <p><strong>Instruccions:</strong></p>
+      <p v-if="loading">Carregant pregunta...</p>
+      <p v-else-if="error">Error en carregar la pregunta</p>
       <p v-else>{{ question }}</p>
     </div>
 
@@ -54,13 +54,13 @@ export default {
     const route = useRoute();
     const lliureStore = useLliureStore();
 
-    const title = computed(() => `Ejercicio ${id.value}`);
+    const title = computed(() => `Exercici ${id.value}`);
     
     const languageLabel = computed(() => {
-      if (language.value === 'html') return 'Lenguaje: HTML';
-      if (language.value === 'css') return 'Lenguaje: CSS';
-      if (language.value === 'js') return 'Lenguaje: JavaScript';
-      return 'Lenguaje desconocido';
+      if (language.value === 'html') return 'Llenguatge: HTML';
+      if (language.value === 'css') return 'Llenguatge: CSS';
+      if (language.value === 'js') return 'Llenguatge: JavaScript';
+      return 'Llenguatge desconegut';
     });
 
     const html = ref("");
@@ -92,7 +92,7 @@ export default {
         error.value = false; 
 
         const response = await fetch(`http://localhost:8000/api/preguntas/${language.value}/${id.value}`);
-        if (!response.ok) throw new Error("Error al obtener la pregunta");
+        if (!response.ok) throw new Error("Error a l'obtenir la pregunta");
 
         const data = await response.json();
         question.value = data.question;  
@@ -106,13 +106,13 @@ export default {
 
     const validateExercise = async () => {
       if (!question.value) {
-        alert("No se ha cargado una pregunta.");
+        alert("No s'ha carregat la pregunta.");
         return;
       }
 
       try {
         const response = await fetch(`http://localhost:8000/api/preguntas/${language.value}/${id.value}`); 
-        if (!response.ok) throw new Error("Error al obtener la respuesta correcta");
+        if (!response.ok) throw new Error("Error a l'obtenir la resposta correcta");
 
         const data = await response.json();
         const respuestaCorrecta = data.resp_correcta ? data.resp_correcta.trim() : "";
@@ -122,7 +122,7 @@ export default {
         await actualizarNivel();
 
         if (respuestaUsuario === respuestaCorrecta) {
-          alert("¡Está bien! Has completado el ejercicio.");
+          alert("¡Felicitats! Has completat l'exercici.");
 
           await actualizarNivel();
 
@@ -131,17 +131,17 @@ export default {
           if ((language.value === "html" && nextId > 10) ||
               (language.value === "css" && nextId > 20) ||
               (language.value === "js" && nextId > 30)) {
-            alert("¡Felicidades! Has completado todas las preguntas de este lenguaje.");
+            alert("¡Felicitats! Has completat totes les preguntes d'aquest llenguatge.");
             return;
           }
 
           router.push(`/nivel/${language.value}/${nextId}`);
         } else {
-          alert("Tu respuesta no es correcta. Intenta de nuevo.");
+          alert("La teva resposta no es correcta. Torna'ho a intentar.");
         }
 
       } catch (error) {
-        console.error("Error al validar el ejercicio:", error);
+        console.error("Error al validar l'exercici:", error);
       }
     };
 
@@ -166,7 +166,7 @@ export default {
           }),
         });
 
-        if (!response.ok) throw new Error("Error al actualizar el nivel");
+        if (!response.ok) throw new Error("Error a l'actualizar el nivell");
 
       } catch (error) {
         console.error("Error en actualizarNivel:", error);
@@ -212,12 +212,10 @@ export default {
 </head>
 <style>
 
-
-
 </style>
 <body>
-    <h1>Hola, mundo</h1>
-    <p>Modifica el CSS para cambiar el estilo.</p>
+    <h1>Hola, mon</h1>
+    <p>Modifica el CSS per cambiar l'estil.</p>
 </body>
 </html>`;
     htmlEditorInstance.setValue(basicHTML);
@@ -225,7 +223,21 @@ export default {
   }
 });
 
-    const goBack = () => router.push("/"); 
+const goBack = () => {
+  let rutaBase = "/nivel_";
+
+  if (language.value === "html") {
+    rutaBase += "html";
+  } else if (language.value === "css") {
+    rutaBase += "css";
+  } else if (language.value === "js") {
+    rutaBase += "js";
+  }
+
+  router.push(rutaBase);
+};
+
+
 
     onUnmounted(() => {
       lliureStore.toggleLliure();
