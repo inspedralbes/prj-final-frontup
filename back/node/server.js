@@ -5,7 +5,13 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const app = express();
 const PORT = 5000;
 
-app.use(cors());
+const corsOptions = {
+    origin: ["http://frontup.cat", "http://www.frontup.cat"],
+    methods: "GET,POST,PUT,DELETE",
+    allowedHeaders: "Content-Type,Authorization"
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const genAI = new GoogleGenerativeAI("AIzaSyBvVgFpTT270F8-TEZIy4zeWYnGr8c-PR0");
