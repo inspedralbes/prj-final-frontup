@@ -30,30 +30,30 @@
           <p>
             Dóna vida a les teves idees construint projectes complets o provant funcions i animacions específiques.
           </p>
-          <button class="btn">Prova l'Editor</button>
+          <button>Prova l'Editor</button>
         </div>
         <div class="card">
           <h3>Practica els teus coneixements</h3>
           <p>
             Vols provar-te fent uns exercicis per veure quin nivell tens?
           </p>
-          <button class="btn">Participa els reptes que et proposem</button>
+          <button>Participa els reptes que et proposem</button>
         </div>
         <div class="card">
           <h3>Comparteix els Teus Projectes</h3>
           <p>
             Uneix-te a la comunitat global de desenvolupadors front-end compartint les teves creacions i inspirant altres.
           </p>
-          <button class="btn">Descobreix el Més Popular</button>
+          <button>Descobreix el Més Popular</button>
         </div>
       </div>
       <br><br>
       <!-- Footer -->
     </div>
-    <footer>
-      <p>© 2025 FrontUp</p>
-    </footer>
   </div>
+  <footer>
+    <p>© 2025 FrontUp</p>
+  </footer>
 </template>
 
 <script>

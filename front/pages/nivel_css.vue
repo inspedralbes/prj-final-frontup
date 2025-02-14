@@ -1,17 +1,10 @@
 <template>
   <div class="level-container">
-    <button class="back-button" @click="irAtras">Atrás</button>
-    <div
-      v-for="level in levels"
-      :key="level.id"
-      class="level-button-container"
-    >
+    <div v-for="level in levels" :key="level.id" class="level-button-container">
       <div
         class="level-button"
         :class="{ locked: level.locked }"
         @click="!level.locked && ir_nivel(level.id)"
-        @mouseenter="hoveredLevel = level.id"
-        @mouseleave="hoveredLevel = null"
       >
         {{ level.id }}
         <div v-if="level.locked" class="lock-icon">🔒</div>
@@ -24,19 +17,46 @@
 export default {
   data() {
     return {
+      language: 'css',
       levels: Array.from({ length: 10 }, (_, i) => ({
-        id: i + 1,
+        id: i + 11,
+        locked: true, 
       })),
-      hoveredLevel: null,
+      userLevel: 11,
     };
   },
+  async created() {
+    await this.fetchUserLevel();
+  },
   methods: {
-    ir_nivel(levelId) {
-      this.$router.push(`/nivel/${levelId}`);
+    async fetchUserLevel() {
+  try {
+    const response = await fetch("http://localhost:8000/api/user", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) throw new Error("Error al obtener el nivel del usuario");
+
+    const data = await response.json();
+
+    this.userLevel = data.user.nivel_css; 
+
+    this.levels = this.levels.map((level) => ({
+      ...level,
+      locked: level.id > this.userLevel,
+    }));
+  } catch (error) {
+    console.error("Error al cargar el nivel del usuario:", error);
+  }
+}
+,ir_nivel(levelId) {
+      this.$router.push(`/nivel/${this.language}/${levelId}`);
     },
     irAtras() {
       this.$router.push("/niveles");
-    }
+    },
   },
 };
 </script>
@@ -51,7 +71,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #202020;
+  background-image: url('/fondo.png');
   border: 1px solid #ddd;
   border-radius: 10px;
   background-size: cover;
@@ -69,7 +89,7 @@ export default {
 .level-button {
   width: 80px;
   height: 80px;
-  background-color: #3498db;
+  background-image: url("/boton.png");
   transform: scale(1.03);
   border-radius: 50%;
   display: flex;
@@ -83,19 +103,19 @@ export default {
 }
 
 .level-button:hover {
-  background-color: #2980b9;
+  background-image: url("/boton.png");
   transform: scale(1.1);
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* 🔒 Estilo para niveles bloqueados */
 .level-button.locked {
-  background-color: #7f8c8d;
+  background-image: url("/boton_lock.png");
   cursor: not-allowed;
 }
 
 .level-button.locked:hover {
-  background-color: #7f8c8d;
+  background-image: url("/boton_lock.png");
   transform: scale(1.03);
 }
 
@@ -107,16 +127,17 @@ export default {
   font-size: 24px;
 }
 
-.level-button-container:nth-child(2) { top: 50%; left: 10%; }
-.level-button-container:nth-child(3) { top: 30%; left: 20%; }
-.level-button-container:nth-child(4) { top: 50%; left: 30%; }
-.level-button-container:nth-child(5) { top: 30%; left: 40%; }
-.level-button-container:nth-child(6) { top: 50%; left: 50%; }
-.level-button-container:nth-child(7) { top: 30%; left: 60%; }
-.level-button-container:nth-child(8) { top: 50%; left: 70%; }
-.level-button-container:nth-child(9) { top: 30%; left: 80%; }
-.level-button-container:nth-child(10) { top: 50%; left: 90%; }
-.level-button-container:nth-child(11) { top: 50%; left: 90%; }
+.level-button-container:nth-child(1) { top: 40%; left: 10%; }
+.level-button-container:nth-child(2) { top: 60%; left: 18%; }
+.level-button-container:nth-child(3) { top: 40%; left: 26%; }
+.level-button-container:nth-child(4) { top: 60%; left: 34%; }
+.level-button-container:nth-child(5) { top: 40%; left: 42%; }
+.level-button-container:nth-child(6) { top: 60%; left: 50%; }
+.level-button-container:nth-child(7) { top: 40%; left: 58%; }
+.level-button-container:nth-child(8) { top: 60%; left: 66%; }
+.level-button-container:nth-child(9) { top: 40%; left: 74%; }
+.level-button-container:nth-child(10) { top: 60%; left: 82%; }
+
 .back-button {
   position: absolute;
   top: 20px;
