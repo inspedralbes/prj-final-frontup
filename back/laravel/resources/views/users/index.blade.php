@@ -1,15 +1,15 @@
 @extends('layouts.app')
 @section('content')
 <div class="container mt-4">
-    <h2 class="mb-3">Lista de Usuarios</h2>
-    <a href="{{ route('users.create') }}" class="btn btn-primary mb-3">Crear Usuario</a>
+    <h2 class="mb-3">Llista d'Usuaris</h2>
+    <a href="{{ route('users.create') }}" class="btn btn-primary mb-3">Crear Usuari</a>
     <table class="table table-striped table-bordered">
         <thead class="thead-dark">
             <tr>
                 <th>ID</th>
-                <th>Nombre</th>
+                <th>Nom</th>
                 <th>Email</th>
-                <th>Acciones</th>
+                <th>Accions</th>
             </tr>
         </thead>
         <tbody>
@@ -22,7 +22,7 @@
                         <a href="{{ route('users.edit', $user) }}" class="btn btn-warning btn-sm">Editar</a>
                         <form action="{{ route('users.destroy', $user) }}" method="POST" style="display:inline;">
                             @csrf @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que quieres eliminar este usuario?');">Eliminar</button>
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Segur que vols eliminar aquest usuari?');">Eliminar</button>
                         </form>
                     </td>
                 </tr>
