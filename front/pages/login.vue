@@ -1,8 +1,7 @@
 <template>
-  <div class="block-mobile-landscape">Si us plau, gira el teu dispositiu</div>
-
   <div class="slider" :class="{ slide: showRegister }">
     <div class="container">
+      <!-- Formulario de login -->
       <div class="left">
         <div class="content">
           <div class="title">Iniciar sessió</div>
@@ -12,6 +11,7 @@
               <input
                 type="email"
                 id="email"
+                placeholder="Correu electrónic"
                 v-model="formData.email"
                 @blur="validateEmail"
                 @keyup.enter="onEnterPressed('email')"
@@ -24,8 +24,9 @@
               <label for="password" class="label">Contrasenya</label>
               <div class="password-input-container">
                 <input
-                  :type="passwordVisible ? 'text' : 'password'"
+                  :type="passwordVisibleLogin ? 'text' : 'password'"
                   id="password"
+                  placeholder="Contrasenya"
                   v-model="formData.password"
                   @blur="validatePassword"
                   @keyup.enter="onEnterPressed('password')"
@@ -33,13 +34,13 @@
                   :class="{'input-error': errors.password}"
                   class="input"
                 />
-                <button type="button" @click="togglePasswordVisibility" class="show-password-btn">
-                  <span v-if="passwordVisible">👁️</span>
+                <button type="button" @click="togglePasswordVisibilityLogin" class="show-password-btn">
+                  <span v-if="passwordVisibleLogin">👁️</span>
                   <span v-else>👁️</span>
                 </button>
               </div>
             </div>
-            <button type="submit" class="button" :disabled="!isLoginFormValid()">Iniciar sessió</button>
+            <button type="submit" class="button login" :disabled="!isLoginFormValid()">Iniciar sessió</button>
           </form>
 
           <div class="slide-button-container">
@@ -77,42 +78,47 @@
                 class="input"
               />
             </div>
-           
             <div class="info">
-  <input
-    type="password"
-    placeholder="Contrasenya"
-    v-model="formData.password"
-    @blur="validatePassword"
-    required
-    :class="{
-      'input-error': errors.password,
-      'input-valid': formData.password && !errors.password
-    }"
-    class="input"
-  />
-  <button type="button" @click="togglePasswordVisibility" class="show-password-btn">
-    <span v-if="passwordVisible">👁️</span>
-    <span v-else>👁️</span>
-  </button>
-</div>
+              <div class="password-input-container">
+                <input
+                  :type="passwordVisibleRegister ? 'text' : 'password'"
+                  placeholder="Contrasenya"
+                  v-model="formData.password"
+                  @blur="validatePassword"
+                  required
+                  :class="{'input-error': errors.password,
+                            'input-valid': formData.passwordRepeat && !errors.passwordRepeat
+                  }"
+                  class="input"
+                />
+                <button type="button" @click="togglePasswordVisibilityRegister" class="show-password-btn">
+                  <span v-if="passwordVisibleRegister">👁️</span>
+                  <span v-else>👁️</span>
+                </button>
+              </div>
+            </div>
 
-<div class="info">
-  <input
-    type="password"
-    placeholder="Repetir contrasenya"
-    v-model="formData.passwordRepeat"
-    @blur="validatePasswordRepeat"
-    required
-    :class="{
-      'input-error': errors.passwordRepeat,
-      'input-valid': formData.passwordRepeat && !errors.passwordRepeat
-    }"
-    class="input"
-  />
-</div>
+            <div class="info">
+              <div class="password-input-container">
+                <input
+                  :type="passwordVisibleRepeat ? 'text' : 'password'"
+                  placeholder="Repetir contrasenya"
+                  v-model="formData.passwordRepeat"
+                  @blur="validatePasswordRepeat"
+                  required
+                  :class="{'input-error': errors.passwordRepeat,
+                            'input-valid': formData.passwordRepeat && !errors.passwordRepeat
+                  }"
+                  class="input"
+                />
+                <button type="button" @click="togglePasswordVisibilityRepeat" class="show-password-btn">
+                  <span v-if="passwordVisibleRepeat">👁️</span>
+                  <span v-else>👁️</span>
+                </button>
+              </div>
+            </div>
 
-            <button type="submit" class="button" :disabled="!isRegisterFormValid()">Registrar-se</button>
+            <button type="submit" class="button password_register" :disabled="!isRegisterFormValid()">Registrar-se</button>
           </form>
           <div class="slide-button-container">
             Ja tens compte?
@@ -125,11 +131,6 @@
   </div>
 </template>
 
-
-
-
-
-
 <script setup>
 import { reactive, ref, onUnmounted, onMounted } from 'vue';
 import { useRouter } from 'nuxt/app';
@@ -139,6 +140,22 @@ import { useLliureStore } from '~/stores/app';
 const router = useRouter();
 const appStore = useAppStore();
 const lliureStore = useLliureStore();
+
+const passwordVisibleLogin = ref(false); // Para el login
+const passwordVisibleRegister = ref(false); // Para el registro
+const passwordVisibleRepeat = ref(false); // Para el repetir contraseña
+
+const togglePasswordVisibilityLogin = () => {
+  passwordVisibleLogin.value = !passwordVisibleLogin.value;
+};
+
+const togglePasswordVisibilityRegister = () => {
+  passwordVisibleRegister.value = !passwordVisibleRegister.value;
+};
+
+const togglePasswordVisibilityRepeat = () => {
+  passwordVisibleRepeat.value = !passwordVisibleRepeat.value;
+};
 
 onMounted(() => {
   lliureStore.toggleLliure();
@@ -163,11 +180,6 @@ const errors = reactive({
 
 const errorMessage = ref('');
 const showRegister = ref(false);
-const passwordVisible = ref(false); // Estado reactivo para manejar la visibilidad de la contraseña
-
-const togglePasswordVisibility = () => {
-  passwordVisible.value = !passwordVisible.value;
-};
 
 const toggleRegister = () => {
   showRegister.value = !showRegister.value;
@@ -175,11 +187,19 @@ const toggleRegister = () => {
 
 const validateEmail = () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  errors.email = emailRegex.test(formData.email) ? '' : 'Correo inválido';
+  if (!formData.email) {
+    errors.email = '';  // Si está vacío, no hay error
+  }else{
+    errors.email = emailRegex.test(formData.email) ? '' : 'Correo inválido';
+  }
 };
 
 const validatePassword = () => {
-  errors.password = formData.password ? '' : 'La contraseña es obligatoria';
+  if (!formData.password) {
+    errors.password = '';  // Si está vacío, no hay error
+  }else{
+    errors.password = formData.password ? '' : 'La contraseña es obligatoria';
+  }
 };
 
 const validatePasswordRepeat = () => {
@@ -191,7 +211,6 @@ const validatePasswordRepeat = () => {
     errors.passwordRepeat = '';  // No hay error si coinciden
   }
 };
-
 
 const isLoginFormValid = () => {
   return formData.email && formData.password && !errors.email && !errors.password;
@@ -322,6 +341,7 @@ body {
   transform: translateX(-50%);
 }
 
+
 .left, .right {
   width: 50%;
   height: 100%;
@@ -335,8 +355,14 @@ body {
 }
 
 .right {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background: transparent;
 }
+
 
 .content {
   background: rgba(0, 0, 0, 0.6);
@@ -382,7 +408,6 @@ body {
 }
 
 
-
 .button {
   width: 100%;
   background-color: var(--primary-color);
@@ -426,7 +451,17 @@ body {
 
 .show-password-btn {
   position: absolute;
-  top: 75%;
+  top: 85%;
+  right: -10%;
+  transform: translateY(-100%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+.show-password-btnr {
+  position: absolute;
+  top: 95%;
   right: -10%;
   transform: translateY(-100%);
   background: none;
