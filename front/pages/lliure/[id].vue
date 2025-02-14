@@ -1,9 +1,15 @@
 <template>
   <div class="todo">
     <header class="header">
-      <button class="header-button" @click="goBack">Home</button>
-      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
-        :readonly="!isEditing" />
+      <button class="header-button" @click="goBack">Atrás</button>
+      <input
+        type="text"
+        v-model="title"
+        class="header-title"
+        @focus="isEditing = true"
+        @blur="isEditing = false"
+        :readonly="!isEditing"
+      />
       <div class="header-actions">
         <button class="header-button" @click="toggleChat">Xat IA</button>
         <button class="header-button" @click="guardarProyecto">Guardar</button>
@@ -12,19 +18,29 @@
       </div>
     </header>
 
+    <!-- Modal de configuración -->
     <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
       <div class="modal-content" @click.stop>
         <h2>Configuració del Projecte</h2>
         <form @submit.prevent="saveSettings">
           <div class="input-group">
-            <label for="project-title">Títol del Projecte</label>
-            <input type="text" id="project-title" v-model="modalTitle" class="modal-input"
-              placeholder="Escriu el títol" />
+            <label for="project-title">Título del Proyecto</label>
+            <input
+              type="text"
+              id="project-title"
+              v-model="modalTitle"
+              class="modal-input"
+              placeholder="Escribe el título"
+            />
           </div>
           <div class="input-group">
-            <label for="project-description">Descripció</label>
-            <textarea id="project-description" v-model="modalDescription" class="modal-textarea"
-              placeholder="Escriu la descripció del projecte"></textarea>
+            <label for="project-description">Descripción</label>
+            <textarea
+              id="project-description"
+              v-model="modalDescription"
+              class="modal-textarea"
+              placeholder="Escribe la descripción del proyecto"
+            ></textarea>
           </div>
           <div class="modal-actions">
             <button type="submit" class="modal-button">Guardar</button>
@@ -33,6 +49,8 @@
         </form>
       </div>
     </div>
+
+    <!-- Modal para guardar antes de salir -->
     <div v-if="guardarParaSalir" class="modal-overlay" @click="closeGuardarParaSalir">
       <div class="modal-content" @click.stop>
         <h2>Vols guardar aquest projecte?</h2>
@@ -44,17 +62,27 @@
         </form>
       </div>
     </div>
+
     <!-- Chat IA flotante -->
-    <div v-if="isChatVisible" class="chat-container"
-      :style="{ transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)` }" @mousedown="startDrag">
+    <div
+      v-if="isChatVisible"
+      class="chat-container"
+      :style="{ transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)` }"
+      @mousedown="startDrag"
+    >
       <button class="close-chat-button" @click="toggleChat">✖</button>
       <h2 class="chat-title">IA FrontUp</h2>
       <div class="messages-container" ref="messagesContainer">
-        <div v-for="(msg, index) in messages" :key="index" class="message" :class="{
-          'user': msg.type === 'user',
-          'ai': msg.type === 'ai',
-          'loading': msg.type === 'loading'
-        }">
+        <div
+          v-for="(msg, index) in messages"
+          :key="index"
+          class="message"
+          :class="{
+            user: msg.type === 'user',
+            ai: msg.type === 'ai',
+            loading: msg.type === 'loading'
+          }"
+        >
           <div v-if="msg.type === 'loading'" class="loading-indicator">
             <div class="dot-flashing"></div>
           </div>
@@ -62,15 +90,21 @@
         </div>
       </div>
       <div class="input-container">
-        <input type="text" v-model="newMessage" placeholder="Escriu el teu missatge ..." class="chat-input"
-          @keyup.enter="sendMessage" :disabled="state.loading" />
+        <input
+          type="text"
+          v-model="newMessage"
+          placeholder="Escribe tu mensaje..."
+          class="chat-input"
+          @keyup.enter="sendMessage"
+          :disabled="state.loading"
+        />
         <button class="send-button" @click="sendMessage" :disabled="state.loading">
           {{ state.loading ? 'Enviant...' : 'Enviar' }}
         </button>
       </div>
     </div>
 
-    <!-- Contenedor principal -->
+    <!-- Contenedor principal de editores -->
     <div class="editor-container">
       <div class="editor-box">
         <div class="editor-label">HTML</div>
@@ -96,9 +130,10 @@
     </div>
   </div>
 </template>
+
 <script>
 import { ref, onMounted, computed, onUnmounted, nextTick } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import CodeMirror from "codemirror";
 import { useLliureStore } from "~/stores/app";
 import "codemirror/lib/codemirror.css";
@@ -106,17 +141,26 @@ import "codemirror/theme/dracula.css";
 import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
 import "codemirror/mode/javascript/javascript";
+// Importar la lógica de comunicación y el store de proyecto
 import useCommunicationManager from "@/stores/comunicationManager";
-import { useAppStore } from '@/stores/app';
-import { useIdProyectoActualStore } from '@/stores/app'
+import { useAppStore } from "@/stores/app";
+import { useIdProyectoActualStore } from "@/stores/app";
 
 export default {
   setup() {
     const appStore = useAppStore();
-    const idProyectoActualStore = useIdProyectoActualStore();
+    const idProyectoActualStore = useIdProyectoActualStore(); // Para otros usos
     const router = useRouter();
-    const { guardarProyectoDB, chatIA, state, borrarProyectoDB } = useCommunicationManager();
+    const route = useRoute();
+    const {
+      guardarProyectoDB,
+      chatIA,
+      state,
+      borrarProyectoDB,
+      useProyectoStore,
+    } = useCommunicationManager();
     const lliureStore = useLliureStore();
+
     const isDragging = ref(false);
     const chatPosition = ref({ x: 20, y: 20 });
     const dragStartPosition = ref({ x: 0, y: 0 });
@@ -132,9 +176,7 @@ export default {
     const isChatVisible = ref(false);
     const newMessage = ref("");
     const cambiadoSinGuardar = ref(false);
-    const messages = ref([
-      { type: 'ai', content: "¡Hola! ¿En qué puedo ayudarte hoy?" }
-    ]);
+    const messages = ref([{ type: "ai", content: "¡Hola! ¿En qué puedo ayudarte hoy?" }]);
     const messagesContainer = ref(null);
     const guardarParaSalir = ref(false);
 
@@ -143,6 +185,7 @@ export default {
     const jsEditor = ref(null);
 
     let htmlEditorInstance, cssEditorInstance, jsEditorInstance;
+
     const startDrag = (event) => {
       isDragging.value = true;
       dragStartPosition.value = {
@@ -152,16 +195,17 @@ export default {
       document.addEventListener("mousemove", onDrag);
       document.addEventListener("mouseup", stopDrag);
     };
+
     const CambiosSinGuardarToTrue = () => {
-      console.log('entrado en cambio a true', cambiadoSinGuardar.value);
+      console.log("entrado en cambio a true", cambiadoSinGuardar.value);
+      cambiadoSinGuardar.value = true;
+    };
 
-      cambiadoSinGuardar.value = true
-    }
     const CambiosSinGuardarToFalse = () => {
+      cambiadoSinGuardar.value = false;
+      console.log("entrado a cambio a false", cambiadoSinGuardar.value);
+    };
 
-      cambiadoSinGuardar.value = false
-      console.log('entrado a cambio a false', cambiadoSinGuardar.value);
-    }
     const onDrag = (event) => {
       if (isDragging.value) {
         chatPosition.value = {
@@ -170,22 +214,25 @@ export default {
         };
       }
     };
+
     const volverHome = async () => {
-      console.log('css.value', css.value);
+      console.log("css.value", css.value);
       router.push("/");
-    }
+    };
+
     const stopDrag = () => {
       isDragging.value = false;
       document.removeEventListener("mousemove", onDrag);
       document.removeEventListener("mouseup", stopDrag);
     };
+
     const closeGuardarParaSalir = () => {
       guardarParaSalir.value = false;
-    }
-    onMounted(() => {
-      lliureStore.toggleLliure();
+    };
 
-      // Configurar editores
+    onMounted(async () => {
+      lliureStore.toggleLliure();
+      // Inicializar editores CodeMirror
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
         mode: "htmlmixed",
         theme: "dracula",
@@ -196,23 +243,41 @@ export default {
         theme: "dracula",
         lineNumbers: true,
       });
-
       jsEditorInstance = CodeMirror(jsEditor.value, {
         mode: "javascript",
         theme: "dracula",
         lineNumbers: true,
       });
 
+      // Obtener el ID del proyecto desde la ruta
+      const projectId = route.params.id;
+      if (projectId) {
+        // Usar el store de proyecto para obtener los datos
+        const proyectoStore = useProyectoStore();
+        const proyecto = await proyectoStore.obtenerProyecto(projectId);
+        if (proyecto) {
+          // Asignar los datos, asegurando que no sean null (se usan cadenas vacías como fallback)
+          html.value = proyecto.html_code || "";
+          css.value = proyecto.css_code || "";
+          js.value = proyecto.js_code || "";
+          // Actualizar el contenido de los editores
+          htmlEditorInstance.setValue(html.value);
+          cssEditorInstance.setValue(css.value);
+          jsEditorInstance.setValue(js.value);
+        }
+      } else {
+        console.error("No se encontró un ID de proyecto válido en la ruta.");
+      }
+
+      // Configurar listeners para detectar cambios en los editores
       htmlEditorInstance.on("change", (instance) => {
         html.value = instance.getValue();
         CambiosSinGuardarToTrue();
       });
-
       cssEditorInstance.on("change", (instance) => {
         css.value = instance.getValue();
         CambiosSinGuardarToTrue();
       });
-
       jsEditorInstance.on("change", (instance) => {
         js.value = instance.getValue();
         CambiosSinGuardarToTrue();
@@ -227,8 +292,9 @@ export default {
     const guardarProyecto2 = () => {
       guardarProyecto();
       guardarParaSalir.value = false;
-      router.push('/');
-    }
+      router.push("/");
+    };
+
     const toggleChat = () => {
       isChatVisible.value = !isChatVisible.value;
     };
@@ -239,28 +305,18 @@ export default {
       const userMessage = newMessage.value;
       newMessage.value = "";
 
-      messages.value.push({
-        type: 'user',
-        content: userMessage
-      });
-
-      messages.value.push({
-        type: 'loading',
-        content: ''
-      });
+      messages.value.push({ type: "user", content: userMessage });
+      messages.value.push({ type: "loading", content: "" });
 
       try {
         const response = await chatIA(userMessage, html.value, css.value, js.value);
         messages.value.pop();
-        messages.value.push({
-          type: 'ai',
-          content: response
-        });
+        messages.value.push({ type: "ai", content: response });
       } catch (error) {
         messages.value.pop();
         messages.value.push({
-          type: 'ai',
-          content: "❌ Error al obtener respuesta. Intenta nuevamente."
+          type: "ai",
+          content: "❌ Error al obtener respuesta. Intenta nuevamente.",
         });
       } finally {
         await nextTick();
@@ -278,8 +334,9 @@ export default {
       if (!cambiadoSinGuardar.value) {
         if (html.value === "" && css.value === "" && js.value === "") {
           try {
-            let id = idProyectoActualStore?.id || Number(localStorage.getItem("idProyectoActual"));
-
+            let id =
+              idProyectoActualStore?.id ||
+              Number(localStorage.getItem("idProyectoActual"));
             if (id) {
               await borrarProyectoDB(id);
             }
@@ -287,11 +344,10 @@ export default {
             console.error("Error al borrar el proyecto:", error);
           }
         }
-
         router.push("/");
       } else {
         guardarParaSalir.value = true;
-        console.log('¿Se muestra el guardar para salir?', guardarParaSalir.value);
+        console.log("¿Se muestra el guardar para salir?", guardarParaSalir.value);
       }
     };
 
@@ -312,13 +368,16 @@ export default {
     const guardarProyecto = async () => {
       CambiosSinGuardarToFalse();
       try {
-        await guardarProyectoDB({
-          nombre: title.value || "",
-          user_id: appStore.loginInfo.id || null,
-          html_code: html.value || "",
-          css_code: css.value || "",
-          js_code: js.value || "",
-        }, idProyectoActualStore.id);
+        await guardarProyectoDB(
+          {
+            nombre: title.value || "",
+            user_id: appStore.loginInfo.id || null,
+            html_code: html.value || "",
+            css_code: css.value || "",
+            js_code: js.value || "",
+          },
+          idProyectoActualStore.id
+        );
       } catch (error) {
         console.error(error);
       }
@@ -381,6 +440,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .todo {
   display: flex;
