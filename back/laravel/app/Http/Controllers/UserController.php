@@ -64,7 +64,31 @@ class UserController extends Controller
     /**
      * Update user levels.
      */
-    
+    public function updateLevels(Request $request, $id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
+
+        $request->validate([
+            'nivel' => 'required|integer|min:1',
+            'nivel_css' => 'required|integer|min:1',
+            'nivel_js' => 'required|integer|min:1',
+        ]);
+
+        $user->nivel = $request->nivel;
+        $user->nivel_css = $request->nivel_css;
+        $user->nivel_js = $request->nivel_js;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Niveles actualizados',
+            'nivel' => $user->nivel,
+            'nivel_css' => $user->nivel_css,
+            'nivel_js' => $user->nivel_js,
+        ]);
+    }
     
     /**
      * Display a listing of the resource.

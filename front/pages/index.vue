@@ -122,7 +122,9 @@ export default {
 .card-container {
   display: flex;
   justify-content: space-around;
-  gap: 5vw;
+  gap: 10px;
+  margin-top: 20px;
+  align-items: stretch; 
 }
 
 .card {
@@ -133,6 +135,9 @@ export default {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   width: 300px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  height: 250px; 
 }
 
 .card h3 {
@@ -144,22 +149,23 @@ export default {
 .card p {
   color: #d4cece;
   margin-bottom: 20px;
+  flex-grow: 1; /* Hace que el texto ocupe el espacio disponible */
 }
 
 .btn {
-    border: none;
+  border: none;
   border-radius: 4px;
   background-color: #333;
   color: #fff;
   cursor: pointer;
-  width: 20vw;
-  height: 10vh;
+  width: 100%; 
+  padding: 10px;
+  margin-top: auto; 
 }
 
-.btn:hover{
+.btn:hover {
   background-color: #555;
 }
-
 
 footer {
   background-color: #000000;
