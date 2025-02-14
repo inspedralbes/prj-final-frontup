@@ -17,18 +17,18 @@ app.post("/pregunta", async (req, res) => {
         const { html } = req.body;
         const { css } = req.body;
         const { js } = req.body;
-        let preguntaIA = 'Eres un programador frontend experto, responde a la siguiente pregunta teniendo en cuenta que la persona a la que le hablas es un desarrollador novato, '+pregunta;
+        let preguntaIA = 'Ets un programador frontend expert, respon a la següent pregunta tenint en compte que la persona a la qual li parles és un desenvolupador novençà, '+pregunta;
         if(html!=""){
-            preguntaIA += ' este es mi html '+html;
+            preguntaIA += ' aquest es el meu html '+html;
         }
         if(css!=""){
-            preguntaIA += ' este es mi css '+css;
+            preguntaIA += ' aquest es el meu css '+css;
         }
         if(js!=""){
-            preguntaIA += ' este es mi js '+js;
+            preguntaIA += ' aquest es el meu js '+js;
         }
-        console.log("Pregunta recibida:", preguntaIA);
-        preguntaIA += ' responde con las minimas palabras posibles aunque si hace falta puedes alargarte algo mas pero sin pasarte abarcando todo lo que te este preguntando'
+        console.log("Pregunta rebuda:", preguntaIA);
+        preguntaIA += ' Respon amb les mínimes paraules possibles encara que si fa falta pots allargar-te alguna cosa més però sense passar-te abastant tot el que està preguntant'
         if (!preguntaIA) {
             return res.status(400).send("La pregunta es requerida");
         }
