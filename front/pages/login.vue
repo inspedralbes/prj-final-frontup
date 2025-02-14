@@ -1,103 +1,122 @@
 <template>
-  <!-- Aviso para móviles en landscape -->
-  <div class="block-mobile-landscape">Please rotate your device</div>
+  <div class="block-mobile-landscape">Si us plau, gira el teu dispositiu</div>
 
- 
-  <!-- Contenedor del slider: su clase "slide" se activa cuando showRegister es true -->
   <div class="slider" :class="{ slide: showRegister }">
-    <!-- Container flexible con dos paneles (login y register) -->
     <div class="container">
-      <!-- Panel izquierdo: Login -->
       <div class="left">
         <div class="content">
-          <div class="title">Log ing</div>
+          <div class="title">Iniciar sessió</div>
           <form @submit.prevent="login" novalidate>
-  <div class="info">
-    <label for="email" class="label">Correo electrónico</label>
-    <input
-      type="email"
-      id="email"
-      v-model="formData.email"
-      @blur="validateEmail"
-      @keyup.enter="onEnterPressed('email')"
-      required
-      class="input"
-    />
-  </div>
-  <div class="info">
-    <label for="password" class="label">Contraseña</label>
-    <input
-      type="password"
-      id="password"
-      v-model="formData.password"
-      @blur="validatePassword"
-      @keyup.enter="onEnterPressed('password')"
-      required
-      class="input"
-    />
-  </div>
-  <button type="submit" class="button" :disabled="!isLoginFormValid()">Sign In</button>
-</form>
+            <div class="info">
+              <label for="email" class="label">Correu electrònic</label>
+              <input
+                type="email"
+                id="email"
+                v-model="formData.email"
+                @blur="validateEmail"
+                @keyup.enter="onEnterPressed('email')"
+                required
+                :class="{'input-error': errors.email}"
+                class="input"
+              />
+            </div>
+            <div class="info">
+              <label for="password" class="label">Contrasenya</label>
+              <div class="password-input-container">
+                <input
+                  :type="passwordVisible ? 'text' : 'password'"
+                  id="password"
+                  v-model="formData.password"
+                  @blur="validatePassword"
+                  @keyup.enter="onEnterPressed('password')"
+                  required
+                  :class="{'input-error': errors.password}"
+                  class="input"
+                />
+                <button type="button" @click="togglePasswordVisibility" class="show-password-btn">
+                  <span v-if="passwordVisible">👁️</span>
+                  <span v-else>👁️</span>
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="button" :disabled="!isLoginFormValid()">Iniciar sessió</button>
+          </form>
 
           <div class="slide-button-container">
-            ¿No tienes cuenta?
-            <span class="slide-button" @click="toggleRegister">Sign Up</span>
+            No tens compte?
+            <span class="slide-button" @click="toggleRegister">Registra't</span>
           </div>
           <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         </div>
       </div>
-      <!-- Panel derecho: Register -->
+
+      <!-- Panel derecho: Registro -->
       <div class="right">
         <div class="content">
-          <div class="title">Register</div>
+          <div class="title">Registrar-se</div>
           <form @submit.prevent="register" novalidate>
             <div class="info">
               <input
                 type="text"
-                placeholder="Nombre"
+                placeholder="Nom"
                 v-model="formData.name"
-                @blur="validatename"
+                @blur="validateName"
                 required
+                :class="{'input-error': errors.name}"
                 class="input"
               />
             </div>
             <div class="info">
               <input
                 type="email"
-                placeholder="Correo electrónico"
+                placeholder="Correu electrònic"
                 v-model="formData.email"
                 @blur="validateEmail"
                 required
+                :class="{'input-error': errors.email}"
                 class="input"
               />
             </div>
+           
             <div class="info">
-              <input
-                type="password"
-                placeholder="Contraseña"
-                v-model="formData.password"
-                @blur="validatePassword"
-                required
-                class="input"
-              />
-            </div>
-            <div class="info">
-              <input
-                type="password"
-                placeholder="Repetir contraseña"
-                v-model="formData.passwordRepeat"
-                @blur="validatePasswordRepeat"
-                required
-                class="input"
-              />
-            </div>
-            <button type="submit" class="button" :disabled="!isRegisterFormValid()">
-              Register
-            </button>
+  <input
+    type="password"
+    placeholder="Contrasenya"
+    v-model="formData.password"
+    @blur="validatePassword"
+    required
+    :class="{
+      'input-error': errors.password,
+      'input-valid': formData.password && !errors.password
+    }"
+    class="input"
+  />
+  <button type="button" @click="togglePasswordVisibility" class="show-password-btn">
+    <span v-if="passwordVisible">👁️</span>
+    <span v-else>👁️</span>
+  </button>
+</div>
+
+<div class="info">
+  <input
+    type="password"
+    placeholder="Repetir contrasenya"
+    v-model="formData.passwordRepeat"
+    @blur="validatePasswordRepeat"
+    required
+    :class="{
+      'input-error': errors.passwordRepeat,
+      'input-valid': formData.passwordRepeat && !errors.passwordRepeat
+    }"
+    class="input"
+  />
+</div>
+
+            <button type="submit" class="button" :disabled="!isRegisterFormValid()">Registrar-se</button>
           </form>
           <div class="slide-button-container">
-            ¿Ya tienes cuenta?
-            <span class="slide-button" @click="toggleRegister">Login</span>
+            Ja tens compte?
+            <span class="slide-button" @click="toggleRegister">Iniciar sessió</span>
           </div>
           <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         </div>
@@ -107,36 +126,33 @@
 </template>
 
 
+
+
+
+
 <script setup>
-
-
 import { reactive, ref, onUnmounted, onMounted } from 'vue';
 import { useRouter } from 'nuxt/app';
 import { useAppStore } from '@/stores/app';
 import { useLliureStore } from '~/stores/app';
 
-
 const router = useRouter();
 const appStore = useAppStore();
 const lliureStore = useLliureStore();
-
 
 onMounted(() => {
   lliureStore.toggleLliure();
 });
 onUnmounted(() => {
   lliureStore.toggleLliure();
-
 });
-// Datos reactivos para formularios y errores
+
 const formData = reactive({
   email: '',
   password: '',
   name: '',
   passwordRepeat: ''
 });
-
-
 
 const errors = reactive({
   email: '',
@@ -145,44 +161,41 @@ const errors = reactive({
   passwordRepeat: ''
 });
 
-
 const errorMessage = ref('');
 const showRegister = ref(false);
+const passwordVisible = ref(false); // Estado reactivo para manejar la visibilidad de la contraseña
 
+const togglePasswordVisibility = () => {
+  passwordVisible.value = !passwordVisible.value;
+};
 
-// Alterna entre Login y Register
 const toggleRegister = () => {
   showRegister.value = !showRegister.value;
 };
 
-
-// Validaciones básicas (ajusta las expresiones regulares o mensajes si lo deseas)
 const validateEmail = () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   errors.email = emailRegex.test(formData.email) ? '' : 'Correo inválido';
 };
 
-
-const validatename = () => {
-  errors.name = formData.name ? '' : 'El nombre de usuario es obligatorio';
-};
-
-
 const validatePassword = () => {
   errors.password = formData.password ? '' : 'La contraseña es obligatoria';
 };
 
-
 const validatePasswordRepeat = () => {
-  errors.passwordRepeat =
-    formData.passwordRepeat === formData.password ? '' : 'Las contraseñas no coinciden';
+  if (!formData.passwordRepeat) {
+    errors.passwordRepeat = '';  // Si está vacío, no hay error
+  } else if (formData.passwordRepeat !== formData.password) {
+    errors.passwordRepeat = 'Las contraseñas no coinciden';
+  } else {
+    errors.passwordRepeat = '';  // No hay error si coinciden
+  }
 };
 
 
 const isLoginFormValid = () => {
   return formData.email && formData.password && !errors.email && !errors.password;
 };
-
 
 const isRegisterFormValid = () => {
   return (
@@ -197,96 +210,45 @@ const isRegisterFormValid = () => {
   );
 };
 
-
-// Función de login (conserva tu lógica de conexión)
 const login = async () => {
   validateEmail();
   validatePassword();
-  if (isLoginFormValid()) {
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email, password: formData.password })
+  if (!isLoginFormValid()) {
+    return;
+  }
+  try {
+    const response = await fetch('http://127.0.0.1:8000/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: formData.email, password: formData.password })
+    });
+    const data = await response.json();
+    if (response.ok) {
+      appStore.setLoginInfo({
+        loggedIn: true,
+        id: data.user.id,
+        token: data.token,
+        name: data.user.name,
+        email: data.user.email,
+        nivel_html: data.user.nivel_html,
+        nivel_css: data.user.nivel_css,
+        nivel_js: data.user.nivel_js,
+        avatar: data.user.avatar
       });
-      const data = await response.json();
-      if (response.ok) {
-        appStore.setLoginInfo({
-          loggedIn: true,
-          id: data.user.id,
-          token: data.token,
-          name: data.user.name,
-          email: data.user.email,
-          nivel_html: data.user.nivel_html,
-          nivel_css: data.user.nivel_css,
-          nivel_js: data.user.nivel_js,
-          avatar: data.user.avatar
-        });
-        router.push('/');
-      } else {
-        errorMessage.value = data.message || 'Credenciales inválidas';
-      }
-    } catch (err) {
-      errorMessage.value = 'Error de red. No se pudo conectar al servidor.';
+      router.push('/');
+    } else {
+      errorMessage.value = data.message || 'Credenciales inválidas';
     }
+  } catch (err) {
+    errorMessage.value = 'Error de red. No se pudo conectar al servidor.';
   }
 };
-
-
-// Función de registro (conserva tu lógica de conexión)
-const register = async () => {
-  validateEmail();
-  validatename();
-  validatePassword();
-  validatePasswordRepeat();
-  if (isRegisterFormValid()) {
-    const avatarUrl = `https://api.multiavatar.com/${formData.name}.png`;
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, avatar: avatarUrl })
-      });
-      const data = await response.json();
-      if (response.ok) {
-        const loginResponse = await fetch('http://127.0.0.1:8000/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: formData.email, password: formData.password })
-        });
-        const loginData = await loginResponse.json();
-        if (loginResponse.ok) {
-          appStore.setLoginInfo({
-            loggedIn: true,
-            id: loginData.user.id,
-            token: loginData.token,
-            name: loginData.user.name,
-            email: loginData.user.email,
-            nivel_html: loginData.user.nivel_html,
-            nivel_css: loginData.user.nivel_css,
-            nivel_js: loginData.user.nivel_js,
-            avatar: avatarUrl
-          });
-          router.push('/');
-        } else {
-          errorMessage.value = loginData.message || 'Error al iniciar sesión automáticamente';
-        }
-      } else {
-        errorMessage.value = data.message || 'Error al crear la cuenta';
-      }
-    } catch (err) {
-      errorMessage.value = 'Error de red. No se pudo conectar al servidor.';
-    }
-  }
-};
-
 </script>
 
 
-<style lang="scss">
-/* ==================== ESTILOS GLOBALES ==================== */
-/* Coloca este bloque sin "scoped" para que afecte al body y demás */
 
+
+<style lang="scss">
 
 :root {
   --background-image: url(https://i.imgur.com/NWC1ak5_d.webp?maxwidth=1520&fidelity=grand);
@@ -305,8 +267,6 @@ const register = async () => {
   --small-font-size: min(calc(0.675rem + 0.5vh), 1rem);
 }
 
-
-/* Body */
 body {
   width: 100%;
   height: 100%;
@@ -319,8 +279,6 @@ body {
   background-size: cover;
 }
 
-
-/* Bloque para móviles en landscape */
 .block-mobile-landscape {
   display: none;
   position: absolute;
@@ -339,71 +297,78 @@ body {
   background-size: cover;
 }
 
-
-/* Slider: ocupa el 30% de ancho y se posiciona a la izquierda por defecto */
 .slider {
   width: 40%;
-  height: 100%; 
+  height: 100%;
   overflow: hidden;
   position: absolute;
   transition: margin-left 0.9s ease;
   margin-left: 0;
 }
+
 .slider.slide {
   margin-left: 60%;
 }
-/* Container interno con display: flex */
+
 .container {
-  
   display: flex;
   width: 200%;
   height: 100%;
   transition: transform .9s ease;
   transform: translateX(0);
 }
+
 .slider.slide .container {
   transform: translateX(-50%);
 }
 
-
-/* Paneles */
 .left, .right {
   width: 50%;
   height: 100%;
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
 .left {
-  
   background: transparent;
 }
+
 .right {
   background: transparent;
 }
 
-
-/* Contenido de cada formulario */
 .content {
-  align-items: center;
-  background: rgba(0, 0, 0, 0.6); /* Fondo semitransparente */
-  padding: 51px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 70px;
   text-align: center;
   color: white;
-  width: 84%;
+  width: 73%;
   margin: 0 auto;
-  position: relative;  /* Cambié a absolute para posicionar dentro del contenedor */
-  top:51%;
-  left: 50%;           /* Asegura el centrado horizontal */
-  transform: translate(-50%, -50%); /* Centrado tanto vertical como horizontal */
-  height: 100%;        /* Esto hará que ocupe toda la altura de la pantalla */
-  min-height: 100vh;   /* Asegura que tenga como mínimo el alto completo de la pantalla */
+  position: relative;
+  top: 51%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-
-
-/* Estilos de inputs */
 .info {
   margin: 1rem 0;
+  text-align: center;
 }
+
+.input-valid {
+  border-color: var(--valid-color) !important;  // Verde cuando es válido
+}
+
+.input-error {
+  border-color: var(--invalid-color) !important;  // Rojo cuando hay error
+}
+
 .input {
   width: 100%;
   border: 2px solid var(--primary-color);
@@ -417,7 +382,7 @@ body {
 }
 
 
-/* Botón */
+
 .button {
   width: 100%;
   background-color: var(--primary-color);
@@ -436,32 +401,49 @@ body {
   }
 }
 
-
-/* Contenedor del botón de cambio de formulario */
 .slide-button-container {
   margin-top: 1rem;
   font-size: var(--small-font-size);
+  text-align: center;
 }
+
 .slide-button {
   color: var(--secondary-color);
   cursor: pointer;
   font-weight: bold;
 }
 
-
-/* Mensaje de error */
 .error-message {
   color: red;
   font-size: var(--medium-font-size);
   margin-top: 10px;
   text-align: center;
 }
-.title{
-  font-weight: bold;
+
+.password-input-container {
+  position: relative;
+}
+
+.show-password-btn {
+  position: absolute;
+  top: 75%;
+  right: -10%;
+  transform: translateY(-100%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.input {
+  width: 100%;
+  padding-right: 40px; /* Deja espacio para el icono */
 }
 
 
+.title {
+  font-weight: bold;
+  text-align: center;
+}
+
 </style>
-
-
-
