@@ -1,8 +1,8 @@
 import { reactive } from 'vue';
-
+import { defineStore } from 'pinia';
 
 const useCommunicationManager = () => {
-  const config = useRuntimeConfig();
+  const config = useRuntimeConfig(); // En Nuxt 3, useRuntimeConfig está disponible globalmente
   const laravelURL = config.public.apiLaravelUrl;
   const nodeURL = config.public.nodeUrl;
 
@@ -20,7 +20,6 @@ const useCommunicationManager = () => {
       'Content-Type': 'application/json',
       'Authorization': state.token ? `Bearer ${state.token}` : '',
     };
-
 
     const options = {
       method,
@@ -73,6 +72,7 @@ const useCommunicationManager = () => {
       return false;
     }
   };
+
   const crearProyectoDB = async (proyecto) => {
     try {
       const response = await fetch(`${laravelURL}/projects`, {
@@ -82,24 +82,24 @@ const useCommunicationManager = () => {
         },
         body: JSON.stringify(proyecto),
       });
-  
+
       if (!response.ok) {
         throw new Error('Error en la solicitud: ' + response.status);
       }
-      
+
       const data = await response.json();
       console.log('Respuesta del servidor:', data);
       return data;
-      
     } catch (error) {
       console.error('Hubo un problema con el fetch:', error);
       throw error;
     }
-  }
-  const guardarProyectoDB = async (proyecto,id) => {
-    console.log('id pasado',id);
-    console.log('proyecto pasado',proyecto);
-    
+  };
+
+  const guardarProyectoDB = async (proyecto, id) => {
+    console.log('id pasado', id);
+    console.log('proyecto pasado', proyecto);
+
     try {
       const response = await fetch(`${laravelURL}/projects/${id}`, {
         method: 'PUT',
@@ -108,41 +108,40 @@ const useCommunicationManager = () => {
         },
         body: JSON.stringify(proyecto),
       });
-  
+
       if (!response.ok) {
         throw new Error('Error en la solicitud: ' + response.status);
       }
-      
+
       const data = await response.json();
       console.log('Respuesta del servidor:', data);
       return data;
-      
     } catch (error) {
       console.error('Hubo un problema con el fetch:', error);
       throw error;
     }
-  }
+  };
+
   const borrarProyectoDB = async (id) => {
-    console.log('id pasado',id);
-    
+    console.log('id pasado', id);
+
     try {
       const response = await fetch(`${laravelURL}/projects/${id}`, {
         method: 'DELETE',
       });
-  
+
       if (!response.ok) {
         throw new Error('Error en la solicitud: ' + response.status);
       }
-      
+
       const data = await response.json();
       console.log('Respuesta del servidor:', data);
       return data;
-      
     } catch (error) {
       console.error('Hubo un problema con el fetch:', error);
       throw error;
     }
-  }
+  };
 
   const chatIA = async (mensaje, html, css, js) => {
     try {
@@ -170,6 +169,7 @@ const useCommunicationManager = () => {
       throw error;
     }
   };
+
   const logoutUser = async () => {
     try {
       await request('/logout', 'POST');
@@ -181,6 +181,29 @@ const useCommunicationManager = () => {
     }
   };
 
+  // Store para gestionar el proyecto
+  const useProyectoStore = defineStore('proyecto', {
+    state: () => ({
+      proyecto: null,
+    }),
+    actions: {
+      async obtenerProyecto(id) {
+        try {
+          const response = await fetch(`${laravelURL}/projects/${id}`);
+          if (!response.ok) {
+            throw new Error('Error en la solicitud');
+          }
+          const data = await response.json();
+          this.proyecto = data;
+          return data;
+        } catch (error) {
+          console.error('Error al obtener el proyecto:', error);
+          return null;
+        }
+      },
+    },
+  });
+
   return {
     state,
     loginUser,
@@ -190,6 +213,7 @@ const useCommunicationManager = () => {
     chatIA,
     crearProyectoDB,
     borrarProyectoDB,
+    useProyectoStore,
   };
 };
 

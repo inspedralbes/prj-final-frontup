@@ -50,17 +50,18 @@ class ProjectController extends Controller
 
 
     public function show($id)
-    {
-        $project = Project::find($id);
+{
+    $project = Project::find($id);
 
-        if (!$project) {
-            return response()->json([
-                'message' => 'Proyecto no encontrado',
-            ], 404);
-        }
-
-        return view('projects.show', compact('project'));
+    if (!$project) {
+        return response()->json([
+            'message' => 'Proyecto no encontrado',
+        ], 404);
     }
+
+    return response()->json($project);
+}
+
 
     public function create()
     {
