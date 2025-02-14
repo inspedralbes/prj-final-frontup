@@ -210,7 +210,7 @@
  
      try {
        // Llamada al endpoint de registro
-       const response = await fetch('http://api.frontup.cat/register', {
+       const response = await fetch('http://api.frontup.cat/api/register', {
          method: 'POST',
          headers: {
            'Content-Type': 'application/json',
