@@ -87,7 +87,7 @@
     methods: {
       async fetchProjects() {
         try {
-          const response = await fetch("http://api.frontup.cat/api/projects/all", {
+          const response = await fetch("http://161.22.40.52/api/projects/all", {
             headers: { "Content-Type": "application/json" },
           });
   

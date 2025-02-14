@@ -64,7 +64,7 @@ export default {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No hay token guardado");
 
-        const response = await fetch("http://api.frontup.cat/api/projects", {
+        const response = await fetch("http://161.22.40.52/api/projects", {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",

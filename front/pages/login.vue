@@ -159,7 +159,7 @@
    validatePassword();
    if (isLoginFormValid()) {
      try {
-       const response = await fetch('http://api.frontup.cat/api/login', {
+       const response = await fetch('http://161.22.40.52/api/login', {
          method: 'POST',
          headers: {
            'Content-Type': 'application/json',
@@ -210,7 +210,7 @@
  
      try {
        // Llamada al endpoint de registro
-       const response = await fetch('http://api.frontup.cat/api/register', {
+       const response = await fetch('http://161.22.40.52/api/register', {
          method: 'POST',
          headers: {
            'Content-Type': 'application/json',
@@ -225,7 +225,7 @@
  
        if (response.ok) {
          // Luego de registrarse, se inicia sesión automáticamente
-         const loginResponse = await fetch('http://api.frontup.cat/api/login', {
+         const loginResponse = await fetch('http://161.22.40.52/api/login', {
            method: 'POST',
            headers: {
              'Content-Type': 'application/json',

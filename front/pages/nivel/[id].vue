@@ -71,7 +71,7 @@ export default {
     const fetchQuestion = async () => {
   try {
     loading.value = true;
-    const response = await fetch(`http://api.frontup.cat/api/preguntas/${nivelId.value}`);
+    const response = await fetch(`http://161.22.40.52/api/preguntas/${nivelId.value}`);
     if (!response.ok) throw new Error("Error al obtener la pregunta");
     const data = await response.json();
     question.value = data.question; 
@@ -107,7 +107,7 @@ const validateExercise = async () => {
     const userId = 1; 
 
     try {
-      const response = await fetch(`http://api.frontup.cat/api/users/${userId}/update-level`, {
+      const response = await fetch(`http://161.22.40.52/api/users/${userId}/update-level`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

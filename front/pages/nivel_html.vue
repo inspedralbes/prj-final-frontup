@@ -32,7 +32,7 @@ export default {
   methods: {
     async fetchUserLevel() {
       try {
-        const response = await fetch("http://api.frontup.cat/api/user", {
+        const response = await fetch("http://161.22.40.52/api/user", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },

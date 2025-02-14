@@ -91,7 +91,7 @@ export default {
         loading.value = true;
         error.value = false; 
 
-        const response = await fetch(`http://localhost:8000/api/preguntas/${language.value}/${id.value}`);
+        const response = await fetch(`http://161.22.40.52/api/preguntas/${language.value}/${id.value}`);
         if (!response.ok) throw new Error("Error a l'obtenir la pregunta");
 
         const data = await response.json();
@@ -111,7 +111,7 @@ export default {
       }
 
       try {
-        const response = await fetch(`http://localhost:8000/api/preguntas/${language.value}/${id.value}`); 
+        const response = await fetch(`http://161.22.40.52/api/preguntas/${language.value}/${id.value}`); 
         if (!response.ok) throw new Error("Error a l'obtenir la resposta correcta");
 
         const data = await response.json();
@@ -154,7 +154,7 @@ export default {
         else if (language.value === "css") campoNivel = "nivel_css";
         else if (language.value === "js") campoNivel = "nivel_js";
 
-        const response = await fetch(`http://localhost:8000/api/actualizar-nivel`, {
+        const response = await fetch(`http://161.22.40.52/api/actualizar-nivel`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
