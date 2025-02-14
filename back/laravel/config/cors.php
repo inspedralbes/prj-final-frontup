@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://www.frontup.cat'],
+    'allowed_origins' => ['http://www.frontup.cat', 'http://frontup.cat'],
 
     'allowed_origins_patterns' => [],
 
