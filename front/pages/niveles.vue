@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     html_ejercicios() {
-      this.$router.push("/nivel");
+      this.$router.push("/nivel_html");
     },
     css_ejercicios() {
       this.$router.push("/nivel_css");
