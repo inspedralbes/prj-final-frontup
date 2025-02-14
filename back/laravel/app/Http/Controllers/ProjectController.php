@@ -127,7 +127,7 @@ class ProjectController extends Controller
     }
 
 
-    public function destroy($id)
+    public function destroy(Request $request ,$id)
     {
         $project = Project::find($id);
 
