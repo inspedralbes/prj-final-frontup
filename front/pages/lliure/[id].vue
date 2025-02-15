@@ -1,15 +1,12 @@
 <template>
   <div class="todo">
+    <div v-if="show" class="alert">
+      {{ message }}
+    </div>
     <header class="header">
       <button class="header-button" @click="goBack">Atrás</button>
-      <input
-        type="text"
-        v-model="title"
-        class="header-title"
-        @focus="isEditing = true"
-        @blur="isEditing = false"
-        :readonly="!isEditing"
-      />
+      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
+        :readonly="!isEditing" />
       <div class="header-actions">
         <button class="header-button" @click="toggleChat">Xat IA</button>
         <button class="header-button" @click="guardarProyecto">Guardar</button>
@@ -25,22 +22,13 @@
         <form @submit.prevent="saveSettings">
           <div class="input-group">
             <label for="project-title">Título del Proyecto</label>
-            <input
-              type="text"
-              id="project-title"
-              v-model="modalTitle"
-              class="modal-input"
-              placeholder="Escribe el título"
-            />
+            <input type="text" id="project-title" v-model="modalTitle" class="modal-input"
+              placeholder="Escribe el título" />
           </div>
           <div class="input-group">
             <label for="project-description">Descripción</label>
-            <textarea
-              id="project-description"
-              v-model="modalDescription"
-              class="modal-textarea"
-              placeholder="Escribe la descripción del proyecto"
-            ></textarea>
+            <textarea id="project-description" v-model="modalDescription" class="modal-textarea"
+              placeholder="Escribe la descripción del proyecto"></textarea>
           </div>
           <div class="modal-actions">
             <button type="submit" class="modal-button">Guardar</button>
@@ -64,25 +52,16 @@
     </div>
 
     <!-- Chat IA flotante -->
-    <div
-      v-if="isChatVisible"
-      class="chat-container"
-      :style="{ transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)` }"
-      @mousedown="startDrag"
-    >
+    <div v-if="isChatVisible" class="chat-container"
+      :style="{ transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)` }" @mousedown="startDrag">
       <button class="close-chat-button" @click="toggleChat">✖</button>
       <h2 class="chat-title">IA FrontUp</h2>
       <div class="messages-container" ref="messagesContainer">
-        <div
-          v-for="(msg, index) in messages"
-          :key="index"
-          class="message"
-          :class="{
-            user: msg.type === 'user',
-            ai: msg.type === 'ai',
-            loading: msg.type === 'loading'
-          }"
-        >
+        <div v-for="(msg, index) in messages" :key="index" class="message" :class="{
+          user: msg.type === 'user',
+          ai: msg.type === 'ai',
+          loading: msg.type === 'loading'
+        }">
           <div v-if="msg.type === 'loading'" class="loading-indicator">
             <div class="dot-flashing"></div>
           </div>
@@ -90,14 +69,8 @@
         </div>
       </div>
       <div class="input-container">
-        <input
-          type="text"
-          v-model="newMessage"
-          placeholder="Escribe tu mensaje..."
-          class="chat-input"
-          @keyup.enter="sendMessage"
-          :disabled="state.loading"
-        />
+        <input type="text" v-model="newMessage" placeholder="Escribe tu mensaje..." class="chat-input"
+          @keyup.enter="sendMessage" :disabled="state.loading" />
         <button class="send-button" @click="sendMessage" :disabled="state.loading">
           {{ state.loading ? 'Enviant...' : 'Enviar' }}
         </button>
@@ -160,7 +133,8 @@ export default {
       useProyectoStore,
     } = useCommunicationManager();
     const lliureStore = useLliureStore();
-
+    const show = ref(false)
+    const message = ref('')
     const isDragging = ref(false);
     const chatPosition = ref({ x: 20, y: 20 });
     const dragStartPosition = ref({ x: 0, y: 0 });
@@ -195,7 +169,13 @@ export default {
       document.addEventListener("mousemove", onDrag);
       document.addEventListener("mouseup", stopDrag);
     };
-
+    const showAlert = (alertMessage) => {
+      message.value = alertMessage
+      show.value = true
+      setTimeout(() => {
+        show.value = false
+      }, 3000)
+    }
     const CambiosSinGuardarToTrue = () => {
       console.log("entrado en cambio a true", cambiadoSinGuardar.value);
       cambiadoSinGuardar.value = true;
@@ -378,6 +358,7 @@ export default {
           },
           idProyectoActualStore.id
         );
+        showAlert(`Projecte guardat amb exit`)
       } catch (error) {
         console.error(error);
       }
@@ -401,6 +382,7 @@ export default {
       messages,
       messagesContainer,
       state,
+      showAlert,
       guardarParaSalir,
       guardarProyecto2,
       volverHome,
@@ -493,7 +475,42 @@ export default {
   padding: 20px;
   gap: 20px;
 }
+.alert {
+  position: fixed;
+  font-size: larger;
+  top: 20px;
+  right: 20px;
+  padding: 4vh 4vw;
+  background: rgb(50, 226, 40);
+  color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  animation: movimiento 0.3s ease-out, opacidad 2s ease-in-out forwards;
+  z-index: 1000;
+}
 
+@keyframes movimiento {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 0.9;
+  }
+}
+
+@keyframes opacidad {
+  0% {
+    opacity: 0.9;
+  }
+  60%{
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
 .editor-box {
   flex: 1;
   position: relative;
