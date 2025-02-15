@@ -105,45 +105,51 @@ export default {
     };
 
     const validateExercise = async () => {
-      if (!question.value) {
-        alert("No s'ha carregat la pregunta.");
-        return;
-      }
+  if (!question.value) {
+    alert("No s'ha carregat la pregunta.");
+    return;
+  }
 
       try {
         const response = await fetch(`http://161.22.40.52/api/preguntas/${language.value}/${id.value}`); 
         if (!response.ok) throw new Error("Error a l'obtenir la resposta correcta");
 
-        const data = await response.json();
-        const respuestaCorrecta = data.resp_correcta ? data.resp_correcta.trim() : "";
+    const data = await response.json();
 
-        const respuestaUsuario = html.value.trim().toLowerCase();
+    const cleanString = (str) => {
+  return str.replace(/[\s\u200B\u200C\u200D\uFEFF]+/g, '').toUpperCase();
+};
 
-        await actualizarNivel();
+const respuestaCorrecta = cleanString(data.resp_correcta);
+console.log("respuesta correcta", respuestaCorrecta);
+const respuestaUsuario = cleanString(html.value);
+    console.log("respuesta usuari", respuestaUsuario);
 
-        if (respuestaUsuario === respuestaCorrecta) {
-          alert("¡Felicitats! Has completat l'exercici.");
+    
+    if (respuestaUsuario === respuestaCorrecta) {
+      alert("¡Felicitats! Has completat l'exercici.");
+      
+      await actualizarNivel();
 
-          await actualizarNivel();
+      let nextId = parseInt(id.value) + 1;
 
-          let nextId = parseInt(id.value) + 1;
-
-          if ((language.value === "html" && nextId > 10) ||
-              (language.value === "css" && nextId > 20) ||
-              (language.value === "js" && nextId > 30)) {
-            alert("¡Felicitats! Has completat totes les preguntes d'aquest llenguatge.");
-            return;
-          }
-
-          router.push(`/nivel/${language.value}/${nextId}`);
-        } else {
-          alert("La teva resposta no es correcta. Torna'ho a intentar.");
-        }
-
-      } catch (error) {
-        console.error("Error al validar l'exercici:", error);
+      if ((language.value === "html" && nextId > 10) ||
+          (language.value === "css" && nextId > 20) ||
+          (language.value === "js" && nextId > 30)) {
+        alert("¡Felicitats! Has completat totes les preguntes d'aquest llenguatge.");
+        return;
       }
-    };
+
+      router.push(`/nivel/${language.value}/${nextId}`);
+    } else {
+      alert("La teva resposta no es correcta. Torna-ho a intentar.");
+    }
+
+  } catch (error) {
+    console.error("Error al validar l'exercici:", error);
+  }
+};
+
 
     const actualizarNivel = async () => {
       try {
