@@ -114,7 +114,6 @@ import "codemirror/theme/dracula.css";
 import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
 import "codemirror/mode/javascript/javascript";
-// Importar la lógica de comunicación y el store de proyecto
 import useCommunicationManager from "@/stores/comunicationManager";
 import { useAppStore } from "@/stores/app";
 import { useIdProyectoActualStore } from "@/stores/app";
@@ -212,7 +211,6 @@ export default {
 
     onMounted(async () => {
       lliureStore.toggleLliure();
-      // Inicializar editores CodeMirror
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
         mode: "htmlmixed",
         theme: "dracula",
@@ -229,18 +227,14 @@ export default {
         lineNumbers: true,
       });
 
-      // Obtener el ID del proyecto desde la ruta
       const projectId = route.params.id;
       if (projectId) {
-        // Usar el store de proyecto para obtener los datos
         const proyectoStore = useProyectoStore();
         const proyecto = await proyectoStore.obtenerProyecto(projectId);
         if (proyecto) {
-          // Asignar los datos, asegurando que no sean null (se usan cadenas vacías como fallback)
           html.value = proyecto.html_code || "";
           css.value = proyecto.css_code || "";
           js.value = proyecto.js_code || "";
-          // Actualizar el contenido de los editores
           htmlEditorInstance.setValue(html.value);
           cssEditorInstance.setValue(css.value);
           jsEditorInstance.setValue(js.value);
@@ -248,8 +242,6 @@ export default {
       } else {
         console.error("No se encontró un ID de proyecto válido en la ruta.");
       }
-
-      // Configurar listeners para detectar cambios en los editores
       htmlEditorInstance.on("change", (instance) => {
         html.value = instance.getValue();
         CambiosSinGuardarToTrue();
@@ -361,6 +353,7 @@ export default {
         showAlert(`Projecte guardat amb exit`)
       } catch (error) {
         console.error(error);
+        showAlert('error al guardar')
       }
     };
 
@@ -475,7 +468,9 @@ export default {
   padding: 20px;
   gap: 20px;
 }
+
 .alert {
+  z-index: 1002;
   position: fixed;
   font-size: larger;
   top: 20px;
@@ -484,9 +479,8 @@ export default {
   background: rgb(50, 226, 40);
   color: white;
   border-radius: 4px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   animation: movimiento 0.3s ease-out, opacidad 2s ease-in-out forwards;
-  z-index: 1000;
 }
 
 @keyframes movimiento {
@@ -494,6 +488,7 @@ export default {
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 0.9;
@@ -504,13 +499,16 @@ export default {
   0% {
     opacity: 0.9;
   }
-  60%{
+
+  60% {
     opacity: 0.9;
   }
+
   100% {
     opacity: 0;
   }
 }
+
 .editor-box {
   flex: 1;
   position: relative;
