@@ -2,7 +2,6 @@
   <div class="container">
     <h1 class="title">Els meus projectes</h1>
 
-    <!-- Selector de ordenación con nuevo estilo -->
     <div class="sort-container">
       <label for="sort" class="sort-label">Ordenar per:</label>
       <select id="sort" v-model="sortCriteria" class="sort-select">
@@ -61,6 +60,7 @@ export default {
   methods: {
     async fetchProjects() {
       try {
+        this.loading = true;
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No hay token guardado");
 
@@ -73,11 +73,13 @@ export default {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.message || "Error al obtener los proyectos");
+          throw new Error(errorData.message || "Error al obtener los projectes");
         }
 
         const data = await response.json();
-        this.projects = data.projects;
+
+        this.projects = Array.isArray(data.projects) ? data.projects : data.projects.data;
+
         this.loading = false;
       } catch (error) {
         this.error = error.message;

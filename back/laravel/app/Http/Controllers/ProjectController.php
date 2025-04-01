@@ -11,14 +11,11 @@ class ProjectController extends Controller
 
     public function indexAll(Request $request)
     {
-        $projects = Project::get();
-
-        return response()->json([
-            'message' => 'Proyectos obtenidos con éxito',
-            'projects' => $projects,
-        ], 200);
+        $projects = Project::paginate(9);
+    
+        return response()->json($projects, 200);
     }
-
+    
     public function index(Request $request)
     {
         if ($request->is('api/*')) {
@@ -27,40 +24,43 @@ class ProjectController extends Controller
             if (!$user) {
                 return response()->json(['message' => 'Usuario no autenticado'], 401);
             }
-            $projects = Project::where('user_id', $user->id)->get();
 
-            return response()->json([
-                'message' => 'Proyectos obtenidos con éxito',
-                'projects' => $projects,
-            ], 200);
+            $query = Project::where('user_id', $user->id);
+
+            if ($request->has('search')) {
+                $search = $request->input('search');
+                $query->where('nombre', 'like', "%{$search}%");
+            }
+
+            $projects = $query->paginate(9);
+
+            return response()->json($projects, 200);
         }
+
         $search = $request->input('search');
 
         if ($search) {
-            $projects = Project::where('nombre', 'like', "%$search%")->get();
+            $projects = Project::where('nombre', 'like', "%{$search}%")->paginate(9);
         } else {
-            $projects = Project::all();
+            $projects = Project::paginate(9);
         }
 
         return view('projects.index', compact('projects'));
     }
 
 
-
-
-
     public function show($id)
-{
-    $project = Project::find($id);
+    {
+        $project = Project::find($id);
 
-    if (!$project) {
-        return response()->json([
-            'message' => 'Proyecto no encontrado',
-        ], 404);
+        if (!$project) {
+            return response()->json([
+                'message' => 'Proyecto no encontrado',
+            ], 404);
+        }
+
+        return response()->json($project);
     }
-
-    return response()->json($project);
-}
 
 
     public function create()
