@@ -7,7 +7,8 @@
         <h2>El lloc ideal per crear, provar i explorar codi web.</h2>
         <p>
           Aquesta plataforma és un entorn interactiu per a desenvolupadors i dissenyadors front-end.
-          Crea i experimenta amb projectes, comparteix les teves creacions, prova les teves idees i troba inspiració per continuar aprenent.
+          Crea i experimenta amb projectes, comparteix les teves creacions, prova les teves idees i troba inspiració per
+          continuar aprenent.
         </p>
       </div>
       <div class="looping-words">
@@ -30,21 +31,22 @@
           <p>
             Dóna vida a les teves idees construint projectes complets o provant funcions i animacions específiques.
           </p>
-          <button>Prova l'Editor</button>
+          <button class="btn">Prova l'Editor</button>
         </div>
         <div class="card">
           <h3>Practica els teus coneixements</h3>
           <p>
             Vols provar-te fent uns exercicis per veure quin nivell tens?
           </p>
-          <button>Participa els reptes que et proposem</button>
+          <button class="btn">Participa els reptes que et proposem</button>
         </div>
         <div class="card">
           <h3>Comparteix els Teus Projectes</h3>
           <p>
-            Uneix-te a la comunitat global de desenvolupadors front-end compartint les teves creacions i inspirant altres.
+            Uneix-te a la comunitat global de desenvolupadors front-end compartint les teves creacions i inspirant
+            altres.
           </p>
-          <button>Descobreix el Més Popular</button>
+          <button class="btn">Descobreix el Més Popular</button>
         </div>
       </div>
       <br><br>
@@ -89,18 +91,14 @@ export default {
 
 <style scoped>
 .todo {
-  background-color: #121212;
   height: 100%;
   color: #e0e0e0;
 }
 
 .main-container {
-  margin-top: 80px;
-  margin-left: 180px;
-  padding: 10px;
   flex-direction: flex;
   justify-content: space-between;
-  background-color: #121212;
+  margin-left: 2%;
 }
 
 .body-content {
@@ -109,9 +107,12 @@ export default {
 }
 
 .body-content h2 {
-  font-size: 3em;
-  margin-bottom: 20px;
-  color: #fff;
+  font-size: 3.5em;
+  margin-bottom: 30px;
+  background: linear-gradient(45deg, #ffffff, #bd89ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
 }
 
 .body-content p {
@@ -123,13 +124,11 @@ export default {
   display: flex;
   justify-content: space-around;
   gap: 10px;
-  margin-top: 20px;
-  align-items: stretch; 
+  align-items: stretch;
 }
 
 .card {
-  margin-top: 10vh;
-  background-color: #1e1e1e;
+  background-color: #161616;
   padding: 10px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
@@ -137,19 +136,21 @@ export default {
   text-align: center;
   display: flex;
   flex-direction: column;
-  height: 250px; 
+  height: 250px;
 }
 
 .card h3 {
   margin-bottom: 15px;
   font-size: 25px;
-  color: #fff;
+  background: linear-gradient(45deg, #ffffff, #bd89ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .card p {
   color: #d4cece;
   margin-bottom: 20px;
-  flex-grow: 1; /* Hace que el texto ocupe el espacio disponible */
+  flex-grow: 1;
 }
 
 .btn {
@@ -158,9 +159,11 @@ export default {
   background-color: #333;
   color: #fff;
   cursor: pointer;
-  width: 100%; 
+  width: 100%;
   padding: 10px;
-  margin-top: auto; 
+  margin-top: auto;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
 }
 
 .btn:hover {
@@ -176,14 +179,18 @@ footer {
 
 .looping-words {
   position: absolute;
-  width: 35%; 
+  width: 35%;
   height: 3.5em;
-  font-size: 5vw; 
+  font-size: 5vw;
   padding-left: 0.1em;
   padding-right: 0.1em;
   overflow: hidden;
   right: 2%;
-  top: 20%;
+  top: 10%;
+  background: linear-gradient(45deg, #bd89ff, #e77777);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
 }
 
 .looping-words__list {
@@ -201,5 +208,8 @@ footer {
   font-family: PP Neue Corp, sans-serif;
   font-weight: 700;
   min-height: 0em;
+  color: #bd89ff;
+  text-shadow: 0 0 10px rgba(189, 137, 255, 0.3);
+  opacity: 0.9;
 }
 </style>

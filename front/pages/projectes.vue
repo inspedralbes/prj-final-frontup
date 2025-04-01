@@ -102,13 +102,14 @@ export default {
   padding: 20px;
   text-align: center;
   background-color: #252323;
+  height: 94vh;
 }
 
 .title {
   font-size: 28px;
   margin-bottom: 30px;
   font-weight: bold;
-  color: #333;
+  color: #c2c2c2;
 }
 
 .loading {

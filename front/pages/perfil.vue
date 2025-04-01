@@ -164,7 +164,6 @@ const logout = () => {
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  margin-left: 180px;
 }
 
 .profile-card {
@@ -176,7 +175,6 @@ const logout = () => {
   max-width: 800px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  margin-top: 6rem;
 }
 
 .profile-header {

@@ -23,8 +23,9 @@ html {
 
  body {
   margin: 0;
-  background-color: #121212;
+  background-color: #141414;
   font-family: 'Work Sans', sans-serif;
+  margin-left: 18vw;
 }
 
 /**

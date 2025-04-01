@@ -65,7 +65,7 @@ export default {
   position: relative;
   height: 99vh;
   width: 90%;
-  margin-left: auto;
+  margin-left: 5%;
   display: flex;
   flex-direction: column;
   align-items: center;

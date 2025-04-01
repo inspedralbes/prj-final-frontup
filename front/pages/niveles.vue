@@ -44,8 +44,6 @@ export default {
 <style scoped>
 .selector {
   height: 100vh;
-  width: 90%;
-  margin-left: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
