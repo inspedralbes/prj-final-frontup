@@ -16,9 +16,12 @@
                 @blur="validateEmail"
                 @keyup.enter="onEnterPressed('email')"
                 required
-                :class="{'input-error': errors.email}"
+                :class="{ 'input-error': errors.email }"
                 class="input"
               />
+              <div v-if="errors.email" class="input-error-message">
+                {{ errors.email }}
+              </div>
             </div>
             <div class="info">
               <label for="password" class="label">Contrasenya</label>
@@ -31,16 +34,29 @@
                   @blur="validatePassword"
                   @keyup.enter="onEnterPressed('password')"
                   required
-                  :class="{'input-error': errors.password}"
+                  :class="{ 'input-error': errors.password }"
                   class="input"
                 />
-                <button type="button" @click="togglePasswordVisibilityLogin" class="show-password-btn">
+                <button
+                  type="button"
+                  @click="togglePasswordVisibilityLogin"
+                  class="show-password-btn"
+                >
                   <span v-if="passwordVisibleLogin">👁️</span>
                   <span v-else>👁️</span>
                 </button>
               </div>
+              <div v-if="errors.password" class="input-error-message">
+                {{ errors.password }}
+              </div>
             </div>
-            <button type="submit" class="button login" :disabled="!isLoginFormValid()">Iniciar sessió</button>
+            <button
+              type="submit"
+              class="button login"
+              :disabled="!isLoginFormValid()"
+            >
+              Iniciar sessió
+            </button>
           </form>
 
           <div class="slide-button-container">
@@ -63,9 +79,12 @@
                 v-model="formData.name"
                 @blur="validateName"
                 required
-                :class="{'input-error': errors.name}"
+                :class="{ 'input-error': errors.name }"
                 class="input"
               />
+              <div v-if="errors.name" class="input-error-message">
+                {{ errors.name }}
+              </div>
             </div>
             <div class="info">
               <input
@@ -74,27 +93,39 @@
                 v-model="formData.email"
                 @blur="validateEmail"
                 required
-                :class="{'input-error': errors.email}"
+                :class="{ 'input-error': errors.email }"
                 class="input"
               />
+              <div v-if="errors.email" class="input-error-message">
+                {{ errors.email }}
+              </div>
             </div>
             <div class="info">
               <div class="password-input-container">
                 <input
                   :type="passwordVisibleRegister ? 'text' : 'password'"
                   placeholder="Contrasenya"
-                  v-model="formData.password"
+                  v-model="formData.passwordRegister"
                   @blur="validatePassword"
                   required
-                  :class="{'input-error': errors.password,
-                            'input-valid': formData.passwordRepeat && !errors.passwordRepeat
+                  :class="{
+                    'input-error': errors.password,
+                    'input-valid':
+                      formData.passwordRepeat && !errors.passwordRepeat,
                   }"
                   class="input"
                 />
-                <button type="button" @click="togglePasswordVisibilityRegister" class="show-password-btn">
+                <button
+                  type="button"
+                  @click="togglePasswordVisibilityRegister"
+                  class="show-password-btn"
+                >
                   <span v-if="passwordVisibleRegister">👁️</span>
                   <span v-else>👁️</span>
                 </button>
+              </div>
+              <div v-if="errors.password" class="input-error-message">
+                {{ errors.password }}
               </div>
             </div>
 
@@ -106,23 +137,40 @@
                   v-model="formData.passwordRepeat"
                   @blur="validatePasswordRepeat"
                   required
-                  :class="{'input-error': errors.passwordRepeat,
-                            'input-valid': formData.passwordRepeat && !errors.passwordRepeat
+                  :class="{
+                    'input-error': errors.passwordRepeat,
+                    'input-valid':
+                      formData.passwordRepeat && !errors.passwordRepeat,
                   }"
                   class="input"
                 />
-                <button type="button" @click="togglePasswordVisibilityRepeat" class="show-password-btn">
+                <button
+                  type="button"
+                  @click="togglePasswordVisibilityRepeat"
+                  class="show-password-btn"
+                >
                   <span v-if="passwordVisibleRepeat">👁️</span>
                   <span v-else>👁️</span>
                 </button>
               </div>
+              <div v-if="errors.passwordRepeat" class="input-error-message">
+                {{ errors.passwordRepeat }}
+              </div>
             </div>
 
-            <button type="submit" class="button password_register" :disabled="!isRegisterFormValid()">Registrar-se</button>
+            <button
+              type="submit"
+              class="button password_register"
+              :disabled="!isRegisterFormValid()"
+            >
+              Registrar-se
+            </button>
           </form>
           <div class="slide-button-container">
             Ja tens compte?
-            <span class="slide-button" @click="toggleRegister">Iniciar sessió</span>
+            <span class="slide-button" @click="toggleRegister"
+              >Iniciar sessió</span
+            >
           </div>
           <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         </div>
@@ -132,10 +180,10 @@
 </template>
 
 <script setup>
-import { reactive, ref, onUnmounted, onMounted } from 'vue';
-import { useRouter } from 'nuxt/app';
-import { useAppStore } from '@/stores/app';
-import { useLliureStore } from '~/stores/app';
+import { reactive, ref, onUnmounted, onMounted } from "vue";
+import { useRouter } from "nuxt/app";
+import { useAppStore } from "@/stores/app";
+import { useLliureStore } from "~/stores/app";
 
 const router = useRouter();
 const appStore = useAppStore();
@@ -165,20 +213,20 @@ onUnmounted(() => {
 });
 
 const formData = reactive({
-  email: '',
-  password: '',
-  name: '',
-  passwordRepeat: ''
+  email: "",
+  password: "",
+  name: "",
+  passwordRepeat: "",
 });
 
 const errors = reactive({
-  email: '',
-  password: '',
-  name: '',
-  passwordRepeat: ''
+  email: "",
+  password: "",
+  name: "",
+  passwordRepeat: "",
 });
 
-const errorMessage = ref('');
+const errorMessage = ref("");
 const showRegister = ref(false);
 
 const toggleRegister = () => {
@@ -188,32 +236,38 @@ const toggleRegister = () => {
 const validateEmail = () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!formData.email) {
-    errors.email = '';  // Si está vacío, no hay error
-  }else{
-    errors.email = emailRegex.test(formData.email) ? '' : 'Correo inválido';
+    errors.email = ""; // Si está vacío, no hay error
+  } else {
+    errors.email = emailRegex.test(formData.email) ? "" : "Correo inválido";
   }
 };
 
+const validatename = () => {
+   errors.name = formData.name ? '' : 'El nombre de usuario es obligatorio';
+ };
+
 const validatePassword = () => {
   if (!formData.password) {
-    errors.password = '';  // Si está vacío, no hay error
-  }else{
-    errors.password = formData.password ? '' : 'La contraseña es obligatoria';
+    errors.password = ""; // Si está vacío, no hay error
+  } else {
+    errors.password = formData.password ? "" : "La contraseña es obligatoria";
   }
 };
 
 const validatePasswordRepeat = () => {
   if (!formData.passwordRepeat) {
-    errors.passwordRepeat = '';  // Si está vacío, no hay error
-  } else if (formData.passwordRepeat !== formData.password) {
-    errors.passwordRepeat = 'Las contraseñas no coinciden';
+    errors.passwordRepeat = ""; // Si está vacío, no hay error
+  } else if (formData.passwordRepeat !== formData.passwordRegister) {
+    errors.passwordRepeat = "Las contraseñas no coinciden";
   } else {
-    errors.passwordRepeat = '';  // No hay error si coinciden
+    errors.passwordRepeat = ""; // No hay error si coinciden
   }
 };
 
 const isLoginFormValid = () => {
-  return formData.email && formData.password && !errors.email && !errors.password;
+  return (
+    formData.email && formData.password && !errors.email && !errors.password
+  );
 };
 
 const isRegisterFormValid = () => {
@@ -236,10 +290,13 @@ const login = async () => {
     return;
   }
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: formData.email, password: formData.password })
+    const response = await fetch("http://127.0.0.1:8000/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password,
+      }),
     });
     const data = await response.json();
     if (response.ok) {
@@ -252,23 +309,87 @@ const login = async () => {
         nivel_html: data.user.nivel_html,
         nivel_css: data.user.nivel_css,
         nivel_js: data.user.nivel_js,
-        avatar: data.user.avatar
+        avatar: data.user.avatar,
       });
-      router.push('/');
+      router.push("/");
     } else {
-      errorMessage.value = data.message || 'Credenciales inválidas';
+      errorMessage.value = data.message || "Credenciales inválidas";
     }
   } catch (err) {
-    errorMessage.value = 'Error de red. No se pudo conectar al servidor.';
+    errorMessage.value = "Error de red. No se pudo conectar al servidor.";
+  }
+};
+
+const register = async () => {
+  validateEmail();
+  validatename();
+  validatePassword();
+  validatePasswordRepeat();
+
+  if (isRegisterFormValid()) {
+    // Genera la URL del avatar basado en el nombre de usuario
+    const avatarUrl = `https://api.dicebear.com/9.x/personas/svg?seed=${formData.name}`;
+
+    try {
+      // Llamada al endpoint de registro
+      const response = await fetch("http://127.0.0.1:8000/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          avatar: avatarUrl,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Luego de registrarse, se inicia sesión automáticamente
+        const loginResponse = await fetch("http://127.0.0.1:8000/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
+        });
+
+        const loginData = await loginResponse.json();
+        if (loginResponse.ok) {
+          // Guarda en Pinia y en localStorage la misma información que en el login
+          appStore.setLoginInfo({
+            loggedIn: true,
+            id: loginData.user.id,
+            token: loginData.token,
+            name: loginData.user.name,
+            email: loginData.user.email,
+            nivel: loginData.user.nivel,
+            nivel_css: loginData.user.nivel_css,
+            nivel_js: loginData.user.nivel_js,
+            avatar: avatarUrl,
+          });
+
+          router.push("/");
+        } else {
+          errorMessage.value =
+            loginData.message || "Error al iniciar sesión automáticamente";
+        }
+      } else {
+        errorMessage.value = data.message || "Error al crear la cuenta";
+      }
+    } catch (error) {
+      console.error("Error durante el registro:", error);
+      errorMessage.value = "Error de red. No se pudo conectar al servidor.";
+    }
   }
 };
 </script>
 
-
-
-
 <style lang="scss">
-
 :root {
   --background-image: url(https://i.imgur.com/NWC1ak5_d.webp?maxwidth=1520&fidelity=grand);
   --primary-color: #f2eeeb;
@@ -333,7 +454,7 @@ body {
   display: flex;
   width: 200%;
   height: 100%;
-  transition: transform .9s ease;
+  transition: transform 0.9s ease;
   transform: translateX(0);
 }
 
@@ -341,8 +462,8 @@ body {
   transform: translateX(-50%);
 }
 
-
-.left, .right {
+.left,
+.right {
   width: 50%;
   height: 100%;
   display: flex;
@@ -363,10 +484,9 @@ body {
   background: transparent;
 }
 
-
 .content {
   background: rgba(0, 0, 0, 0.6);
-  padding: 70px;
+  padding: 16%;
   text-align: center;
   color: white;
   width: 73%;
@@ -388,11 +508,11 @@ body {
 }
 
 .input-valid {
-  border-color: var(--valid-color) !important;  // Verde cuando es válido
+  border-color: var(--valid-color) !important;
 }
 
 .input-error {
-  border-color: var(--invalid-color) !important;  // Rojo cuando hay error
+  border-color: var(--invalid-color) !important;
 }
 
 .input {
@@ -406,7 +526,6 @@ body {
   outline: none;
   margin-top: 0.5rem;
 }
-
 
 .button {
   width: 100%;
@@ -459,26 +578,22 @@ body {
   cursor: pointer;
   font-size: 18px;
 }
-.show-password-btnr {
-  position: absolute;
-  top: 95%;
-  right: -10%;
-  transform: translateY(-100%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-}
 
 .input {
   width: 100%;
-  padding-right: 40px; /* Deja espacio para el icono */
+  padding-right: 40px;
 }
-
 
 .title {
   font-weight: bold;
   text-align: center;
 }
 
+.input-error-message {
+  font-size: 0.85rem;
+  color: var(--invalid-color);
+  text-align: left;
+  margin-top: 5px;
+  top: 50%;
+}
 </style>
