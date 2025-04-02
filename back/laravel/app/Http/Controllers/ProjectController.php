@@ -150,10 +150,11 @@ class ProjectController extends Controller
             }
 
             $validatedData = $request->validate([
-                'nombre'   => 'required|string|max:255',
+                'nombre'    => 'required|string|max:255',
                 'html_code' => 'nullable|string',
-                'css_code' => 'nullable|string',
-                'js_code'  => 'nullable|string',
+                'css_code'  => 'nullable|string',
+                'js_code'   => 'nullable|string',
+                'statuts'   => 'nullable|boolean',
             ]);
 
             $project->update($validatedData);
@@ -164,25 +165,27 @@ class ProjectController extends Controller
                 'project' => $project,
             ], 200);
         }
+
         $project = Project::find($id);
 
-            if (!$project) {
-                return response()->json([
-                    'message' => 'Proyecto no encontrado',
-                ], 404);
-            }
+        if (!$project) {
+            return response()->json([
+                'message' => 'Proyecto no encontrado',
+            ], 404);
+        }
 
-            $validatedData = $request->validate([
-                'nombre' => 'required|string|max:255',
-                'html_code' => 'nullable|string',
-                'css_code' => 'nullable|string',
-                'js_code' => 'nullable|string',
-            ]);
+        $validatedData = $request->validate([
+            'nombre'    => 'required|string|max:255',
+            'html_code' => 'nullable|string',
+            'css_code'  => 'nullable|string',
+            'js_code'   => 'nullable|string',
+        ]);
 
-            $project->update($validatedData);
+        $project->update($validatedData);
 
-            return redirect()->route('projects.index')->with('success', 'Proyecto actualizado con éxito');
+        return redirect()->route('projects.index')->with('success', 'Proyecto actualizado con éxito');
     }
+
 
     public function destroy(Request $request, $id)
     {

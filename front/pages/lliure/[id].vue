@@ -2,14 +2,8 @@
   <div class="todo">
     <header class="header">
       <button class="header-button" @click="goBack">Atrás</button>
-      <input
-        type="text"
-        v-model="title"
-        class="header-title"
-        @focus="isEditing = true"
-        @blur="isEditing = false"
-        :readonly="!isEditing"
-      />
+      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
+        :readonly="!isEditing" />
       <div class="header-actions">
         <button class="header-button" @click="toggleChat">Xat IA</button>
         <button class="header-button" @click="guardarProyecto">Guardar</button>
@@ -25,22 +19,21 @@
         <form @submit.prevent="saveSettings">
           <div class="input-group">
             <label for="project-title">Título del Proyecto</label>
-            <input
-              type="text"
-              id="project-title"
-              v-model="modalTitle"
-              class="modal-input"
-              placeholder="Escribe el título"
-            />
+            <input type="text" id="project-title" v-model="modalTitle" class="modal-input"
+              placeholder="Escribe el título" />
           </div>
           <div class="input-group">
             <label for="project-description">Descripción</label>
-            <textarea
-              id="project-description"
-              v-model="modalDescription"
-              class="modal-textarea"
-              placeholder="Escribe la descripción del proyecto"
-            ></textarea>
+            <textarea id="project-description" v-model="modalDescription" class="modal-textarea"
+              placeholder="Escribe la descripción del proyecto"></textarea>
+          </div>
+          <!-- Selector de privacidad -->
+          <div class="input-group">
+            <label for="project-privacy">Privacidad</label>
+            <select v-model="isPrivate" id="project-privacy" class="modal-input">
+              <option value="0">Público</option>
+              <option value="1">Privado</option>
+            </select>
           </div>
           <div class="modal-actions">
             <button type="submit" class="modal-button">Guardar</button>
@@ -64,25 +57,16 @@
     </div>
 
     <!-- Chat IA flotante -->
-    <div
-      v-if="isChatVisible"
-      class="chat-container"
-      :style="{ transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)` }"
-      @mousedown="startDrag"
-    >
+    <div v-if="isChatVisible" class="chat-container"
+      :style="{ transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)` }" @mousedown="startDrag">
       <button class="close-chat-button" @click="toggleChat">✖</button>
       <h2 class="chat-title">IA FrontUp</h2>
       <div class="messages-container" ref="messagesContainer">
-        <div
-          v-for="(msg, index) in messages"
-          :key="index"
-          class="message"
-          :class="{
-            user: msg.type === 'user',
-            ai: msg.type === 'ai',
-            loading: msg.type === 'loading'
-          }"
-        >
+        <div v-for="(msg, index) in messages" :key="index" class="message" :class="{
+          user: msg.type === 'user',
+          ai: msg.type === 'ai',
+          loading: msg.type === 'loading'
+        }">
           <div v-if="msg.type === 'loading'" class="loading-indicator">
             <div class="dot-flashing"></div>
           </div>
@@ -90,14 +74,8 @@
         </div>
       </div>
       <div class="input-container">
-        <input
-          type="text"
-          v-model="newMessage"
-          placeholder="Escribe tu mensaje..."
-          class="chat-input"
-          @keyup.enter="sendMessage"
-          :disabled="state.loading"
-        />
+        <input type="text" v-model="newMessage" placeholder="Escribe tu mensaje..." class="chat-input"
+          @keyup.enter="sendMessage" :disabled="state.loading" />
         <button class="send-button" @click="sendMessage" :disabled="state.loading">
           {{ state.loading ? 'Enviant...' : 'Enviar' }}
         </button>
@@ -180,6 +158,9 @@ export default {
     const messagesContainer = ref(null);
     const guardarParaSalir = ref(false);
 
+    // Definir isPrivate como una propiedad reactiva
+    const isPrivate = ref(0); // Por defecto, público (0)
+
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
     const jsEditor = ref(null);
@@ -231,8 +212,7 @@ export default {
     };
 
     onMounted(async () => {
-      lliureStore.toggleLliure();
-      // Inicializar editores CodeMirror
+      // Inicializar el estado de los editores CodeMirror
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
         mode: "htmlmixed",
         theme: "dracula",
@@ -252,18 +232,18 @@ export default {
       // Obtener el ID del proyecto desde la ruta
       const projectId = route.params.id;
       if (projectId) {
-        // Usar el store de proyecto para obtener los datos
+        idProyectoActualStore.id = projectId;
+
         const proyectoStore = useProyectoStore();
         const proyecto = await proyectoStore.obtenerProyecto(projectId);
         if (proyecto) {
-          // Asignar los datos, asegurando que no sean null (se usan cadenas vacías como fallback)
           html.value = proyecto.html_code || "";
           css.value = proyecto.css_code || "";
           js.value = proyecto.js_code || "";
-          // Actualizar el contenido de los editores
           htmlEditorInstance.setValue(html.value);
           cssEditorInstance.setValue(css.value);
           jsEditorInstance.setValue(js.value);
+          isPrivate.value = proyecto.statuts || 0;
         }
       } else {
         console.error("No se encontró un ID de proyecto válido en la ruta.");
@@ -283,6 +263,7 @@ export default {
         CambiosSinGuardarToTrue();
       });
     });
+
 
     onUnmounted(() => {
       lliureStore.toggleLliure();
@@ -367,7 +348,15 @@ export default {
 
     const guardarProyecto = async () => {
       CambiosSinGuardarToFalse();
+
+      // Verificar si el ID está disponible antes de guardar
+      if (!idProyectoActualStore.id) {
+        console.error("ID del proyecto es null o no se encuentra.");
+        return;
+      }
+
       try {
+        // Guardar el proyecto con el valor de privacidad seleccionado
         await guardarProyectoDB(
           {
             nombre: title.value || "",
@@ -375,13 +364,16 @@ export default {
             html_code: html.value || "",
             css_code: css.value || "",
             js_code: js.value || "",
+            statuts: isPrivate.value,  // Asegúrate de pasar el valor correcto de privacidad
           },
-          idProyectoActualStore.id
+          idProyectoActualStore.id  // Pasa el ID del proyecto correctamente aquí
         );
       } catch (error) {
-        console.error(error);
+        console.error("Error al guardar el proyecto:", error);
       }
     };
+
+
 
     return {
       title,
@@ -413,6 +405,7 @@ export default {
       closeGuardarParaSalir,
       saveSettings,
       guardarProyecto,
+      isPrivate,  // Incluir isPrivate en el retorno
       isDragging,
       chatPosition,
       startDrag,

@@ -137,7 +137,7 @@ export default {
   background-color: #252323;
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  height: 90vh;
+  height: 120vh;
 }
 
 .title {
