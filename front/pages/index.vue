@@ -5,6 +5,7 @@
       <!-- Contenido de la Home -->
       <div class="body-content">
         <h2>El lloc ideal per crear, provar i explorar codi web.</h2>
+        <br><br>
         <p>
           Aquesta plataforma és un entorn interactiu per a desenvolupadors i dissenyadors front-end.
           Crea i experimenta amb projectes, comparteix les teves creacions, prova les teves idees i troba inspiració per
@@ -50,12 +51,8 @@
         </div>
       </div>
       <br><br>
-      <!-- Footer -->
     </div>
   </div>
-  <footer>
-    <p>© 2025 FrontUp</p>
-  </footer>
 </template>
 
 <script>
@@ -103,10 +100,10 @@ export default {
 
 .body-content {
   text-align: left;
-  width: 50%;
 }
 
 .body-content h2 {
+  width: 50%;
   font-size: 3.5em;
   margin-bottom: 30px;
   background: linear-gradient(45deg, #ffffff, #bd89ff);
@@ -116,8 +113,10 @@ export default {
 }
 
 .body-content p {
-  font-size: 1em;
+  font-size: 1.1em;
   color: #b0b0b0;
+  line-height: 1.6;
+  max-width: 80%;
 }
 
 .card-container {
@@ -128,7 +127,10 @@ export default {
 }
 
 .card {
-  background-color: #161616;
+  background-image: linear-gradient(139deg,
+      rgba(36, 40, 50, 1) 0%,
+      rgba(36, 40, 50, 1) 0%,
+      rgba(37, 28, 40, 1) 100%);
   padding: 10px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
@@ -151,12 +153,14 @@ export default {
   color: #d4cece;
   margin-bottom: 20px;
   flex-grow: 1;
+  font-size: 1.1em;
+  color: #b0b0b0;
 }
 
 .btn {
   border: none;
   border-radius: 4px;
-  background-color: #333;
+  background-color: #28243b;
   color: #fff;
   cursor: pointer;
   width: 100%;
@@ -167,15 +171,10 @@ export default {
 }
 
 .btn:hover {
-  background-color: #555;
+  background-color: #474261;
 }
 
-footer {
-  background-color: #000000;
-  text-align: center;
-  padding: 10px 20px;
-  color: white;
-}
+
 
 .looping-words {
   position: absolute;
@@ -186,11 +185,14 @@ footer {
   padding-right: 0.1em;
   overflow: hidden;
   right: 2%;
-  top: 10%;
-  background: linear-gradient(45deg, #bd89ff, #e77777);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-
+  top: 5%;
+  
+  background: linear-gradient(139deg, rgba(36, 40, 50, 0.9) 0%, rgba(37, 28, 40, 0.9) 100%);
+  border-radius: 12px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  
+  
 }
 
 .looping-words__list {
@@ -211,5 +213,8 @@ footer {
   color: #bd89ff;
   text-shadow: 0 0 10px rgba(189, 137, 255, 0.3);
   opacity: 0.9;
+  background: linear-gradient(45deg, #bd89ff, #e77777);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 </style>

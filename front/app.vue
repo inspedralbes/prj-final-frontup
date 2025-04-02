@@ -12,7 +12,7 @@
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             <polyline points="9 22 9 12 15 12 15 22"></polyline>
           </svg>
-          <p class="label">Home</p>
+          <p class="label">FrontUp</p>
         </li>
       </ul>
 
@@ -83,6 +83,9 @@
     </div>
   </div>
   <NuxtPage />
+  <footer>
+    <p>© 2025 FrontUp</p>
+  </footer>
 </template>
 
 <script setup>
@@ -286,7 +289,7 @@ h2 {
 }
 
 .leftsection-card {
-  width: 240px;
+  width: 220px;
   height: 100vh;
   background-color: rgba(36, 40, 50, 1);
   background-image: linear-gradient(139deg,
@@ -294,7 +297,7 @@ h2 {
       rgba(36, 40, 50, 1) 0%,
       rgba(37, 28, 40, 1) 100%);
   border-radius: 0 10px 10px 0;
-  padding: 20px 0;
+  padding: 20px 0; 
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -347,5 +350,14 @@ h2 {
   font-weight: 600;
   font-size: 0.95rem;
   margin: 0;
+}
+footer {
+  background-image: linear-gradient(139deg,
+    rgba(34, 38, 47, 1) 0%,
+    rgba(32, 36, 42, 1) 50%,
+    rgba(28, 33, 42, 1) 100%);
+  text-align: center;
+  padding: 10px 20px;
+  color: white;
 }
 </style>

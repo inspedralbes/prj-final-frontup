@@ -23,9 +23,12 @@ html {
 
  body {
   margin: 0;
-  background-color: #141414;
+  background-image: linear-gradient(139deg,
+  rgba(36, 40, 50, 1) 0%,
+  rgba(36, 40, 50, 1) 50%,
+  rgba(37, 28, 40, 1) 100%);  
   font-family: 'Work Sans', sans-serif;
-  margin-left: 18vw;
+  margin-left: 16vw;
 }
 
 /**
