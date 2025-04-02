@@ -11,10 +11,27 @@ class ProjectController extends Controller
 
     public function indexAll(Request $request)
     {
-        $projects = Project::paginate(9);
+        $query = Project::query();
+        
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where('nombre', 'like', "%{$search}%");
+        }
+        
+        if ($request->has('sort')) {
+            $sort = $request->input('sort');
+            if ($sort === 'date_asc') {
+                $query->orderBy('created_at', 'asc');
+            } elseif ($sort === 'date_desc') {
+                $query->orderBy('created_at', 'desc');
+            }
+        }
+        
+        $projects = $query->paginate(9);
     
         return response()->json($projects, 200);
     }
+    
     
     public function index(Request $request)
     {
@@ -31,22 +48,42 @@ class ProjectController extends Controller
                 $search = $request->input('search');
                 $query->where('nombre', 'like', "%{$search}%");
             }
+            
+            if ($request->has('sort')) {
+                $sort = $request->input('sort');
+                if ($sort === 'date_asc') {
+                    $query->orderBy('created_at', 'asc');
+                } elseif ($sort === 'date_desc') {
+                    $query->orderBy('created_at', 'desc');
+                }
+            }
 
             $projects = $query->paginate(9);
 
             return response()->json($projects, 200);
         }
 
-        $search = $request->input('search');
+        $query = Project::query();
 
-        if ($search) {
-            $projects = Project::where('nombre', 'like', "%{$search}%")->paginate(9);
-        } else {
-            $projects = Project::paginate(9);
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where('nombre', 'like', "%{$search}%");
         }
+        
+        if ($request->has('sort')) {
+            $sort = $request->input('sort');
+            if ($sort === 'date_asc') {
+                $query->orderBy('created_at', 'asc');
+            } elseif ($sort === 'date_desc') {
+                $query->orderBy('created_at', 'desc');
+            }
+        }
+
+        $projects = $query->paginate(9);
 
         return view('projects.index', compact('projects'));
     }
+
 
 
     public function show($id)

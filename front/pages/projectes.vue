@@ -2,68 +2,70 @@
   <div class="container">
     <h1 class="title">Els meus projectes</h1>
 
-    <div class="sort-container">
-      <label for="sort" class="sort-label">Ordenar per:</label>
-      <select id="sort" v-model="sortCriteria" class="sort-select">
-        <option value="default">Destacats</option>
-        <option value="date_asc">Data: Més antics primer</option>
-        <option value="date_desc">Data: Més recents primer</option>
-      </select>
+    <div class="header">
+      <div class="search-bar">
+        <input type="text" v-model="searchQuery" placeholder="🔍 Filtrar projectes..." class="filter-input" />
+      </div>
+      <div class="sort-container">
+        <label for="sort" class="sort-label">Ordenar per:</label>
+        <select id="sort" v-model="sortCriteria" class="sort-select">
+          <option value="default">Destacats</option>
+          <option value="date_asc">Data: Més antics primer</option>
+          <option value="date_desc">Data: Més recents primer</option>
+        </select>
+      </div>
     </div>
 
     <div v-if="loading" class="loading">Cargant projectes...</div>
+    <div v-else-if="error" class="error">{{ error }}</div>
+    <div v-else>
+      <div v-if="projects.length === 0" class="no-projectes">
+        No hi ha projectes disponibles.
+      </div>
+      <div class="projects-list">
+        <Item v-for="project in projects" :key="project.id" :project="project" @click="navigateToProject(project.id)" />
+      </div>
 
-    <div v-else-if="sortedProjects.length === 0" class="no-projects">
-      No tens projectes encara.
-      <br /><br />
-      <button class="btn" @click="navigateToLibre">Crear el teu primer projecte</button>
-    </div>
-
-    <div v-else class="projects-list">
-      <Item v-for="project in sortedProjects" @click="navigateToProject(project.id)" :key="project.id"
-        :project="project" />
-    </div>
-
-    <div class="pagination">
-      <button @click="prevPage" :disabled="currentPage === 1" class="page-btn">Anterior</button>
-      <span>Pàgina {{ currentPage }} de {{ totalPages }}</span>
-      <button @click="nextPage" :disabled="currentPage === totalPages" class="page-btn">Següent</button>
+      <div class="pagination">
+        <button @click="prevPage" :disabled="currentPage === 1" class="page-btn">
+          Anterior
+        </button>
+        <span>Pàgina {{ currentPage }} de {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages" class="page-btn">
+          Següent
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import Item from '@/pages/item.vue';
+import Item from "@/pages/item.vue";
 
 export default {
-  name: "Projectes",
+  name: "TotsProjectes",
   components: {
     Item,
   },
   data() {
     return {
       projects: [],
+      searchQuery: "",
+      sortCriteria: "default",
       loading: true,
       error: null,
-      sortCriteria: "default",
       currentPage: 1,
       totalPages: 1,
     };
   },
-  computed: {
-    sortedProjects() {
-      let sorted = [...this.projects];
-      if (this.sortCriteria === "date_asc") {
-        return sorted.sort(
-          (a, b) => new Date(a.created_at) - new Date(b.created_at)
-        );
-      }
-      if (this.sortCriteria === "date_desc") {
-        return sorted.sort(
-          (a, b) => new Date(b.created_at) - new Date(a.created_at)
-        );
-      }
-      return sorted;
+  watch: {
+    searchQuery() {
+      this.currentPage = 1;
+      this.fetchProjects();
+    },
+    sortCriteria() {
+      this.currentPage = 1;
+      this.fetchProjects();
     },
   },
   async mounted() {
@@ -73,10 +75,19 @@ export default {
     async fetchProjects(page = 1) {
       try {
         this.loading = true;
+        const url = new URL("http://localhost:8000/api/projects");
+        url.searchParams.append("page", page);
+        if (this.searchQuery) {
+          url.searchParams.append("search", this.searchQuery);
+        }
+        if (this.sortCriteria && this.sortCriteria !== "default") {
+          url.searchParams.append("sort", this.sortCriteria);
+        }
+
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No hay token guardado");
 
-        const response = await fetch(`http://localhost:8000/api/projects?page=${page}`, {
+        const response = await fetch(url, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -85,9 +96,7 @@ export default {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(
-            errorData.message || "Error al obtener los projectes"
-          );
+          throw new Error(errorData.message || "Error carregant projectes");
         }
 
         const data = await response.json();
@@ -100,23 +109,21 @@ export default {
         this.loading = false;
       }
     },
-    changePage(page) {
-      if (page >= 1 && page <= this.totalPages) {
-        this.fetchProjects(page);
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+        this.fetchProjects(this.currentPage);
       }
     },
-    nextPage() {
-      this.changePage(this.currentPage + 1);
-    },
     prevPage() {
-      this.changePage(this.currentPage - 1);
-    },
-    navigateToLibre() {
-      this.$router.push("/lliure");
+      if (this.currentPage > 1) {
+        this.currentPage--;
+        this.fetchProjects(this.currentPage);
+      }
     },
     navigateToProject(id) {
       this.$router.push(`/lliure/${id}`);
-    }
+    },
   },
 };
 </script>
@@ -125,26 +132,78 @@ export default {
 .container {
   max-width: 1200px;
   margin: auto;
-  padding: 20px;
+  padding: 30px;
+  padding-top: 80px;
   text-align: center;
   background-color: #252323;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  margin-left: 27vh;
 }
 
 .title {
-  font-size: 28px;
-  margin-bottom: 30px;
-  font-weight: bold;
+  color: white;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+}
+
+.search-bar {
+  width: 200vh;
+  align-self: flex-start;
+  margin-left: -55vh;
+}
+
+.filter-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  background-color: #3a3a3a;
   color: #ddd;
 }
 
-.loading {
-  font-size: 18px;
-  color: #555;
+.sort-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.no-projects {
+.sort-label {
+  font-size: 16px;
+  color: #fff;
+}
+
+.sort-select {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  background-color: #2c2c2c;
+  color: #fff;
+  cursor: pointer;
+}
+
+.loading,
+.error {
   font-size: 18px;
-  color: red;
+  color: #ff4d4d;
+}
+
+.no-projectes {
+  font-size: 18px;
+  color: #ffb74d;
 }
 
 .projects-list {
@@ -152,57 +211,6 @@ export default {
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
   margin-top: 20px;
-  margin-left: 190px;
-}
-
-.btn {
-  background-color: #292929;
-  color: #ffffff;
-  border: 2px solid #444;
-  padding: 12px 18px;
-  width: 40%;
-  cursor: pointer;
-  text-transform: uppercase;
-  border-radius: 6px;
-  font-weight: bold;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.btn:hover {
-  background-color: #3d3d3d;
-  transform: scale(1.05);
-}
-
-.sort-container {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-bottom: 15px;
-  padding-right: 20px;
-}
-
-.sort-label {
-  font-size: 16px;
-  font-weight: bold;
-  color: #ddd;
-  margin-right: 10px;
-}
-
-.sort-select {
-  background-color: #292929;
-  color: #ffffff;
-  border: 2px solid #444;
-  padding: 10px 15px;
-  font-size: 14px;
-  font-weight: bold;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.sort-select:hover {
-  background-color: #3d3d3d;
-  transform: scale(1.05);
 }
 
 .pagination {
