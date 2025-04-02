@@ -212,7 +212,7 @@ export default {
     };
 
     onMounted(async () => {
-      // Inicializar el estado de los editores CodeMirror
+      lliureStore.toggleLliure();
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
         mode: "htmlmixed",
         theme: "dracula",
@@ -229,7 +229,6 @@ export default {
         lineNumbers: true,
       });
 
-      // Obtener el ID del proyecto desde la ruta
       const projectId = route.params.id;
       if (projectId) {
         idProyectoActualStore.id = projectId;
@@ -249,7 +248,6 @@ export default {
         console.error("No se encontró un ID de proyecto válido en la ruta.");
       }
 
-      // Configurar listeners para detectar cambios en los editores
       htmlEditorInstance.on("change", (instance) => {
         html.value = instance.getValue();
         CambiosSinGuardarToTrue();
