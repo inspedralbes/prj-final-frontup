@@ -2,7 +2,7 @@ import { reactive } from 'vue';
 import { defineStore } from 'pinia';
 
 const useCommunicationManager = () => {
-  const config = useRuntimeConfig(); // En Nuxt 3, useRuntimeConfig está disponible globalmente
+  const config = useRuntimeConfig(); 
   const laravelURL = config.public.apiLaravelUrl;
   const nodeURL = config.public.nodeUrl;
 
@@ -142,7 +142,64 @@ const useCommunicationManager = () => {
       throw error;
     }
   };
-
+  const addLike = async (projectId) => {
+    try {
+      const response = await request('/likes', 'POST', { project_id: projectId });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+  
+  const removeLike = async (projectId) => {
+    try {
+      await request(`/likes/${projectId}`, 'DELETE');
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+  
+  const checkLike = async (projectId) => {
+    try {
+      const response = await request(`/likes/check/${projectId}`, 'GET');
+      return response.hasLiked || false;
+    } catch (error) {
+      return false;
+    }
+  };
+  
+  const getLikeCount = async (projectId) => {
+    try {
+      const response = await request(`/likes/count/${projectId}`, 'GET');
+      return response.count || 0;
+    } catch (error) {
+      return 0;
+    }
+  };
+  
+  const toggleLike = async (projectId) => {
+    try {
+      const hasLiked = await checkLike(projectId);
+      if (hasLiked) {
+        await removeLike(projectId);
+      } else {
+        await addLike(projectId);
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+  
+  const getUserLikes = async () => {
+    try {
+      const response = await request('/likes/user', 'GET');
+      return response || [];
+    } catch (error) {
+      return [];
+    }
+  };
   const chatIA = async (mensaje, html, css, js) => {
     try {
       const response = await fetch(`${nodeURL}/pregunta`, {
@@ -181,7 +238,6 @@ const useCommunicationManager = () => {
     }
   };
 
-  // Store para gestionar el proyecto
   const useProyectoStore = defineStore('proyecto', {
     state: () => ({
       proyecto: null,
@@ -214,6 +270,12 @@ const useCommunicationManager = () => {
     crearProyectoDB,
     borrarProyectoDB,
     useProyectoStore,
+    addLike,
+    removeLike,
+    checkLike,
+    getLikeCount,
+    toggleLike,
+    getUserLikes
   };
 };
 
