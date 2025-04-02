@@ -106,10 +106,9 @@ export default {
 }
 
 .title {
-  font-size: 28px;
-  margin-bottom: 30px;
-  font-weight: bold;
-  color: #c2c2c2;
+  color: white;
+  text-align: left;
+  margin-bottom: 20px;
 }
 
 .loading {

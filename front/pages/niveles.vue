@@ -43,21 +43,20 @@ export default {
 
 <style scoped>
 .selector {
-  height: 100vh;
+  height: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   background-color: #202020;
 }
 
 h1 {
   color: white;
   text-align: center;
-  margin-top: -50px; 
   margin-bottom: 30px; 
   font-size: 30px;
   font-weight: bold;
+  margin-top: 12vh;
 }
 
 .botones {
@@ -102,10 +101,10 @@ button:hover {
   width: 100%;
   height: 100px;
   border-radius: 12px;
-  background: linear-gradient(145deg, gray, white); 
-  border: solid 4px black; 
-  color: #333; 
-  font-size: 20px; 
+  background: linear-gradient(145deg, #2c2f33, #23272a);
+  border: 3px solid #7289da;
+  color: #f5f6fa;
+  font-size: 20px;
   font-weight: bold;
   text-align: center;
   display: flex;
@@ -114,18 +113,19 @@ button:hover {
   position: absolute;
   margin-top: 400px;
   opacity: 0;
-  transform: translateY(-100%); 
-  transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.3s ease; 
+  transform: translateY(-100%);
+  transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   padding: 10px;
-  font-family: 'Arial', sans-serif; 
+  font-family: 'Arial', sans-serif;
 }
 
 .boton-container:hover .hover-text {
   opacity: 1;
-  transform: translateY(0); 
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3); 
+  transform: translateY(0);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
 }
+
 
 
 .HTML { background-image: url('/html.svg'); }       

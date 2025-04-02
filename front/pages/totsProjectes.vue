@@ -112,9 +112,7 @@ export default {
 <style scoped>
 .container {
   max-width: 1200px;
-  margin: auto;
   padding: 30px;
-  padding-top: 80px;
   text-align: center;
   background-color: #252323;
   border-radius: 10px;
@@ -155,7 +153,6 @@ h1 {
 }
 
 .sort-container {
-  display: flex;
   align-items: center;
   gap: 10px;
 }
@@ -191,7 +188,6 @@ h1 {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
-  margin-top: 20px;
 }
 
 .pagination {
