@@ -133,12 +133,11 @@ export default {
   max-width: 1200px;
   margin: auto;
   padding: 30px;
-  padding-top: 80px;
   text-align: center;
   background-color: #252323;
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  margin-left: 27vh;
+  height: 90vh;
 }
 
 .title {
@@ -158,7 +157,6 @@ export default {
 .search-bar {
   width: 200vh;
   align-self: flex-start;
-  margin-left: -55vh;
 }
 
 .filter-input {
