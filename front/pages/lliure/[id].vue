@@ -2,14 +2,8 @@
   <div class="todo">
     <header class="header">
       <button class="header-button" @click="goBack">Atrás</button>
-      <input
-        type="text"
-        v-model="title"
-        class="header-title"
-        @focus="isEditing = true"
-        @blur="isEditing = false"
-        :readonly="!isEditing"
-      />
+      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
+        :readonly="!isEditing" />
       <div class="header-actions">
         <button class="header-button" @click="toggleChat">Xat IA</button>
         <button class="header-button" @click="guardarProyecto">Guardar</button>
@@ -25,22 +19,13 @@
         <form @submit.prevent="saveSettings">
           <div class="input-group">
             <label for="project-title">Título del Proyecto</label>
-            <input
-              type="text"
-              id="project-title"
-              v-model="modalTitle"
-              class="modal-input"
-              placeholder="Escribe el título"
-            />
+            <input type="text" id="project-title" v-model="modalTitle" class="modal-input"
+              placeholder="Escribe el título" />
           </div>
           <div class="input-group">
             <label for="project-description">Descripción</label>
-            <textarea
-              id="project-description"
-              v-model="modalDescription"
-              class="modal-textarea"
-              placeholder="Escribe la descripción del proyecto"
-            ></textarea>
+            <textarea id="project-description" v-model="modalDescription" class="modal-textarea"
+              placeholder="Escribe la descripción del proyecto"></textarea>
           </div>
           <div class="modal-actions">
             <button type="submit" class="modal-button">Guardar</button>
@@ -64,25 +49,16 @@
     </div>
 
     <!-- Chat IA flotante -->
-    <div
-      v-if="isChatVisible"
-      class="chat-container"
-      :style="{ transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)` }"
-      @mousedown="startDrag"
-    >
+    <div v-if="isChatVisible" class="chat-container"
+      :style="{ transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)` }" @mousedown="startDrag">
       <button class="close-chat-button" @click="toggleChat">✖</button>
       <h2 class="chat-title">IA FrontUp</h2>
       <div class="messages-container" ref="messagesContainer">
-        <div
-          v-for="(msg, index) in messages"
-          :key="index"
-          class="message"
-          :class="{
-            user: msg.type === 'user',
-            ai: msg.type === 'ai',
-            loading: msg.type === 'loading'
-          }"
-        >
+        <div v-for="(msg, index) in messages" :key="index" class="message" :class="{
+          user: msg.type === 'user',
+          ai: msg.type === 'ai',
+          loading: msg.type === 'loading'
+        }">
           <div v-if="msg.type === 'loading'" class="loading-indicator">
             <div class="dot-flashing"></div>
           </div>
@@ -90,14 +66,8 @@
         </div>
       </div>
       <div class="input-container">
-        <input
-          type="text"
-          v-model="newMessage"
-          placeholder="Escribe tu mensaje..."
-          class="chat-input"
-          @keyup.enter="sendMessage"
-          :disabled="state.loading"
-        />
+        <input type="text" v-model="newMessage" placeholder="Escribe tu mensaje..." class="chat-input"
+          @keyup.enter="sendMessage" :disabled="state.loading" />
         <button class="send-button" @click="sendMessage" :disabled="state.loading">
           {{ state.loading ? 'Enviant...' : 'Enviar' }}
         </button>
@@ -141,6 +111,11 @@ import "codemirror/theme/dracula.css";
 import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
 import "codemirror/mode/javascript/javascript";
+import "codemirror/addon/edit/closetag.js";
+import "codemirror/addon/hint/show-hint.js";
+import "codemirror/addon/hint/javascript-hint.js";
+import "codemirror/addon/hint/css-hint.js";
+import "codemirror/addon/hint/html-hint.js";
 // Importar la lógica de comunicación y el store de proyecto
 import useCommunicationManager from "@/stores/comunicationManager";
 import { useAppStore } from "@/stores/app";
@@ -237,6 +212,7 @@ export default {
         mode: "htmlmixed",
         theme: "dracula",
         lineNumbers: true,
+        autoCloseTags: true,
       });
       cssEditorInstance = CodeMirror(cssEditor.value, {
         mode: "css",
