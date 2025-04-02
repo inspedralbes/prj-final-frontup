@@ -20,7 +20,14 @@
     </div>
 
     <div v-else class="projects-list">
-      <Item v-for="project in sortedProjects" @click="navigateToProject(project.id)" :key="project.id" :project="project"  />
+      <Item v-for="project in sortedProjects" @click="navigateToProject(project.id)" :key="project.id"
+        :project="project" />
+    </div>
+
+    <div class="pagination">
+      <button @click="prevPage" :disabled="currentPage === 1" class="page-btn">Anterior</button>
+      <span>Pàgina {{ currentPage }} de {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages" class="page-btn">Següent</button>
     </div>
   </div>
 </template>
@@ -39,32 +46,37 @@ export default {
       loading: true,
       error: null,
       sortCriteria: "default",
+      currentPage: 1,
+      totalPages: 1,
     };
   },
   computed: {
     sortedProjects() {
       let sorted = [...this.projects];
-
       if (this.sortCriteria === "date_asc") {
-        return sorted.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        return sorted.sort(
+          (a, b) => new Date(a.created_at) - new Date(b.created_at)
+        );
       }
       if (this.sortCriteria === "date_desc") {
-        return sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        return sorted.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
       }
       return sorted;
-    }
+    },
   },
   async mounted() {
     await this.fetchProjects();
   },
   methods: {
-    async fetchProjects() {
+    async fetchProjects(page = 1) {
       try {
         this.loading = true;
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No hay token guardado");
 
-        const response = await fetch("http://localhost:8000/api/projects", {
+        const response = await fetch(`http://localhost:8000/api/projects?page=${page}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -73,18 +85,31 @@ export default {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.message || "Error al obtener los projectes");
+          throw new Error(
+            errorData.message || "Error al obtener los projectes"
+          );
         }
 
         const data = await response.json();
-
-        this.projects = Array.isArray(data.projects) ? data.projects : data.projects.data;
-
+        this.projects = data.data;
+        this.currentPage = data.current_page;
+        this.totalPages = data.last_page;
         this.loading = false;
       } catch (error) {
         this.error = error.message;
         this.loading = false;
       }
+    },
+    changePage(page) {
+      if (page >= 1 && page <= this.totalPages) {
+        this.fetchProjects(page);
+      }
+    },
+    nextPage() {
+      this.changePage(this.currentPage + 1);
+    },
+    prevPage() {
+      this.changePage(this.currentPage - 1);
     },
     navigateToLibre() {
       this.$router.push("/lliure");
@@ -95,7 +120,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .container {
@@ -110,7 +134,7 @@ export default {
   font-size: 28px;
   margin-bottom: 30px;
   font-weight: bold;
-  color: #333;
+  color: #ddd;
 }
 
 .loading {
@@ -179,5 +203,33 @@ export default {
 .sort-select:hover {
   background-color: #3d3d3d;
   transform: scale(1.05);
+}
+
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  color: white;
+}
+
+.page-btn {
+  padding: 10px 15px;
+  background-color: #444;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.page-btn:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+}
+
+.page-btn:hover:not(:disabled) {
+  background-color: #777;
 }
 </style>
