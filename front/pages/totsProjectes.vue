@@ -139,8 +139,6 @@ h1 {
 }
 
 .search-bar {
-
-.search-bar {
   width: 200vh;
   align-self: flex-start;
   margin-left: -55vh;
