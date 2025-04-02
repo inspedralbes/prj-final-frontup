@@ -448,6 +448,7 @@ export default {
   background-color: #1e1e1e;
   font-family: 'Arial', sans-serif;
   color: #ffffff;
+  margin-left: -16vw;
 }
 
 .header {

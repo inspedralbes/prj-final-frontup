@@ -270,7 +270,6 @@
 .todo {
  height: 100vh;
  width: 100%;
- background-color: #1c1c1c;
  display: flex;
  justify-content: center;
  align-items: center;
