@@ -451,7 +451,7 @@ body {
   transition: margin-left 0.9s ease;
   margin-left: 0;
 }
-
+// longitut a la que se aleja hacia la derecha
 .slider.slide {
   margin-left: 50%;
 }
@@ -591,7 +591,6 @@ body {
   padding-right: 40px;
 }
 
-
 .title {
   font-weight: bold;
   font-size: 30px;
@@ -610,5 +609,103 @@ body {
 
 .input-error {
   border-color: var(--invalid-color);
+}
+@media (max-width: 1080px) {
+  .content {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 20%;
+    text-align: center;
+    color: white;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .slider {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
+    transition: margin-left 0.9s ease;
+    margin-left: 0;
+  }
+  .slider.slide {
+    margin-left: 0%;
+  }
+
+  .left {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    background: transparent;
+  }
+
+  .right {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    background: transparent;
+  }
+  .button {
+    width: 40%;
+    background-color: var(--primary-color);
+    font-size: var(--medium-font-size);
+    border: none;
+    border-radius: 25px;
+    padding: 3%;
+    text-transform: capitalize;
+    font-weight: 600;
+    color: var(--title-color);
+    margin: 0.5rem 20%;
+    transition: all 0.25s;
+    cursor: pointer;
+    &:hover {
+      background-color: var(--secondary-color);
+      color: var(--primary-color);
+    }
+  }
+  .input {
+    width: 80%;
+    border: 5px solid var(--primary-color);
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 50px;
+    padding: 2% 2%;
+    font-size: var(--medium-font-size);
+    color: var(--title-color);
+    outline: none;
+  }
+
+  .show-password-btn {
+    position: absolute;
+    top: 70%;
+    left: 85%;
+    transform: translateY(-70%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  .input-valid {
+    border-color: var(--valid-color);
+  }
+
+  .input-error {
+    border-color: var(--invalid-color);
+  }
+  .input-error-message {
+    font-size: 25px;
+    color: var(--invalid-color);
+    text-align: left;
+    margin-top: 5px;
+  }
 }
 </style>
