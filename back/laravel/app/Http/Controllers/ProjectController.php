@@ -179,6 +179,7 @@ class ProjectController extends Controller
             'html_code' => 'nullable|string',
             'css_code'  => 'nullable|string',
             'js_code'   => 'nullable|string',
+            'statuts'   => 'nullable|boolean',
         ]);
 
         $project->update($validatedData);
