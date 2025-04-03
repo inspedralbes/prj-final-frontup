@@ -13,6 +13,8 @@ class ProjectController extends Controller
     {
         $query = Project::query();
         
+        $query->where('statuts', 0);
+        
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->where('nombre', 'like', "%{$search}%");
@@ -28,10 +30,10 @@ class ProjectController extends Controller
         }
         
         $projects = $query->paginate(9);
-    
+
         return response()->json($projects, 200);
     }
-    
+
     
     public function index(Request $request)
     {
