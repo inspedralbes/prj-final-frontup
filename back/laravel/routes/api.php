@@ -18,9 +18,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/likes', [LikesController::class, 'store']);
     //borrar like
     Route::delete('/likes/{projectId}', [LikesController::class, 'destroy']);
-    //chequea si le has dado like a una publicacion
-    Route::get('/likes/check/{projectId}', [LikesController::class, 'checkLike']);
     //todos los likes que has dado
+    Route::get('/likes/check/{projectId}', [LikesController::class, 'checkLike']);
+    //chequea si le has dado like a una publicacion
     Route::get('/likes/user', [LikesController::class, 'userLikes']);
 });
 //contador de likes para un proyecto

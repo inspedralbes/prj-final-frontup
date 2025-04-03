@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import Item from '@/pages/item.vue';
+import Item from '~/components/item.vue';
 
 export default {
   name: "Projectes",

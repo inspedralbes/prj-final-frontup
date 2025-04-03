@@ -144,42 +144,108 @@ const useCommunicationManager = () => {
   };
   const addLike = async (projectId) => {
     try {
-      const response = await request('/likes', 'POST', { project_id: projectId });
+      const token = localStorage.getItem('token');
+      if (!token) return false;
+      
+      const response = await fetch(`${laravelURL}/likes`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ project_id: projectId })
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       return true;
     } catch (error) {
+      console.error('Error adding like:', error);
       return false;
     }
   };
   
   const removeLike = async (projectId) => {
     try {
-      await request(`/likes/${projectId}`, 'DELETE');
+      const token = localStorage.getItem('token');
+      if (!token) return false;
+      
+      const response = await fetch(`${laravelURL}/likes/${projectId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       return true;
     } catch (error) {
+      console.error('Error removing like:', error);
       return false;
     }
   };
   
   const checkLike = async (projectId) => {
     try {
-      const response = await request(`/likes/check/${projectId}`, 'GET');
-      return response.hasLiked || false;
+      const token = localStorage.getItem('token');
+      if (!token) return false;
+      
+      const response = await fetch(`${laravelURL}/likes/check/${projectId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data.hasLiked || false;
     } catch (error) {
+      console.error('Error checking like status:', error);
       return false;
     }
   };
   
   const getLikeCount = async (projectId) => {
     try {
-      const response = await request(`/likes/count/${projectId}`, 'GET');
-      return response.count || 0;
+      const response = await fetch(`${laravelURL}/likes/count/${projectId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data.count || 0;
     } catch (error) {
+      console.error('Error getting like count:', error);
       return 0;
     }
   };
   
   const toggleLike = async (projectId) => {
     try {
+      const token = localStorage.getItem('token');
+      if (!token) return false;
+      
       const hasLiked = await checkLike(projectId);
       if (hasLiked) {
         await removeLike(projectId);
@@ -188,15 +254,33 @@ const useCommunicationManager = () => {
       }
       return true;
     } catch (error) {
+      console.error('Error toggling like:', error);
       return false;
     }
   };
   
   const getUserLikes = async () => {
     try {
-      const response = await request('/likes/user', 'GET');
-      return response || [];
+      const token = localStorage.getItem('token');
+      if (!token) return [];
+      
+      const response = await fetch(`${laravelURL}/likes/user`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data || [];
     } catch (error) {
+      console.error('Error getting user likes:', error);
       return [];
     }
   };
