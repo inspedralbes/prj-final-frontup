@@ -23,7 +23,7 @@
         No hi ha projectes disponibles.
       </div>
       <div class="projects-list">
-        <Item v-for="project in projects" :key="project.id" :project="project" @click="navigateToProject(project.id)" />
+        <Item v-for="project in projects" :key="project.id" :project="project" />
       </div>
 
       <div class="pagination">

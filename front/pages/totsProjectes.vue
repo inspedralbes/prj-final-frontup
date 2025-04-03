@@ -97,7 +97,9 @@
           }
   
           const data = await response.json();
-          this.projects = data.projects;
+          console.log(data);
+          
+          this.projects = data.data;
           this.loading = false;
         } catch (error) {
           this.error = error.message;
