@@ -112,17 +112,23 @@
 <script>
 import { ref, onMounted, computed, onUnmounted, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import CodeMirror from "codemirror";
 import { useLliureStore } from "~/stores/app";
-import "codemirror/lib/codemirror.css";
-import "codemirror/theme/dracula.css";
-import "codemirror/mode/htmlmixed/htmlmixed";
-import "codemirror/mode/css/css";
-import "codemirror/mode/javascript/javascript";
 // Importar la lógica de comunicación y el store de proyecto
 import useCommunicationManager from "@/stores/comunicationManager";
 import { useAppStore } from "@/stores/app";
 import { useIdProyectoActualStore } from "@/stores/app";
+
+// CodeMirror 6 imports
+import { EditorState } from '@codemirror/state';
+import { EditorView, keymap, lineNumbers, highlightActiveLine } from '@codemirror/view';
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+import { indentOnInput, syntaxHighlighting, defaultHighlightStyle, bracketMatching } from '@codemirror/language';
+import { autocompletion } from '@codemirror/autocomplete';
+import { html } from '@codemirror/lang-html';
+import { css } from '@codemirror/lang-css';
+import { javascript } from '@codemirror/lang-javascript';
+import { searchKeymap } from '@codemirror/search';
+import { dracula } from '@uiw/codemirror-theme-dracula';
 
 export default {
   setup() {
@@ -143,9 +149,9 @@ export default {
     const chatPosition = ref({ x: 20, y: 20 });
     const dragStartPosition = ref({ x: 0, y: 0 });
     const title = ref("Untitled");
-    const html = ref("");
-    const css = ref("");
-    const js = ref("");
+    const htmlCode = ref("");
+    const cssCode = ref("");
+    const jsCode = ref("");
     const isEditing = ref(false);
     const showSettingsModal = ref(false);
     const modalTitle = ref("");
@@ -164,7 +170,7 @@ export default {
     const cssEditor = ref(null);
     const jsEditor = ref(null);
 
-    let htmlEditorInstance, cssEditorInstance, jsEditorInstance;
+    let htmlEditorView, cssEditorView, jsEditorView;
 
     const startDrag = (event) => {
       isDragging.value = true;
@@ -177,13 +183,11 @@ export default {
     };
 
     const CambiosSinGuardarToTrue = () => {
-      console.log("entrado en cambio a true", cambiadoSinGuardar.value);
       cambiadoSinGuardar.value = true;
     };
 
     const CambiosSinGuardarToFalse = () => {
       cambiadoSinGuardar.value = false;
-      console.log("entrado a cambio a false", cambiadoSinGuardar.value);
     };
 
     const onDrag = (event) => {
@@ -196,7 +200,6 @@ export default {
     };
 
     const volverHome = async () => {
-      console.log("css.value", css.value);
       router.push("/");
     };
 
@@ -210,24 +213,61 @@ export default {
       guardarParaSalir.value = false;
     };
 
-    onMounted(async () => {
-      lliureStore.toggleLliure();
-      htmlEditorInstance = CodeMirror(htmlEditor.value, {
-        mode: "htmlmixed",
-        theme: "dracula",
-        lineNumbers: true,
-      });
-      cssEditorInstance = CodeMirror(cssEditor.value, {
-        mode: "css",
-        theme: "dracula",
-        lineNumbers: true,
-      });
-      jsEditorInstance = CodeMirror(jsEditor.value, {
-        mode: "javascript",
-        theme: "dracula",
-        lineNumbers: true,
+    // Función para crear un editor de CodeMirror 6
+    const createEditor = (element, content, language, updateCallback) => {
+      // Seleccionar el lenguaje correcto
+      let langSupport;
+      switch (language) {
+        case 'html':
+          langSupport = html();
+          break;
+        case 'css':
+          langSupport = css();
+          break;
+        case 'javascript':
+          langSupport = javascript();
+          break;
+        default:
+          langSupport = html();
+      }
+
+      // Crear el estado del editor
+      const state = EditorState.create({
+        doc: content,
+        extensions: [
+          lineNumbers(),
+          history(),
+          highlightActiveLine(),
+          indentOnInput(),
+          syntaxHighlighting(defaultHighlightStyle),
+          bracketMatching(),
+          autocompletion(),
+          langSupport,
+          keymap.of([
+            ...defaultKeymap,
+            ...historyKeymap,
+            ...searchKeymap
+          ]),
+          dracula,
+          EditorView.updateListener.of(update => {
+            if (update.docChanged) {
+              updateCallback(update.state.doc.toString());
+              CambiosSinGuardarToTrue();
+            }
+          })
+        ]
       });
 
+      // Crear la vista del editor
+      return new EditorView({
+        state,
+        parent: element
+      });
+    };
+
+    onMounted(async () => {
+      lliureStore.toggleLliure();
+      
       const projectId = route.params.id;
       if (projectId) {
         idProyectoActualStore.id = projectId;
@@ -235,36 +275,38 @@ export default {
         const proyectoStore = useProyectoStore();
         const proyecto = await proyectoStore.obtenerProyecto(projectId);
         if (proyecto) {
-          html.value = proyecto.html_code || "";
-          css.value = proyecto.css_code || "";
-          js.value = proyecto.js_code || "";
-          htmlEditorInstance.setValue(html.value);
-          cssEditorInstance.setValue(css.value);
-          jsEditorInstance.setValue(js.value);
+          htmlCode.value = proyecto.html_code || "";
+          cssCode.value = proyecto.css_code || "";
+          jsCode.value = proyecto.js_code || "";
           isPrivate.value = proyecto.statuts || 0;
+          title.value = proyecto.nombre || "Untitled";
         }
       } else {
         console.error("No se encontró un ID de proyecto válido en la ruta.");
       }
 
-      htmlEditorInstance.on("change", (instance) => {
-        html.value = instance.getValue();
-        CambiosSinGuardarToTrue();
+      // Inicializar los editores CodeMirror 6
+      htmlEditorView = createEditor(htmlEditor.value, htmlCode.value, 'html', (newValue) => {
+        htmlCode.value = newValue;
       });
-      cssEditorInstance.on("change", (instance) => {
-        css.value = instance.getValue();
-        CambiosSinGuardarToTrue();
+      
+      cssEditorView = createEditor(cssEditor.value, cssCode.value, 'css', (newValue) => {
+        cssCode.value = newValue;
       });
-      jsEditorInstance.on("change", (instance) => {
-        js.value = instance.getValue();
-        CambiosSinGuardarToTrue();
+      
+      jsEditorView = createEditor(jsEditor.value, jsCode.value, 'javascript', (newValue) => {
+        jsCode.value = newValue;
       });
     });
-
 
     onUnmounted(() => {
       lliureStore.toggleLliure();
       idProyectoActualStore.vaciarId();
+      
+      // Destruir las vistas de CodeMirror
+      if (htmlEditorView) htmlEditorView.destroy();
+      if (cssEditorView) cssEditorView.destroy();
+      if (jsEditorView) jsEditorView.destroy();
     });
 
     const guardarProyecto2 = () => {
@@ -287,7 +329,7 @@ export default {
       messages.value.push({ type: "loading", content: "" });
 
       try {
-        const response = await chatIA(userMessage, html.value, css.value, js.value);
+        const response = await chatIA(userMessage, htmlCode.value, cssCode.value, jsCode.value);
         messages.value.pop();
         messages.value.push({ type: "ai", content: response });
       } catch (error) {
@@ -310,7 +352,7 @@ export default {
 
     const goBack = async () => {
       if (!cambiadoSinGuardar.value) {
-        if (html.value === "" && css.value === "" && js.value === "") {
+        if (htmlCode.value === "" && cssCode.value === "" && jsCode.value === "") {
           try {
             let id =
               idProyectoActualStore?.id ||
@@ -325,7 +367,6 @@ export default {
         router.push("/");
       } else {
         guardarParaSalir.value = true;
-        console.log("¿Se muestra el guardar para salir?", guardarParaSalir.value);
       }
     };
 
@@ -356,9 +397,9 @@ export default {
           {
             nombre: title.value || "",
             user_id: appStore.loginInfo.id || null,
-            html_code: html.value || "",
-            css_code: css.value || "",
-            js_code: js.value || "",
+            html_code: htmlCode.value || "",
+            css_code: cssCode.value || "",
+            js_code: jsCode.value || "",
             statuts: isPrivate.value,
           },
           idProyectoActualStore.id 
@@ -368,13 +409,11 @@ export default {
       }
     };
 
-
-
     return {
       title,
-      html,
-      css,
-      js,
+      htmlCode,
+      cssCode,
+      jsCode,
       htmlEditor,
       cssEditor,
       jsEditor,
@@ -408,18 +447,17 @@ export default {
       stopDrag,
       CambiosSinGuardarToTrue,
       output: computed(() => {
-        let jsContent = js.value;
         let scriptContent = `
           try {
-            ${jsContent}
+            ${jsCode.value}
           } catch (e) {
             console.error('Error in JavaScript:', e);
           }
         `;
         return `
           <html>
-            <head><style>${css.value}</style></head>
-            <body>${html.value}
+            <head><style>${cssCode.value}</style></head>
+            <body>${htmlCode.value}
               <script>${scriptContent}<\/script>
             </body>
           </html>`;
@@ -430,6 +468,45 @@ export default {
 </script>
 
 <style scoped>
+
+.cm-editor {
+  height: 100%;
+  width: 100%;
+  font-size: 14px;
+}
+
+.cm-scroller {
+  overflow: auto;
+  height: 100%;
+}
+
+.cm-content {
+  font-family: 'Fira Code', monospace;
+}
+
+.cm-tooltip {
+  border: 1px solid #333;
+  background-color: #252525;
+  color: #eee;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.cm-tooltip.cm-tooltip-autocomplete > ul {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.cm-tooltip.cm-tooltip-autocomplete > ul > li {
+  padding: 4px 8px;
+}
+
+.cm-tooltip.cm-tooltip-autocomplete > ul > li.cm-completionInfo {
+  padding: 6px;
+  margin-top: 6px;
+  border-top: 1px solid #555;
+}
+
 .todo {
   display: flex;
   flex-direction: column;
