@@ -158,8 +158,7 @@ export default {
     const messagesContainer = ref(null);
     const guardarParaSalir = ref(false);
 
-    // Definir isPrivate como una propiedad reactiva
-    const isPrivate = ref(0); // Por defecto, público (0)
+    const isPrivate = ref(0);
 
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
@@ -347,14 +346,12 @@ export default {
     const guardarProyecto = async () => {
       CambiosSinGuardarToFalse();
 
-      // Verificar si el ID está disponible antes de guardar
       if (!idProyectoActualStore.id) {
         console.error("ID del proyecto es null o no se encuentra.");
         return;
       }
 
       try {
-        // Guardar el proyecto con el valor de privacidad seleccionado
         await guardarProyectoDB(
           {
             nombre: title.value || "",
@@ -362,9 +359,9 @@ export default {
             html_code: html.value || "",
             css_code: css.value || "",
             js_code: js.value || "",
-            statuts: isPrivate.value,  // Asegúrate de pasar el valor correcto de privacidad
+            statuts: isPrivate.value,
           },
-          idProyectoActualStore.id  // Pasa el ID del proyecto correctamente aquí
+          idProyectoActualStore.id 
         );
       } catch (error) {
         console.error("Error al guardar el proyecto:", error);
@@ -403,7 +400,7 @@ export default {
       closeGuardarParaSalir,
       saveSettings,
       guardarProyecto,
-      isPrivate,  // Incluir isPrivate en el retorno
+      isPrivate,  
       isDragging,
       chatPosition,
       startDrag,
