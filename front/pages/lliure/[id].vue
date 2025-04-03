@@ -119,16 +119,13 @@ import { useAppStore } from "@/stores/app";
 import { useIdProyectoActualStore } from "@/stores/app";
 
 // CodeMirror 6 imports
-import { EditorState } from '@codemirror/state';
-import { EditorView, keymap, lineNumbers, highlightActiveLine } from '@codemirror/view';
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
-import { indentOnInput, syntaxHighlighting, defaultHighlightStyle, bracketMatching } from '@codemirror/language';
-import { autocompletion } from '@codemirror/autocomplete';
+import * as CM from '@codemirror/basic-setup';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';
-import { searchKeymap } from '@codemirror/search';
-import { dracula } from '@uiw/codemirror-theme-dracula';
+import { oneDark } from '@codemirror/theme-one-dark';
+import { EditorState, EditorView } from '@codemirror/basic-setup';
+
 
 export default {
   setup() {
@@ -215,40 +212,20 @@ export default {
 
     // Función para crear un editor de CodeMirror 6
     const createEditor = (element, content, language, updateCallback) => {
-      // Seleccionar el lenguaje correcto
       let langSupport;
       switch (language) {
-        case 'html':
-          langSupport = html();
-          break;
-        case 'css':
-          langSupport = css();
-          break;
-        case 'javascript':
-          langSupport = javascript();
-          break;
-        default:
-          langSupport = html();
+        case 'html': langSupport = html(); break;
+        case 'css': langSupport = css(); break;
+        case 'javascript': langSupport = javascript(); break;
+        default: langSupport = html();
       }
 
-      // Crear el estado del editor
       const state = EditorState.create({
         doc: content,
         extensions: [
-          lineNumbers(),
-          history(),
-          highlightActiveLine(),
-          indentOnInput(),
-          syntaxHighlighting(defaultHighlightStyle),
-          bracketMatching(),
-          autocompletion(),
+          CM.basicSetup,
           langSupport,
-          keymap.of([
-            ...defaultKeymap,
-            ...historyKeymap,
-            ...searchKeymap
-          ]),
-          dracula,
+          oneDark,
           EditorView.updateListener.of(update => {
             if (update.docChanged) {
               updateCallback(update.state.doc.toString());
@@ -258,7 +235,6 @@ export default {
         ]
       });
 
-      // Crear la vista del editor
       return new EditorView({
         state,
         parent: element
@@ -267,7 +243,7 @@ export default {
 
     onMounted(async () => {
       lliureStore.toggleLliure();
-      
+
       const projectId = route.params.id;
       if (projectId) {
         idProyectoActualStore.id = projectId;
@@ -289,11 +265,11 @@ export default {
       htmlEditorView = createEditor(htmlEditor.value, htmlCode.value, 'html', (newValue) => {
         htmlCode.value = newValue;
       });
-      
+
       cssEditorView = createEditor(cssEditor.value, cssCode.value, 'css', (newValue) => {
         cssCode.value = newValue;
       });
-      
+
       jsEditorView = createEditor(jsEditor.value, jsCode.value, 'javascript', (newValue) => {
         jsCode.value = newValue;
       });
@@ -302,7 +278,7 @@ export default {
     onUnmounted(() => {
       lliureStore.toggleLliure();
       idProyectoActualStore.vaciarId();
-      
+
       // Destruir las vistas de CodeMirror
       if (htmlEditorView) htmlEditorView.destroy();
       if (cssEditorView) cssEditorView.destroy();
@@ -402,7 +378,7 @@ export default {
             js_code: jsCode.value || "",
             statuts: isPrivate.value,
           },
-          idProyectoActualStore.id 
+          idProyectoActualStore.id
         );
       } catch (error) {
         console.error("Error al guardar el proyecto:", error);
@@ -439,7 +415,7 @@ export default {
       closeGuardarParaSalir,
       saveSettings,
       guardarProyecto,
-      isPrivate,  
+      isPrivate,
       isDragging,
       chatPosition,
       startDrag,
@@ -468,7 +444,6 @@ export default {
 </script>
 
 <style scoped>
-
 .cm-editor {
   height: 100%;
   width: 100%;
@@ -492,16 +467,16 @@ export default {
   padding: 2px 6px;
 }
 
-.cm-tooltip.cm-tooltip-autocomplete > ul {
+.cm-tooltip.cm-tooltip-autocomplete>ul {
   max-height: 300px;
   overflow-y: auto;
 }
 
-.cm-tooltip.cm-tooltip-autocomplete > ul > li {
+.cm-tooltip.cm-tooltip-autocomplete>ul>li {
   padding: 4px 8px;
 }
 
-.cm-tooltip.cm-tooltip-autocomplete > ul > li.cm-completionInfo {
+.cm-tooltip.cm-tooltip-autocomplete>ul>li.cm-completionInfo {
   padding: 6px;
   margin-top: 6px;
   border-top: 1px solid #555;
