@@ -28,26 +28,38 @@
       <!-- Card Container -->
       <div class="card-container">
         <div class="card">
-          <h3>Crea i Experimenta</h3>
-          <p>
-            Dóna vida a les teves idees construint projectes complets o provant funcions i animacions específiques.
-          </p>
-          <button class="btn">Prova l'Editor</button>
+          <div class="card-content">
+            <h3>Crea i Experimenta</h3>
+            <p>
+              Dóna vida a les teves idees construint projectes complets o provant funcions i animacions específiques.
+            </p>
+            <div class="btn-container">
+              <button class="btn">Prova l'Editor</button>
+            </div>
+          </div>
         </div>
         <div class="card">
-          <h3>Practica els teus coneixements</h3>
-          <p>
-            Vols provar-te fent uns exercicis per veure quin nivell tens?
-          </p>
-          <button class="btn">Participa els reptes que et proposem</button>
+          <div class="card-content">
+            <h3>Practica els teus coneixements</h3>
+            <p>
+              Vols provar-te fent uns exercicis per veure quin nivell tens?
+            </p>
+            <div class="btn-container">
+              <button class="btn">Participa els reptes que et proposem</button>
+            </div>
+          </div>
         </div>
         <div class="card">
-          <h3>Comparteix els Teus Projectes</h3>
-          <p>
-            Uneix-te a la comunitat global de desenvolupadors front-end compartint les teves creacions i inspirant
-            altres.
-          </p>
-          <button class="btn">Descobreix el Més Popular</button>
+          <div class="card-content">
+            <h3>Comparteix els Teus Projectes</h3>
+            <p>
+              Uneix-te a la comunitat global de desenvolupadors front-end compartint les teves creacions i inspirant
+              altres.
+            </p>
+            <div class="btn-container">
+              <button class="btn">Descobreix el Més Popular</button>
+            </div>
+          </div>
         </div>
       </div>
       <br><br>
@@ -56,11 +68,9 @@
 </template>
 
 <script>
-
 export default {
   name: 'Index',
   mounted() {
-
     setTimeout(() => {
       const wordList = document.querySelector('.looping-words__list');
       const words = Array.from(wordList.children);
@@ -84,7 +94,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .todo {
@@ -122,23 +131,30 @@ export default {
 .card-container {
   display: flex;
   justify-content: space-around;
-  gap: 10px;
+  gap: 30px;
   align-items: stretch;
 }
 
 .card {
-  background-image: linear-gradient(139deg,
-      rgba(36, 40, 50, 1) 0%,
-      rgba(36, 40, 50, 1) 0%,
-      rgba(37, 28, 40, 1) 100%);
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   width: 300px;
-  text-align: center;
+  height: 350px;
+  background: #07182E;
+  position: relative;
+  display: flex;
+  place-content: center;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.card-content {
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  height: 250px;
+  text-align: center;
+  padding: 20px;
+  height: 100%;
+  width: 100%;
 }
 
 .card h3 {
@@ -147,6 +163,7 @@ export default {
   background: linear-gradient(45deg, #ffffff, #bd89ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  z-index: 1;
 }
 
 .card p {
@@ -155,26 +172,61 @@ export default {
   flex-grow: 1;
   font-size: 1.1em;
   color: #b0b0b0;
+  z-index: 1;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  width: 100px;
+  background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
+  height: 130%;
+  animation: rotBGimg 6s linear infinite;
+  transition: all 0.2s linear;
+}
+
+@keyframes rotBGimg {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  background: #07182E;
+  inset: 5px;
+  border-radius: 15px;
+}
+
+.btn-container {
+  width: 100%;
+  position: relative;
+  margin-bottom: 60px;
 }
 
 .btn {
   border: none;
-  border-radius: 4px;
-  background-color: #28243b;
+  border-radius: 10px;
+  background-color: rgba(189, 137, 255, 0.2);
   color: #fff;
   cursor: pointer;
   width: 100%;
-  padding: 10px;
-  margin-top: auto;
+  padding: 12px 0;
   font-size: 1em;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  border: 1px solid rgba(189, 137, 255, 0.3);
 }
 
 .btn:hover {
-  background-color: #474261;
+  background-color: rgba(189, 137, 255, 0.4);
+  box-shadow: 0 0 15px rgba(189, 137, 255, 0.5);
 }
-
-
 
 .looping-words {
   position: absolute;
@@ -188,11 +240,9 @@ export default {
   top: 5%;
   
   background: linear-gradient(139deg, rgba(36, 40, 50, 0.9) 0%, rgba(37, 28, 40, 0.9) 100%);
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 10px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  
-  
 }
 
 .looping-words__list {
