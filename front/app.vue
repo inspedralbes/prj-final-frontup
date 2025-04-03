@@ -196,6 +196,9 @@ const navigateToTotsProjectes = () => {
 </script>
 
 <style>
+body{
+  background-color: rgb(29, 32, 39);
+}
 h2 {
   padding: 10px;
 }
