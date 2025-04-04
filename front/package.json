@@ -18,5 +18,9 @@
     "prismjs": "^1.29.0",
     "vue": "latest",
     "vue-router": "latest"
+  },
+  "devDependencies": {
+    "sass": "^1.84.0",
+    "sass-loader": "^10.1.1"
   }
 }
