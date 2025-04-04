@@ -118,7 +118,7 @@
   
   <style scoped>
   .container {
-    max-width: 1200px;
+    max-width: 100%;
     margin: auto;
     padding: 30px;
     padding-top: 80px;
@@ -126,7 +126,7 @@
     background-color: #252323;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    margin-left: 27vh;
+    height: 100vh;
   }
   
   h1 {
@@ -206,6 +206,7 @@
   align-items: center;
   gap: 15px;
   color: white;
+  bottom: 0;
 }
 
 .page-btn {
