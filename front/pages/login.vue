@@ -109,15 +109,18 @@
               <div class="password-input-container">
                 <input
                   :type="passwordVisibleRegister ? 'text' : 'password'"
+                  id="password"
                   placeholder="Contrasenya"
-                  v-model="formData.passwordRegister"
+                  v-model="formData.password"
+                  @blur="validatePassword"
                   :class="{
                     'input-error': errors.password,
                     'input-valid':
-                      formData.passwordRegister && !errors.password,
+                      formData.password && !errors.password,
                   }"
                   class="input"
                 />
+
                 <button
                   type="button"
                   @click="togglePasswordVisibilityRegister"
@@ -141,9 +144,10 @@
               <div class="password-input-container">
                 <input
                   :type="passwordVisibleRepeat ? 'text' : 'password'"
-                  @blur="validateBothPasswords"
+                  id="passwordRepeat"
                   placeholder="Repetir contrasenya"
                   v-model="formData.passwordRepeat"
+                  @blur="validatePasswordRepeat"
                   :class="{
                     'input-error': errors.passwordRepeat,
                     'input-valid':
@@ -151,6 +155,7 @@
                   }"
                   class="input"
                 />
+
                 <button
                   type="button"
                   @click="togglePasswordVisibilityRepeat"
@@ -195,6 +200,13 @@ import { reactive, ref, onUnmounted, onMounted, watch } from "vue";
 import { useRouter } from "nuxt/app";
 import { useAppStore } from "@/stores/app";
 import { useLliureStore } from "~/stores/app";
+
+// Limpia el fondo al salir del componente
+onBeforeUnmount(() => {
+  document.body.style.background = '';
+  document.body.style.backgroundSize = '';
+});
+
 
 const router = useRouter();
 const appStore = useAppStore();
@@ -241,7 +253,7 @@ const errorMessage = ref("");
 const showRegister = ref(false);
 
 const toggleRegister = () => {
-  showRegister.value = !showRegister.value;
+showRegister.value = !showRegister.value;
 };
 
 const validateEmail = () => {
@@ -267,16 +279,16 @@ const validatePassword = () => {
   }
 };
 
-const validateBothPasswords = () => {
+const validatePasswordRepeat = () => {
   // Si alguno de los dos campos está vacío, se limpian los errores.
-  if (!formData.passwordRegister || !formData.passwordRepeat) {
+  if (!formData.password || !formData.passwordRepeat) {
     errors.password = "";
     errors.passwordRepeat = "";
     return;
   }
 
   // Si no coinciden, se marca error en ambos.
-  if (formData.passwordRegister !== formData.passwordRepeat) {
+  if (formData.password !== formData.passwordRepeat) {
     errors.password = "Las contraseñas no coinciden";
     errors.passwordRepeat = "Las contraseñas no coinciden";
   } else {
@@ -287,8 +299,8 @@ const validateBothPasswords = () => {
 };
 
 // Observar cambios en ambos campos
-watch(() => formData.passwordRegister, validateBothPasswords);
-watch(() => formData.passwordRepeat, validateBothPasswords);
+watch(() => formData.password, validatePasswordRepeat);
+watch(() => formData.passwordRepeat, validatePasswordRepeat);
 
 const isLoginFormValid = () => {
   return (
@@ -350,7 +362,7 @@ const register = async () => {
   validateEmail();
   validatename();
   validatePassword();
-  validateBothPasswords();
+  validatePasswordRepeat();
 
   if (isRegisterFormValid()) {
     // Genera la URL del avatar basado en el nombre de usuario
@@ -358,10 +370,16 @@ const register = async () => {
 
     try {
       // Llamada al endpoint de registro
-      const response = await fetch("http://127.0.0.1:8000/api/register", {
+      console.log("entrado en fetch register", {
+        ...formData,
+        avatar: avatarUrl,
+      });
+
+      const response = await fetch("http://localhost:8000/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify({
           ...formData,
@@ -414,8 +432,7 @@ const register = async () => {
   }
 };
 </script>
-
-<style lang="scss">
+<style scoped, lang="scss">
 :root {
   --background-image: url(https://i.imgur.com/NWC1ak5_d.webp?maxwidth=1520&fidelity=grand);
   --primary-color: #f2eeeb;
@@ -610,7 +627,104 @@ body {
 .input-error {
   border-color: var(--invalid-color);
 }
-@media (max-width: 1080px) {
+@media ( max-width: 1080px) {
+  .content {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10%;
+    text-align: center;
+    color: white;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .slider {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
+    transition: margin-left 0.9s ease;
+    margin-left: 0;
+  }
+  .slider.slide {
+    margin-left: 0%;
+  }
+
+  .left {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    background: transparent;
+  }
+
+  .right {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    background: transparent;
+  }
+  .button {
+    width: 40%;
+    background-color: var(--primary-color);
+    font-size: var(--medium-font-size);
+    border: none;
+    border-radius: 25px;
+    padding: 3%;
+    text-transform: capitalize;
+    font-weight: 600;
+    color: var(--title-color);
+    margin: 0.5rem 20%;
+    transition: all 0.25s;
+    cursor: pointer;
+    &:hover {
+      background-color: var(--secondary-color);
+      color: var(--primary-color);
+    }
+  }
+  .input {
+    width: 80%;
+    border: 5px solid var(--primary-color);
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 50px;
+    padding: 2% 2%;
+    font-size: var(--medium-font-size);
+    color: var(--title-color);
+    outline: none;
+  }
+
+  .show-password-btn {
+    position: absolute;
+    top: 70%;
+    left: 85%;
+    transform: translateY(-70%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  .input-valid {
+    border-color: var(--valid-color);
+  }
+
+  .input-error {
+    border-color: var(--invalid-color);
+  }
+  .input-error-message {
+    font-size: 25px;
+    color: var(--invalid-color);
+    text-align: left;
+    margin-top: 5px;
+  }
+  @media (max-width: 600) {
   .content {
     background: rgba(0, 0, 0, 0.6);
     padding: 20%;
@@ -708,4 +822,6 @@ body {
     margin-top: 5px;
   }
 }
+}
+
 </style>
