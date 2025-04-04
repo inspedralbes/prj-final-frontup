@@ -231,18 +231,15 @@ export default {
 .looping-words {
   position: absolute;
   width: 35%;
-  height: 3.5em;
+  height: 3.4em;
   font-size: 5vw;
   padding-left: 0.1em;
   padding-right: 0.1em;
   overflow: hidden;
   right: 2%;
   top: 5%;
-  
-  background: linear-gradient(139deg, rgba(36, 40, 50, 0.9) 0%, rgba(37, 28, 40, 0.9) 100%);
   border-radius: 10px;
   padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .looping-words__list {
