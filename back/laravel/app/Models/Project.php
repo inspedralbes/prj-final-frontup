@@ -19,7 +19,7 @@ class Project extends Model
     public function users(){
         return $this->belongsTo(User::class, 'user_id');
     }
-    public function puntuacions(){
-        return $this->hasMany(Puntuacion::class, 'project_id');
+    public function likes(){
+        return $this->hasMany(Likes::class, 'project_id');
     }
 }

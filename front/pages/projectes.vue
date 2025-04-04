@@ -23,7 +23,7 @@
         No hi ha projectes disponibles.
       </div>
       <div class="projects-list">
-        <Item v-for="project in projects" :key="project.id" :project="project" @click="navigateToProject(project.id)" />
+        <Item v-for="project in projects" :key="project.id" :project="project" />
       </div>
 
       <div class="pagination">
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import Item from "@/pages/item.vue";
+import Item from '~/components/item.vue';
 
 export default {
   name: "TotsProjectes",
@@ -130,14 +130,14 @@ export default {
 
 <style scoped>
 .container {
-  max-width: 1200px;
+  max-width: 100%;
   margin: auto;
   padding: 30px;
   text-align: center;
   background-color: #252323;
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  height: 90vh;
+  height: 120vh;
 }
 
 .title {

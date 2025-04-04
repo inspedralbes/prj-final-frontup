@@ -1,139 +1,146 @@
 <template>
-  <div class="container">
-    <h1>Projectes públics</h1>
-    <div class="header">
-      <div class="search-bar">
-        <input type="text" v-model="searchQuery" placeholder="🔍 Filtrar projectes..." class="filter-input" />
+    <div class="container">
+      <h1>Projectes públics</h1>
+      <div class="header">
+        <div class="search-bar">
+          <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="🔍 Filtrar projectes..."
+            class="filter-input"
+          />
+        </div>
+        <div class="sort-container">
+          <label for="sort" class="sort-label">Ordenar per:</label>
+          <select id="sort" v-model="sortCriteria" class="sort-select">
+            <option value="default">Destacats</option>
+            <option value="date_asc">Data: Més antics primer</option>
+            <option value="date_desc">Data: Més recents primer</option>
+          </select>
+        </div>
       </div>
-      <div class="sort-container">
-        <label for="sort" class="sort-label">Ordenar per:</label>
-        <select id="sort" v-model="sortCriteria" class="sort-select">
-          <option value="default">Destacats</option>
-          <option value="date_asc">Data: Més antics primer</option>
-          <option value="date_desc">Data: Més recents primer</option>
-        </select>
+  
+      <div v-if="loading" class="loading">Carregant...</div>
+      <div v-else-if="error" class="error">{{ error }}</div>
+      <div v-else>
+        <div v-if="paginatedProjects.length === 0" class="no-projects">
+          No hi ha projectes disponibles.
+        </div>
+        <div class="projects-list">
+          <Item v-for="project in paginatedProjects" :key="project.id" :project="project" />
+        </div>
+  
+        <div class="pagination">
+          <button @click="prevPage" :disabled="currentPage === 1" class="page-btn">Anterior</button>
+          <span>Pàgina {{ currentPage }} de {{ totalPages }}</span>
+          <button @click="nextPage" :disabled="currentPage === totalPages" class="page-btn">Següent</button>
+        </div>
       </div>
     </div>
-
-    <div v-if="loading" class="loading">Carregant...</div>
-    <div v-else-if="error" class="error">{{ error }}</div>
-    <div v-else>
-      <div v-if="projects.length === 0" class="no-projects">
-        No hi ha projectes disponibles.
-      </div>
-      <div class="projects-list">
-        <Item v-for="project in projects" :key="project.id" :project="project" />
-      </div>
-
-      <div class="pagination">
-        <button @click="prevPage" :disabled="currentPage === 1" class="page-btn">Anterior</button>
-        <span>Pàgina {{ currentPage }} de {{ lastPage }}</span>
-        <button @click="nextPage" :disabled="currentPage === lastPage" class="page-btn">Següent</button>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script>
-import Item from "@/pages/item.vue";
-
-export default {
-  name: "TotsProjectes",
-  components: {
-    Item,
-  },
-  data() {
-    return {
-      projects: [],
-      searchQuery: "",
-      sortCriteria: "default",
-      loading: true,
-      error: null,
-      currentPage: 1,
-      lastPage: 1,
-    };
-  },
-  async mounted() {
-    await this.fetchProjects();
-  },
-  watch: {
-    searchQuery() {
-      this.currentPage = 1;
-      this.fetchProjects();
+  </template>
+  
+  <script>
+  import Item from "~/components/item.vue";
+  
+  export default {
+    name: "TotsProjectes",
+    components: {
+      Item,
     },
-    sortCriteria() {
-      this.currentPage = 1;
-      this.fetchProjects();
+    data() {
+      return {
+        projects: [],
+        searchQuery: "",
+        sortCriteria: "default",
+        loading: true,
+        error: null,
+        currentPage: 1,
+        projectsPerPage: 9,
+      };
     },
-  },
-  methods: {
-    async fetchProjects() {
-      this.loading = true;
-      try {
-        const url = new URL("http://localhost:8000/api/projects/all");
-        url.searchParams.append("page", this.currentPage);
-        if (this.searchQuery) url.searchParams.append("search", this.searchQuery);
-        if (this.sortCriteria && this.sortCriteria !== "default")
-          url.searchParams.append("sort", this.sortCriteria);
-
-        const response = await fetch(url, {
-          headers: { "Content-Type": "application/json" },
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Error carregant projectes");
+    computed: {
+      filteredProjects() {
+        let filtered = this.projects.filter((project) =>
+          project.nombre.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
+  
+        if (this.sortCriteria === "date_desc") {
+          return filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        } else if (this.sortCriteria === "date_asc") {
+          return filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        } else {
+          return filtered;
         }
-
-        const data = await response.json();
-        this.projects = data.data;
-        this.currentPage = data.current_page;
-        this.lastPage = data.last_page;
-        this.loading = false;
-      } catch (error) {
-        this.error = error.message;
-        this.loading = false;
-      }
+      },
+      totalPages() {
+        return Math.ceil(this.filteredProjects.length / this.projectsPerPage);
+      },
+      paginatedProjects() {
+        const start = (this.currentPage - 1) * this.projectsPerPage;
+        const end = start + this.projectsPerPage;
+        return this.filteredProjects.slice(start, end);
+      },
     },
-    nextPage() {
-      if (this.currentPage < this.lastPage) {
-        this.currentPage++;
-        this.fetchProjects();
-      }
+    async mounted() {
+      await this.fetchProjects();
     },
-    prevPage() {
-      if (this.currentPage > 1) {
-        this.currentPage--;
-        this.fetchProjects();
-      }
+    methods: {
+      async fetchProjects() {
+        try {
+          const response = await fetch("http://localhost:8000/api/projects/all", {
+            headers: { "Content-Type": "application/json" },
+          });
+  
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Error carregant projectes");
+          }
+  
+          const data = await response.json();
+          console.log(data);
+          
+          this.projects = data.data;
+          this.loading = false;
+        } catch (error) {
+          this.error = error.message;
+          this.loading = false;
+        }
+      },
+      nextPage() {
+        if (this.currentPage < this.totalPages) this.currentPage++;
+      },
+      prevPage() {
+        if (this.currentPage > 1) this.currentPage--;
+      },
     },
-  },
-};
-</script>
-
-<style scoped>
-.container {
-  max-width: 1200px;
-  padding: 30px;
-  text-align: center;
-  background-color: #252323;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  height: 90vh;
-}
-
-h1 {
-  color: white;
-  text-align: left;
-  margin-bottom: 20px;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 10px;
+  };
+  </script>
+  
+  <style scoped>
+  .container {
+    max-width: 100%;
+    margin: auto;
+    padding: 30px;
+    padding-top: 80px;
+    text-align: center;
+    background-color: #252323;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    height: 100vh;
+  }
+  
+  h1 {
+    color: white;
+    text-align: left;
+    margin-bottom: 20px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
 }
 
 .search-bar {
@@ -199,6 +206,7 @@ h1 {
   align-items: center;
   gap: 15px;
   color: white;
+  bottom: 0;
 }
 
 .page-btn {
