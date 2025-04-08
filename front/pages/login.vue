@@ -344,7 +344,7 @@ const login = async () => {
         token: data.token,
         name: data.user.name,
         email: data.user.email,
-        nivel_html: data.user.nivel_html,
+        nivel: data.user.nivel,
         nivel_css: data.user.nivel_css,
         nivel_js: data.user.nivel_js,
         avatar: data.user.avatar,
