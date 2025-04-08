@@ -27,6 +27,14 @@
             <textarea id="project-description" v-model="modalDescription" class="modal-textarea"
               placeholder="Escribe la descripción del proyecto"></textarea>
           </div>
+          <!-- Selector de privacidad -->
+          <div class="input-group">
+            <label for="project-privacy">Privacidad</label>
+            <select v-model="isPrivate" id="project-privacy" class="modal-input">
+              <option value="0">Público</option>
+              <option value="1">Privado</option>
+            </select>
+          </div>
           <div class="modal-actions">
             <button type="submit" class="modal-button">Guardar</button>
             <button type="button" class="modal-button cancel" @click="closeSettingsModal">Cancel·lar</button>
@@ -108,18 +116,22 @@ import CodeMirror from "codemirror";
 import { useLliureStore } from "~/stores/app";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
+
 import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
 import "codemirror/mode/javascript/javascript";
-import "codemirror/addon/edit/closetag.js";
-import "codemirror/addon/hint/show-hint.js";
-import "codemirror/addon/hint/javascript-hint.js";
-import "codemirror/addon/hint/css-hint.js";
-import "codemirror/addon/hint/html-hint.js";
+
+import "codemirror/addon/hint/show-hint";
+import "codemirror/addon/hint/show-hint.css";
+import "codemirror/addon/hint/html-hint";
+import "codemirror/addon/hint/anyword-hint";
+import "codemirror/addon/edit/closetag";
+import "codemirror/addon/edit/matchtags";
+import "codemirror/addon/hint/javascript-hint";
+
 // Importar la lógica de comunicación y el store de proyecto
 import useCommunicationManager from "@/stores/comunicationManager";
-import { useAppStore } from "@/stores/app";
-import { useIdProyectoActualStore } from "@/stores/app";
+import { useAppStore, useIdProyectoActualStore } from "@/stores/app"; // si ambos están en el mismo archivo
 
 export default {
   setup() {
@@ -154,6 +166,8 @@ export default {
     const messages = ref([{ type: "ai", content: "¡Hola! ¿En qué puedo ayudarte hoy?" }]);
     const messagesContainer = ref(null);
     const guardarParaSalir = ref(false);
+
+    const isPrivate = ref(0);
 
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
@@ -207,45 +221,68 @@ export default {
 
     onMounted(async () => {
       lliureStore.toggleLliure();
-      // Inicializar editores CodeMirror
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
         mode: "htmlmixed",
         theme: "dracula",
         lineNumbers: true,
         autoCloseTags: true,
+        matchTags: { bothTags: true },
+        extraKeys: {
+          "Ctrl-Space": "autocomplete"
+        },
       });
+      htmlEditorInstance.on("inputRead", (editor, change) => {
+        if (change.text[0] === "<") {
+          editor.showHint({
+            completeSingle: false
+          });
+        }
+      });
+
+
       cssEditorInstance = CodeMirror(cssEditor.value, {
         mode: "css",
         theme: "dracula",
         lineNumbers: true,
+        extraKeys: {
+          "Ctrl-Space": "autocomplete",
+        },
       });
+      cssEditorInstance.on("inputRead", (editor, change) => {
+        if (change.text[0].match(/[a-zA-Z\-]/)) {
+          editor.showHint({ completeSingle: false });
+        }
+      });
+
+
       jsEditorInstance = CodeMirror(jsEditor.value, {
         mode: "javascript",
         theme: "dracula",
         lineNumbers: true,
+        extraKeys: {
+          "Ctrl-Space": "autocomplete" 
+        }
       });
 
-      // Obtener el ID del proyecto desde la ruta
       const projectId = route.params.id;
       if (projectId) {
-        // Usar el store de proyecto para obtener los datos
+        idProyectoActualStore.id = projectId;
+
         const proyectoStore = useProyectoStore();
         const proyecto = await proyectoStore.obtenerProyecto(projectId);
         if (proyecto) {
-          // Asignar los datos, asegurando que no sean null (se usan cadenas vacías como fallback)
           html.value = proyecto.html_code || "";
           css.value = proyecto.css_code || "";
           js.value = proyecto.js_code || "";
-          // Actualizar el contenido de los editores
           htmlEditorInstance.setValue(html.value);
           cssEditorInstance.setValue(css.value);
           jsEditorInstance.setValue(js.value);
+          isPrivate.value = proyecto.statuts || 0;
         }
       } else {
         console.error("No se encontró un ID de proyecto válido en la ruta.");
       }
 
-      // Configurar listeners para detectar cambios en los editores
       htmlEditorInstance.on("change", (instance) => {
         html.value = instance.getValue();
         CambiosSinGuardarToTrue();
@@ -259,6 +296,7 @@ export default {
         CambiosSinGuardarToTrue();
       });
     });
+
 
     onUnmounted(() => {
       lliureStore.toggleLliure();
@@ -343,6 +381,12 @@ export default {
 
     const guardarProyecto = async () => {
       CambiosSinGuardarToFalse();
+
+      if (!idProyectoActualStore.id) {
+        console.error("ID del proyecto es null o no se encuentra.");
+        return;
+      }
+
       try {
         await guardarProyectoDB(
           {
@@ -351,13 +395,16 @@ export default {
             html_code: html.value || "",
             css_code: css.value || "",
             js_code: js.value || "",
+            statuts: isPrivate.value,
           },
           idProyectoActualStore.id
         );
       } catch (error) {
-        console.error(error);
+        console.error("Error al guardar el proyecto:", error);
       }
     };
+
+
 
     return {
       title,
@@ -389,6 +436,7 @@ export default {
       closeGuardarParaSalir,
       saveSettings,
       guardarProyecto,
+      isPrivate,
       isDragging,
       chatPosition,
       startDrag,
@@ -424,7 +472,8 @@ export default {
   background-color: #1e1e1e;
   font-family: 'Arial', sans-serif;
   color: #ffffff;
-  margin-left: -16vw;
+  margin-left: -220px;
+  left: 0;
 }
 
 .header {
