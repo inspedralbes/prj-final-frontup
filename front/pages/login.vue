@@ -348,7 +348,7 @@ const register = async () => {
             token: loginData.token,
             name: loginData.user.name,
             email: loginData.user.email,
-            nivel: loginData.user.nivel,
+            nivel: data.user.nivel_html,
             nivel_css: loginData.user.nivel_css,
             nivel_js: loginData.user.nivel_js,
             avatar: avatarUrl,
