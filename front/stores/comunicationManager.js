@@ -284,6 +284,31 @@ const useCommunicationManager = () => {
       return [];
     }
   };
+  const getUserAllLikes = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return [];
+      
+      const response = await fetch(`${laravelURL}/likes/user`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data || [];
+    } catch (error) {
+      console.error('Error getting user likes:', error);
+      return [];
+    }
+  };
   const chatIA = async (mensaje, html, css, js) => {
     try {
       const response = await fetch(`${nodeURL}/pregunta`, {
@@ -359,7 +384,8 @@ const useCommunicationManager = () => {
     checkLike,
     getLikeCount,
     toggleLike,
-    getUserLikes
+    getUserLikes,
+    getUserAllLikes,
   };
 };
 
