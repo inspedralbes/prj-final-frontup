@@ -85,4 +85,15 @@ class LikesController extends Controller
         $likes = Likes::with('project')->where('user_id', $userId)->get();
         return response()->json($likes);
     }
+    public function userAllLikes()
+    {
+        $userId = Auth::id();
+
+        $likedProjects = Likes::where('user_id', $userId)
+            ->with('project')
+            ->get()
+            ->pluck('project');
+
+        return response()->json($likedProjects);
+    }
 }
