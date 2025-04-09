@@ -437,48 +437,62 @@ export default {
   font-family: 'Arial', sans-serif;
   color: #ffffff;
   margin-left: -220px;
-  left: 0;
 }
 
 .header {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 70px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 20px;
-  background-color: #2d2d2d;
-  color: #fff;
+  padding: 0 30px;
+  background-color: #1f1f1f;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 100;
 }
 
 .header-title {
-  font-size: 15px;
-  color: #fff;
-  background-color: #444;
-  border: none;
-  padding: 8px;
-  border-radius: 4px;
+  font-size: 18px;
+  color: #ffffff;
+  background-color: transparent;
+  border: 2px solid transparent;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
   text-align: center;
+  min-width: 180px;
+}
+
+.header-title:focus {
+  border-color: #4CAF50;
+  background-color: #292929;
+  outline: none;
 }
 
 .header-actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
 .header-button {
-  background-color: #555;
-  border: none;
+  background-color: #2e2e2e;
+  border: 1px solid #444;
   color: #fff;
-  padding: 8px 12px;
-  border-radius: 4px;
+  padding: 8px 14px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
 .header-button:hover {
-  background-color: #777;
+  background-color: #3a3a3a;
 }
 
 .editor-container {
+  margin-top: 70px;
   display: flex;
   padding: 20px;
   gap: 20px;
@@ -523,6 +537,7 @@ export default {
   background-color: white;
   height: 100vh;
   overflow: hidden;
+  margin-left: 20px;
 }
 
 .output-container.expanded {

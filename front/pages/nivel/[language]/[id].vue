@@ -1,17 +1,15 @@
 <template>
   <div class="todo">
     <header class="header">
-      <button class="header-button" @click="goBack">Enrere</button>
-      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
-        :readonly="!isEditing" />
+      <button class="header-button" @click="goBack">Atrás</button>
+      <h1 class="header-title">{{ title }}</h1>
       <div class="header-actions">
-        <button class="header-button" @click="guardarProyecto">Desar</button>
+        <button class="header-button" @click="toggleChat">Xat IA</button>
+        <button class="header-button" @click="guardarProyecto">Guardar</button>
         <button class="header-button" @click="openSettingsModal">Configuració</button>
         <button class="header-button">💡</button>
       </div>
     </header>
-
-    <div class="exercise-number">Títol {{ id }}</div>
 
     <div class="exercise-instructions">
       <p><strong>Instruccions:</strong></p>
@@ -22,7 +20,7 @@
 
     <div class="editor-output-wrapper">
       <div class="editor-box">
-        <div class="editor-label">{{ languageLabel }}</div> 
+        <div class="editor-label">{{ languageLabel }}</div>
         <div ref="htmlEditor" class="code-editor"></div>
       </div>
 
@@ -47,6 +45,7 @@ import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
 import "codemirror/mode/javascript/javascript";
 import { useLliureStore } from "~/stores/app";
+import Swal from 'sweetalert2';
 
 export default {
   setup() {
@@ -55,7 +54,7 @@ export default {
     const lliureStore = useLliureStore();
 
     const title = computed(() => `Exercici ${id.value}`);
-    
+
     const languageLabel = computed(() => {
       if (language.value === 'html') return 'Llenguatge: HTML';
       if (language.value === 'css') return 'Llenguatge: CSS';
@@ -67,20 +66,20 @@ export default {
     const css = ref("");
     const js = ref("");
     const isEditing = ref(false);
-    const question = ref(""); 
+    const question = ref("");
     const loading = ref(true);
     const error = ref(false);
-    const language = ref(route.params.language);  
-    const id = ref(route.params.id);  
+    const language = ref(route.params.language);
+    const id = ref(route.params.id);
 
     const htmlEditor = ref(null);
     let htmlEditorInstance;
 
     watch(() => route.params.language, (newLanguage) => {
       if (newLanguage === 'html') {
-        id.value = Math.max(1, Math.min(10, parseInt(route.params.id))); 
+        id.value = Math.max(1, Math.min(10, parseInt(route.params.id)));
       } else if (newLanguage === 'css') {
-        id.value = Math.max(11, Math.min(20, parseInt(route.params.id))); 
+        id.value = Math.max(11, Math.min(20, parseInt(route.params.id)));
       } else if (newLanguage === 'js') {
         id.value = Math.max(21, Math.min(30, parseInt(route.params.id)));
       }
@@ -89,13 +88,13 @@ export default {
     const fetchQuestion = async () => {
       try {
         loading.value = true;
-        error.value = false; 
+        error.value = false;
 
         const response = await fetch(`http://localhost:8000/api/preguntas/${language.value}/${id.value}`);
         if (!response.ok) throw new Error("Error a l'obtenir la pregunta");
 
         const data = await response.json();
-        question.value = data.question;  
+        question.value = data.question;
       } catch (err) {
         console.error("Error en fetchQuestion:", err);
         error.value = true;
@@ -105,55 +104,70 @@ export default {
     };
 
     const validateExercise = async () => {
-  if (!question.value) {
-    alert("No s'ha carregat la pregunta.");
-    return;
-  }
-
-  try {
-    const response = await fetch(`http://localhost:8000/api/preguntas/${language.value}/${id.value}`); 
-    if (!response.ok) throw new Error("Error a l'obtenir la resposta correcta");
-
-    const data = await response.json();
-
-    const cleanString = (str) => {
-  return str.replace(/[\s\u200B\u200C\u200D\uFEFF]+/g, '').toUpperCase();
-};
-
-const respuestaCorrecta = cleanString(data.resp_correcta);
-console.log("respuesta correcta", respuestaCorrecta);
-const respuestaUsuario = cleanString(html.value);
-    console.log("respuesta usuari", respuestaUsuario);
-
-    
-    if (respuestaUsuario === respuestaCorrecta) {
-      alert("¡Felicitats! Has completat l'exercici.");
-      
-      await actualizarNivel();
-
-      let nextId = parseInt(id.value) + 1;
-
-      if ((language.value === "html" && nextId > 10) ||
-          (language.value === "css" && nextId > 20) ||
-          (language.value === "js" && nextId > 30)) {
-        alert("¡Felicitats! Has completat totes les preguntes d'aquest llenguatge.");
+      if (!question.value) {
+        alert("No s'ha carregat la pregunta.");
         return;
       }
 
-      router.push(`/nivel/${language.value}/${nextId}`);
-    } else {
-      alert("La teva resposta no es correcta. Torna-ho a intentar.");
-    }
+      try {
+        const response = await fetch(`http://localhost:8000/api/preguntas/${language.value}/${id.value}`);
+        if (!response.ok) throw new Error("Error a l'obtenir la resposta correcta");
 
-  } catch (error) {
-    console.error("Error al validar l'exercici:", error);
-  }
-};
+        const data = await response.json();
+
+        const cleanString = (str) => {
+          return str.replace(/[\s\u200B\u200C\u200D\uFEFF]+/g, '').toUpperCase();
+        };
+
+        const respuestaCorrecta = cleanString(data.resp_correcta);
+        console.log("respuesta correcta", respuestaCorrecta);
+        const respuestaUsuario = cleanString(html.value);
+        console.log("respuesta usuari", respuestaUsuario);
+
+
+        if (respuestaUsuario === respuestaCorrecta) {
+          await Swal.fire({
+            icon: 'success',
+            title: '¡Felicitats!',
+            text: "Has completat l'exercici.",
+          });
+
+          await actualizarNivel();
+
+          let nextId = parseInt(id.value) + 1;
+
+          if (
+            (language.value === "html" && nextId > 10) ||
+            (language.value === "css" && nextId > 20) ||
+            (language.value === "js" && nextId > 30)
+          ) {
+            await Swal.fire({
+              icon: 'info',
+              title: '🎉 Enhorabona!',
+              text: "Has completat totes les preguntes d'aquest llenguatge.",
+            });
+            return;
+          }
+
+          router.push(`/nivel/${language.value}/${nextId}`);
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Incorrecte',
+            text: "La teva resposta no es correcta. Torna-ho a intentar.",
+          });
+        }
+
+
+      } catch (error) {
+        console.error("Error al validar l'exercici:", error);
+      }
+    };
 
 
     const actualizarNivel = async () => {
       try {
-        const userId = 1; 
+        const userId = 1;
         let campoNivel = "";
 
         if (language.value === "html") campoNivel = "nivel";
@@ -179,9 +193,9 @@ const respuestaUsuario = cleanString(html.value);
       }
     };
 
-    watch(() => route.params.id, (newId)=> {
+    watch(() => route.params.id, (newId) => {
       id.value = newId;
-      fetchQuestion(); 
+      fetchQuestion();
       clearEditors();
     });
 
@@ -196,22 +210,22 @@ const respuestaUsuario = cleanString(html.value);
     };
 
     onMounted(() => {
-  lliureStore.toggleLliure();
+      lliureStore.toggleLliure();
 
-  fetchQuestion();  
+      fetchQuestion();
 
-  htmlEditorInstance = CodeMirror(htmlEditor.value, {
-    mode: "htmlmixed",
-    theme: "dracula",
-    lineNumbers: true,
-  });
+      htmlEditorInstance = CodeMirror(htmlEditor.value, {
+        mode: "htmlmixed",
+        theme: "dracula",
+        lineNumbers: true,
+      });
 
-  htmlEditorInstance.on("change", (instance) => {
-    html.value = instance.getValue();  
-  });
+      htmlEditorInstance.on("change", (instance) => {
+        html.value = instance.getValue();
+      });
 
-  if (language.value === "css") {
-    const basicHTML = `<!DOCTYPE html>
+      if (language.value === "css") {
+        const basicHTML = `<!DOCTYPE html>
 <html>
 <head>
     <link rel="stylesheet" href="styles.css">
@@ -224,24 +238,24 @@ const respuestaUsuario = cleanString(html.value);
     <p>Modifica el CSS per cambiar l'estil.</p>
 </body>
 </html>`;
-    htmlEditorInstance.setValue(basicHTML);
-    html.value = basicHTML;
-  }
-});
+        htmlEditorInstance.setValue(basicHTML);
+        html.value = basicHTML;
+      }
+    });
 
-const goBack = () => {
-  let rutaBase = "/nivel_";
+    const goBack = () => {
+      let rutaBase = "/nivel_";
 
-  if (language.value === "html") {
-    rutaBase += "html";
-  } else if (language.value === "css") {
-    rutaBase += "css";
-  } else if (language.value === "js") {
-    rutaBase += "js";
-  }
+      if (language.value === "html") {
+        rutaBase += "html";
+      } else if (language.value === "css") {
+        rutaBase += "css";
+      } else if (language.value === "js") {
+        rutaBase += "js";
+      }
 
-  router.push(rutaBase);
-};
+      router.push(rutaBase);
+    };
 
 
 
@@ -267,7 +281,7 @@ const goBack = () => {
         </html>
       `),
       validateExercise,
-      languageLabel,  
+      languageLabel,
     };
   },
 };
@@ -285,90 +299,98 @@ const goBack = () => {
   color: #ffffff;
   height: 100vh;
   box-sizing: border-box;
+  margin-left: -220px;
 }
 
 .header {
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 15px; 
-  background-color: #2d2d2d;
-  color: #fff;
-  width: 100%;
-  height: 10%;
-  box-sizing: border-box;
+  padding: 0 30px;
+  background-color: #1f1f1f;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 100;
 }
 
 .header-title {
-  font-size: 16px; 
-  color: #fff;
-  background-color: #444;
-  border: none;
-  padding: 6px;
-  border-radius: 4px;
+  font-size: 18px;
+  color: #ffffff;
   text-align: center;
+  min-width: 180px;
+  margin: 0;
+}
+
+.header-title:focus {
+  border-color: #4CAF50;
+  background-color: #292929;
+  outline: none;
 }
 
 .header-actions {
   display: flex;
-  gap: 8px; 
+  gap: 12px;
 }
 
 .header-button {
-  background-color: #555;
-  border: none;
+  background-color: #2e2e2e;
+  border: 1px solid #444;
   color: #fff;
-  padding: 6px 10px;
-  border-radius: 4px;
+  padding: 8px 14px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
 .header-button:hover {
-  background-color: #777;
+  background-color: #3a3a3a;
 }
 
 .exercise-instructions {
-  margin-top: 100px; 
+  margin-top: 100px;
   background-color: #1e1e1e;
   color: #fff;
-  padding: 8px 15px; 
+  padding: 8px 15px;
   border-radius: 6px;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.3);
-  max-width: 750px; 
+  max-width: 750px;
 }
 
 .editor-output-wrapper {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 30px; 
+  gap: 30px;
   width: 100%;
   max-width: 1000px;
-  margin-top: 30px; 
+  margin-top: 30px;
   box-sizing: border-box;
- 
+
 }
 
 .editor-box,
 .output-container {
   flex: 1;
-  max-width: 100%; 
+  max-width: 100%;
   border-radius: 6px;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .editor-box {
   background-color: #2d2d2d;
-  padding: 10px; 
+  padding: 10px;
   display: flex;
   flex-direction: column;
 }
 
 .editor-label {
   margin-bottom: 8px;
-  font-size: 15px; 
+  font-size: 15px;
   color: #fff;
   background-color: #444;
   padding: 4px 6px;
