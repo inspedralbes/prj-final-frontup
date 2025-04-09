@@ -361,8 +361,7 @@ const logout = () => {
 }
 
 .avatar-input {
-  flex-grow: 1;
-  padding: 0.8rem 1.2rem;
+  padding: 0.8rem 6rem;
   border-radius: 10px;
   border: 1px solid rgba(189, 137, 255, 0.3);
   background-color: rgba(255, 255, 255, 0.05);
