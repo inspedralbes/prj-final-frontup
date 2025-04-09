@@ -1,194 +1,205 @@
 <template>
-  <div class="slider" :class="{ slide: showRegister }">
-    <div class="container">
-      <!-- Formulario de login -->
-      <div class="left">
-        <div class="content">
-          <div class="title">Iniciar sessió</div>
-          <form @submit.prevent="login" novalidate>
-            <div class="info">
-              <label for="email" class="label">Correu electrònic</label>
-              <input
-                type="email"
-                id="email"
-                placeholder="Correu electrónic"
-                v-model="formData.email"
-                @blur="validateEmail"
-                @keyup.enter="onEnterPressed('email')"
-                required
-                :class="{ 'input-error': errors.email }"
-                class="input"
-              />
-              <div v-if="errors.email" class="input-error-message">
-                {{ errors.email }}
-              </div>
-            </div>
-            <div class="info">
-              <label for="password" class="label">Contrasenya</label>
-              <div class="password-input-container">
+  <div class="login-wrapper">
+    <div class="slider" :class="{ slide: showRegister }">
+      <div>
+    <button v-if="showRegister" class="atras" @click="gohome">
+      Home
+    </button>
+    <button v-else class="atras" @click="gohome">
+      Home
+    </button>
+  </div>
+      <div class="Formulario">
+        <!-- Formulario de login -->
+        <div class="left">
+          <div class="content">
+            <div class="title">Iniciar sessió</div>
+            <form @submit.prevent="login" novalidate>
+              <div class="info">
+                <label for="email" class="label">Correu electrònic</label>
                 <input
-                  :type="passwordVisibleLogin ? 'text' : 'password'"
-                  id="password"
-                  placeholder="Contrasenya"
-                  v-model="formData.password"
-                  @blur="validatePassword"
-                  @keyup.enter="onEnterPressed('password')"
+                  type="email"
+                  id="email"
+                  placeholder="Correu electrónic"
+                  v-model="formData.email"
+                  @blur="validateEmail"
+                  @keyup.enter="onEnterPressed('email')"
                   required
-                  :class="{ 'input-error': errors.password }"
+                  :class="{ 'input-error': errors.email }"
                   class="input"
                 />
-                <button
-                  type="button"
-                  @click="togglePasswordVisibilityLogin"
-                  class="show-password-btn"
-                >
-                  <span v-if="passwordVisibleLogin">
-                    <img src="/close-eye.png" alt="Icono" class="ojo" />
-                  </span>
-                  <span v-else>
-                    <img src="/open-eye.png" alt="Icono" class="ojo" />
-                  </span>
-                </button>
+                <div v-if="errors.email" class="input-error-message">
+                  {{ errors.email }}
+                </div>
               </div>
-              <div v-if="errors.password" class="input-error-message">
-                {{ errors.password }}
+              <div class="info">
+                <label for="password" class="label">Contrasenya</label>
+                <div class="password-input-Formulario">
+                  <input
+                    :type="passwordVisibleLogin ? 'text' : 'password'"
+                    id="password"
+                    placeholder="Contrasenya"
+                    v-model="formData.password"
+                    @blur="validatePassword"
+                    @keyup.enter="onEnterPressed('password')"
+                    required
+                    :class="{ 'input-error': errors.password }"
+                    class="input"
+                  />
+                  <button
+                    type="button"
+                    @click="togglePasswordVisibilityLogin"
+                    class="show-password-btn"
+                  >
+                    <span v-if="passwordVisibleLogin">
+                      <img src="/public/close-eye.png" alt="Icono" class="ojo" />
+                    </span>
+                    <span v-else>
+                      <img src="/public/open-eye.png" alt="Icono" class="ojo" />
+                    </span>
+                  </button>
+                </div>
+                <div v-if="errors.password" class="input-error-message">
+                  {{ errors.password }}
+                </div>
               </div>
-            </div>
-            <button
-              type="submit"
-              class="button login"
-              :disabled="!isLoginFormValid()"
-            >
-              Iniciar sessió
-            </button>
-          </form>
+              <button
+                type="submit"
+                class="button login"
+                :disabled="!isLoginFormValid()"
+              >
+                Iniciar sessió
+              </button>
+            </form>
 
-          <div class="slide-button-container">
-            No tens compte?
-            <span class="slide-button" @click="toggleRegister">Registra't</span>
+            <div class="slide-button-Formulario">
+              No tens compte?
+              <span class="slide-button" @click="togglebutton"
+                >Registra't</span
+              >
+            </div>
+            <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
           </div>
-          <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         </div>
-      </div>
 
-      <!-- Panel derecho: Registro -->
-      <div class="right">
-        <div class="content">
-          <div class="title">Registrar-se</div>
-          <form @submit.prevent="register" novalidate>
-            <div class="info">
-              <input
-                type="text"
-                placeholder="Nom"
-                v-model="formData.name"
-                @blur="validateName"
-                required
-                :class="{ 'input-error': errors.name }"
-                class="input"
-              />
-              <div v-if="errors.name" class="input-error-message">
-                {{ errors.name }}
-              </div>
-            </div>
-            <div class="info">
-              <input
-                type="email"
-                placeholder="Correu electrònic"
-                v-model="formData.email"
-                @blur="validateEmail"
-                required
-                :class="{ 'input-error': errors.email }"
-                class="input"
-              />
-              <div v-if="errors.email" class="input-error-message">
-                {{ errors.email }}
-              </div>
-            </div>
-            <!-- Input de contraseña -->
-            <div class="info">
-              <div class="password-input-container">
+        <!-- Panel derecho: Registro -->
+        <div class="right">
+          <div class="content">
+            <div class="title">Registrar-se</div>
+            <form @submit.prevent="register" novalidate>
+              <div class="info">
                 <input
-                  :type="passwordVisibleRegister ? 'text' : 'password'"
-                  id="password"
-                  placeholder="Contrasenya"
-                  v-model="formData.password"
-                  @blur="validatePassword"
-                  :class="{
-                    'input-error': errors.password,
-                    'input-valid':
-                      formData.password && !errors.password,
-                  }"
+                  type="text"
+                  placeholder="Nom"
+                  v-model="formData.name"
+                  @blur="validateName"
+                  required
+                  :class="{ 'input-error': errors.name }"
                   class="input"
                 />
-
-                <button
-                  type="button"
-                  @click="togglePasswordVisibilityRegister"
-                  class="show-password-btn"
-                >
-                  <span v-if="passwordVisibleRegister">
-                    <img src="/close-eye.png" alt="Icono" class="ojo" />
-                  </span>
-                  <span v-else>
-                    <img src="/open-eye.png" alt="Icono" class="ojo" />
-                  </span>
-                </button>
+                <div v-if="errors.name" class="input-error-message">
+                  {{ errors.name }}
+                </div>
               </div>
-              <div v-if="errors.password" class="input-error-message">
-                {{ errors.password }}
-              </div>
-            </div>
-
-            <!-- Input de repetir contraseña -->
-            <div class="info">
-              <div class="password-input-container">
+              <div class="info">
                 <input
-                  :type="passwordVisibleRepeat ? 'text' : 'password'"
-                  id="passwordRepeat"
-                  placeholder="Repetir contrasenya"
-                  v-model="formData.passwordRepeat"
-                  @blur="validatePasswordRepeat"
-                  :class="{
-                    'input-error': errors.passwordRepeat,
-                    'input-valid':
-                      formData.passwordRepeat && !errors.passwordRepeat,
-                  }"
+                  type="email"
+                  placeholder="Correu electrònic"
+                  v-model="formData.email"
+                  @blur="validateEmail"
+                  required
+                  :class="{ 'input-error': errors.email }"
                   class="input"
                 />
+                <div v-if="errors.email" class="input-error-message">
+                  {{ errors.email }}
+                </div>
+              </div>
+              <!-- Input de contraseña -->
+              <div class="info">
+                <div class="password-input-Formulario">
+                  <input
+                    :type="passwordVisibleRegister ? 'text' : 'password'"
+                    id="password"
+                    placeholder="Contrasenya"
+                    v-model="formData.password"
+                    @blur="validatePassword"
+                    :class="{
+                      'input-error': errors.password,
+                      'input-valid': formData.password && !errors.password,
+                    }"
+                    class="input"
+                  />
 
-                <button
-                  type="button"
-                  @click="togglePasswordVisibilityRepeat"
-                  class="show-password-btn"
-                >
-                  <span v-if="passwordVisibleRepeat">
-                    <img src="/close-eye.png" alt="Icono" class="ojo" />
-                  </span>
-                  <span v-else>
-                    <img src="/open-eye.png" alt="Icono" class="ojo" />
-                  </span>
-                </button>
+                  <button
+                    type="button"
+                    @click="togglePasswordVisibilityRegister"
+                    class="show-password-btn"
+                  >
+                    <span v-if="passwordVisibleRegister">
+                      <img src="/public/close-eye.png" alt="Icono" class="ojo" />
+                    </span>
+                    <span v-else>
+                      <img src="/public/open-eye.png" alt="Icono" class="ojo" />
+                    </span>
+                  </button>
+                </div>
+                <div v-if="errors.password" class="input-error-message">
+                  {{ errors.password }}
+                </div>
               </div>
-              <div v-if="errors.passwordRepeat" class="input-error-message">
-                {{ errors.passwordRepeat }}
+
+              <!-- Input de repetir contraseña -->
+              <div class="info">
+                <div class="password-input-Formulario">
+                  <input
+                    :type="passwordVisibleRepeat ? 'text' : 'password'"
+                    id="passwordRepeat"
+                    placeholder="Repetir contrasenya"
+                    v-model="formData.passwordRepeat"
+                    @blur="validatePasswordRepeat"
+                    :class="{
+                      'input-error': errors.passwordRepeat,
+                      'input-valid':
+                        formData.passwordRepeat && !errors.passwordRepeat,
+                    }"
+                    class="input"
+                  />
+
+                  <button
+                    type="button"
+                    @click="togglePasswordVisibilityRepeat"
+                    class="show-password-btn"
+                  >
+                    <span v-if="passwordVisibleRepeat">
+                      <img src="/public/close-eye.png" alt="Icono" class="ojo" />
+                    </span>
+                    <span v-else>
+                      <img src="/public/open-eye.png" alt="Icono" class="ojo" />
+                    </span>
+                  </button>
+                </div>
+                <div v-if="errors.passwordRepeat" class="input-error-message">
+                  {{ errors.passwordRepeat }}
+                </div>
               </div>
+
+              <button
+                type="submit"
+                class="button password_register"
+                :disabled="!isRegisterFormValid()"
+              >
+                Registrar-se
+              </button>
+            </form>
+            <div class="slide-button-Formulario">
+              Ja tens compte?
+              <span class="slide-button" @click="togglebutton"
+                >Iniciar sessió</span
+              >
             </div>
-
-            <button
-              type="submit"
-              class="button password_register"
-              :disabled="!isRegisterFormValid()"
-            >
-              Registrar-se
-            </button>
-          </form>
-          <div class="slide-button-container">
-            Ja tens compte?
-            <span class="slide-button" @click="toggleRegister"
-              >Iniciar sessió</span
-            >
+            <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
           </div>
-          <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         </div>
       </div>
     </div>
@@ -197,16 +208,19 @@
 
 <script setup>
 import { reactive, ref, onUnmounted, onMounted, watch } from "vue";
-import { useRouter } from "nuxt/app";
+import { useRouter } from '#app';
 import { useAppStore } from "@/stores/app";
 import { useLliureStore } from "~/stores/app";
+import { onBeforeUnmount } from "vue";
 
-// Limpia el fondo al salir del componente
-onBeforeUnmount(() => {
-  document.body.style.background = '';
-  document.body.style.backgroundSize = '';
+
+onMounted(() => {
+  document.body.classList.add('login-page');  // Añadir clase para la página de login
 });
 
+onBeforeUnmount(() => {
+  document.body.classList.remove('login-page');  // Eliminar clase cuando se navega a otra página
+});
 
 const router = useRouter();
 const appStore = useAppStore();
@@ -215,6 +229,16 @@ const lliureStore = useLliureStore();
 const passwordVisibleLogin = ref(false); // Para el login
 const passwordVisibleRegister = ref(false); // Para el registro
 const passwordVisibleRepeat = ref(false); // Para el repetir contraseña
+
+const errorMessage = ref("");
+const showRegister = ref(false); // Valor inicial, asegúrate de que sea false
+
+
+const gohome = () => {
+  showRegister.value = !showRegister.value;
+  router.push('/'); // Esto ahora funcionará correctamente
+};
+
 
 const togglePasswordVisibilityLogin = () => {
   passwordVisibleLogin.value = !passwordVisibleLogin.value;
@@ -249,11 +273,11 @@ const errors = reactive({
   passwordRepeat: "",
 });
 
-const errorMessage = ref("");
-const showRegister = ref(false);
 
-const toggleRegister = () => {
-showRegister.value = !showRegister.value;
+
+const togglebutton = () => {
+  showRegister.value = !showRegister.value;
+  
 };
 
 const validateEmail = () => {
@@ -441,14 +465,14 @@ const register = async () => {
   --text-color: #848488;
   --valid-color: #00ff00;
   --invalid-color: #ff0000;
-  --transparent: #00000000;
   --font-family: "Poppins", sans-serif;
   --large-font-size: calc(3rem + 1.625vh);
   --medium-font-size: min(calc(1rem + 0.725vh), 1.25rem);
   --small-font-size: min(calc(0.675rem + 0.5vh), 1rem);
-}
+} 
 
-body {
+body.login-page {
+  min-height: 100vh;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -459,7 +483,22 @@ body {
   background: var(--background-image) no-repeat center center fixed;
   background-size: cover;
 }
-// fondo que se mueve
+.login-wrapper {
+  min-height: calc(100vh - 60px);  /* Mantiene la altura al 100% */
+  padding-bottom: 60px; /* Deja espacio suficiente para que el contenido no tape el footer */
+  display: flex;
+  flex-direction: column;
+}
+footer {
+  position: absolute;  /* Lo posiciona de forma absoluta al fondo */
+  width: 100%;
+  height: 60px;  /* Ajusta la altura a la de tu footer */
+  background-color: #333;
+  color: white;
+  text-align: center;
+  z-index: 1; /* Asegura que el footer no se superponga al contenido */
+}
+
 .slider {
   width: 50%;
   height: 100%;
@@ -468,12 +507,33 @@ body {
   transition: margin-left 0.9s ease;
   margin-left: 0;
 }
-// longitut a la que se aleja hacia la derecha
 .slider.slide {
   margin-left: 50%;
 }
 
-.container {
+.atras {
+  position: relative;
+  z-index: 10; 
+  width: 20%;
+  background-color: var(--primary-color);
+  font-size: var(--medium-font-size);
+  border: none;
+  border-radius: 25px;
+  padding: 1%;
+  text-transform: capitalize;
+  font-weight: 600;
+  color: var(--title-color);
+  margin: auto;
+  transition: all 0.25s;
+  cursor: pointer;
+  left: 10%;  /* Ajusta este valor para mover más a la derecha */
+  margin-top: 20px;  &:hover {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+  }
+}
+
+.Formulario {
   display: flex;
   width: 200%;
   height: 100%;
@@ -481,17 +541,8 @@ body {
   transform: translateX(0);
 }
 
-.slider.slide .container {
+.slider.slide .Formulario {
   transform: translateX(-50%);
-}
-
-.left,
-.right {
-  width: 90%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .left {
@@ -499,7 +550,6 @@ body {
   height: 100%;
   display: flex;
   align-items: center;
-  background: transparent;
 }
 
 .right {
@@ -507,7 +557,6 @@ body {
   height: 100%;
   display: flex;
   align-items: center;
-  background: transparent;
 }
 
 .content {
@@ -565,12 +614,6 @@ body {
   }
 }
 
-.slide-button-container {
-  margin-top: rem;
-  font-size: var(--small-font-size);
-  text-align: center;
-}
-
 .slide-button {
   color: var(--secondary-color);
   cursor: pointer;
@@ -584,14 +627,14 @@ body {
   text-align: center;
 }
 
-.password-input-container {
+.password-input-Formulario {
   position: relative;
 }
 
 .show-password-btn {
   position: absolute;
-  top: 75%;
-  left: 105%;
+  top: 70%;
+  left: 95%;
   transform: translateY(-70%);
   background: none;
   border: none;
@@ -601,11 +644,6 @@ body {
 .ojo {
   width: 20px;
   height: 20px;
-}
-
-.input {
-  width: 100%;
-  padding-right: 40px;
 }
 
 .title {
@@ -627,7 +665,7 @@ body {
 .input-error {
   border-color: var(--invalid-color);
 }
-@media ( max-width: 1080px) {
+@media (max-width: 1080px) {
   .content {
     background: rgba(0, 0, 0, 0.6);
     padding: 10%;
@@ -662,7 +700,6 @@ body {
     height: 100%;
     display: flex;
     align-items: center;
-    background: transparent;
   }
 
   .right {
@@ -670,7 +707,6 @@ body {
     height: 100%;
     display: flex;
     align-items: center;
-    background: transparent;
   }
   .button {
     width: 40%;
@@ -724,104 +760,101 @@ body {
     text-align: left;
     margin-top: 5px;
   }
+}
   @media (max-width: 600) {
-  .content {
-    background: rgba(0, 0, 0, 0.6);
-    padding: 20%;
-    text-align: center;
-    color: white;
-    width: 100%;
-    margin: 0 auto;
-    position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    height: 100%;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  .slider {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    position: absolute;
-    transition: margin-left 0.9s ease;
-    margin-left: 0;
-  }
-  .slider.slide {
-    margin-left: 0%;
-  }
+    .content {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20%;
+      text-align: center;
+      color: white;
+      width: 100%;
+      margin: 0 auto;
+      position: relative;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      height: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .slider {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: absolute;
+      transition: margin-left 0.9s ease;
+      margin-left: 0;
+    }
+    .slider.slide {
+      margin-left: 0%;
+    }
 
-  .left {
-    width: 50%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    background: transparent;
-  }
+    .left {
+      width: 50%;
+      height: 100%;
+      display: flex;
+      align-items: center;
 
-  .right {
-    width: 50%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    background: transparent;
-  }
-  .button {
-    width: 40%;
-    background-color: var(--primary-color);
-    font-size: var(--medium-font-size);
-    border: none;
-    border-radius: 25px;
-    padding: 3%;
-    text-transform: capitalize;
-    font-weight: 600;
-    color: var(--title-color);
-    margin: 0.5rem 20%;
-    transition: all 0.25s;
-    cursor: pointer;
-    &:hover {
-      background-color: var(--secondary-color);
-      color: var(--primary-color);
+    .right {
+      width: 50%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    .button {
+      width: 40%;
+      background-color: var(--primary-color);
+      font-size: var(--medium-font-size);
+      border: none;
+      border-radius: 25px;
+      padding: 3%;
+      text-transform: capitalize;
+      font-weight: 600;
+      color: var(--title-color);
+      margin: 0.5rem 20%;
+      transition: all 0.25s;
+      cursor: pointer;
+      &:hover {
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+      }
+    }
+    .input {
+      width: 80%;
+      border: 5px solid var(--primary-color);
+      background-color: rgba(0, 0, 0, 0.4);
+      border-radius: 50px;
+      padding: 2% 2%;
+      font-size: var(--medium-font-size);
+      color: var(--title-color);
+      outline: none;
+    }
+
+    .show-password-btn {
+      position: absolute;
+      top: 70%;
+      left: 85%;
+      transform: translateY(-70%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .input-valid {
+      border-color: var(--valid-color);
+    }
+
+    .input-error {
+      border-color: var(--invalid-color);
+    }
+    .input-error-message {
+      font-size: 25px;
+      color: var(--invalid-color); 
+      text-align: left;
+      margin-top: 5px;
     }
   }
-  .input {
-    width: 80%;
-    border: 5px solid var(--primary-color);
-    background-color: rgba(0, 0, 0, 0.4);
-    border-radius: 50px;
-    padding: 2% 2%;
-    font-size: var(--medium-font-size);
-    color: var(--title-color);
-    outline: none;
-  }
-
-  .show-password-btn {
-    position: absolute;
-    top: 70%;
-    left: 85%;
-    transform: translateY(-70%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-  }
-  .input-valid {
-    border-color: var(--valid-color);
-  }
-
-  .input-error {
-    border-color: var(--invalid-color);
-  }
-  .input-error-message {
-    font-size: 25px;
-    color: var(--invalid-color);
-    text-align: left;
-    margin-top: 5px;
-  }
 }
-}
-
 </style>
