@@ -58,6 +58,8 @@ class ProjectController extends Controller
                     $query->orderBy('created_at', 'asc');
                 } elseif ($sort === 'date_desc') {
                     $query->orderBy('created_at', 'desc');
+                } elseif ($sort === 'popular') {
+                    $query->withCount('likes')->orderBy('likes_count', 'desc');
                 }
             }
 
