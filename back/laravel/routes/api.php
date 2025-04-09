@@ -22,6 +22,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/likes/check/{projectId}', [LikesController::class, 'checkLike']);
     //chequea si le has dado like a una publicacion
     Route::get('/likes/user', [LikesController::class, 'userLikes']);
+    //Todas las publicaciones a las que le ha dado like un usuario
+    Route::get('/likes/allUserLikes', [LikesController::class, 'userAllLikes']);
 });
 //contador de likes para un proyecto
 Route::get('/likes/count/{projectId}', [LikesController::class, 'likeCount']);
