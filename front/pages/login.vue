@@ -866,4 +866,5 @@ body.login-page {
   } 
   
 }
+}
 </style>
