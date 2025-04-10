@@ -131,12 +131,12 @@ import "codemirror/addon/hint/javascript-hint";
 
 // Importar la lógica de comunicación y el store de proyecto
 import useCommunicationManager from "@/stores/comunicationManager";
-import { useAppStore, useIdProyectoActualStore } from "@/stores/app"; // si ambos están en el mismo archivo
+import { useAppStore, useIdProyectoActualStore } from "@/stores/app"; 
 
 export default {
   setup() {
     const appStore = useAppStore();
-    const idProyectoActualStore = useIdProyectoActualStore(); // Para otros usos
+    const idProyectoActualStore = useIdProyectoActualStore();
     const router = useRouter();
     const route = useRoute();
     const {
@@ -166,9 +166,8 @@ export default {
     const messages = ref([{ type: "ai", content: "¡Hola! ¿En qué puedo ayudarte hoy?" }]);
     const messagesContainer = ref(null);
     const guardarParaSalir = ref(false);
-    // Establecer 0 como valor por defecto (Público)
     const isPrivate = ref(0);
-    const description = ref(""); // Añadir ref para descripción del proyecto
+    const description = ref("");
 
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
@@ -275,8 +274,8 @@ export default {
           html.value = proyecto.html_code || "";
           css.value = proyecto.css_code || "";
           js.value = proyecto.js_code || "";
-          title.value = proyecto.nombre || "Untitled"; // Cargar título
-          description.value = proyecto.descripcion || ""; // Cargar descripción
+          title.value = proyecto.nombre || "Untitled";
+          description.value = proyecto.descripcion || "";
           htmlEditorInstance.setValue(html.value);
           cssEditorInstance.setValue(css.value);
           jsEditorInstance.setValue(js.value);
@@ -371,7 +370,7 @@ export default {
     const openSettingsModal = () => {
       showSettingsModal.value = true;
       modalTitle.value = title.value;
-      modalDescription.value = description.value; // Cargar la descripción actual
+      modalDescription.value = description.value; 
     };
 
     const closeSettingsModal = () => {
@@ -380,8 +379,8 @@ export default {
 
     const saveSettings = () => {
       title.value = modalTitle.value;
-      description.value = modalDescription.value; // Guardar la descripción
-      CambiosSinGuardarToTrue(); // Marcar que hay cambios sin guardar
+      description.value = modalDescription.value;
+      CambiosSinGuardarToTrue();
       closeSettingsModal();
     };
 
@@ -397,7 +396,7 @@ export default {
         await guardarProyectoDB(
           {
             nombre: title.value || "",
-            descripcion: description.value || "", // Guardar la descripción en la BD
+            descripcion: description.value || "",
             user_id: appStore.loginInfo.id || null,
             html_code: html.value || "",
             css_code: css.value || "",
@@ -447,8 +446,8 @@ export default {
       onDrag,
       stopDrag,
       CambiosSinGuardarToTrue,
-      isPrivate, // Agregado explícitamente para asegurar que se exporta
-      description, // Agregado explícitamente para asegurar que se exporta
+      isPrivate,
+      description,
       output: computed(() => {
         let jsContent = js.value;
         let scriptContent = `
