@@ -1,6 +1,6 @@
 <template>
   <div class="todo">
-    <header class="header">
+    <header class="header" v-show="!isExpanded">
       <button class="header-button" @click="goBack">Atrás</button>
       <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
         :readonly="!isEditing" />
@@ -481,7 +481,6 @@ export default {
 }
 
 .header {
-  position: fixed;
   left: 0;
   right: 0;
   height: 70px;
@@ -533,7 +532,6 @@ export default {
 }
 
 .editor-container {
-  margin-top: 70px;
   display: flex;
   padding: 20px;
   gap: 20px;
