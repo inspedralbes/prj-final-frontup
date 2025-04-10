@@ -461,8 +461,8 @@ const register = async () => {
   --background-image: url(deserd.png);
   --primary-color: #f2eeeb;
   --secondary-color: #5353ff;
-  --title-color: #333;
-  --text-color: #848488;
+  --title-color: black;
+  --text-color: white;
   --valid-color: #00ff00;
   --invalid-color: #ff0000;
   --font-family: "Poppins", sans-serif;
