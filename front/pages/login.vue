@@ -726,7 +726,7 @@ body.login-page {
     border-radius: 50px;
     padding: 2% 2%;
     font-size: var(--medium-font-size);
-    color: var(--title-color);
+    color: var(--text-color);
     outline: none;
   }
 
@@ -753,8 +753,9 @@ body.login-page {
     text-align: left;
     margin-top: 5px;
   }
+  
 }
-  @media (max-width: 600) {
+  @media (max-width: 400) {
     .content {
       background: rgba(0, 0, 0, 0.6);
       padding: 20%;
@@ -821,7 +822,7 @@ body.login-page {
       border-radius: 50px;
       padding: 2% 2%;
       font-size: var(--medium-font-size);
-      color: var(--title-color);
+      color: var(--text-color);
       outline: none;
     }
 
@@ -849,5 +850,6 @@ body.login-page {
       margin-top: 5px;
     }
   } 
+  
 }
 </style>
