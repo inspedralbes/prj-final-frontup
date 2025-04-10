@@ -12,8 +12,8 @@
       </div>
     </header>
 
-    <!-- Modal de configuración -->
-    <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
+     <!-- Modal de configuración -->
+     <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
       <div class="modal-content" @click.stop>
         <h2>Configuració del Projecte</h2>
         <form @submit.prevent="saveSettings">
@@ -166,8 +166,9 @@ export default {
     const messages = ref([{ type: "ai", content: "¡Hola! ¿En qué puedo ayudarte hoy?" }]);
     const messagesContainer = ref(null);
     const guardarParaSalir = ref(false);
-
+    // Establecer 0 como valor por defecto (Público)
     const isPrivate = ref(0);
+    const description = ref(""); // Añadir ref para descripción del proyecto
 
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
@@ -274,6 +275,8 @@ export default {
           html.value = proyecto.html_code || "";
           css.value = proyecto.css_code || "";
           js.value = proyecto.js_code || "";
+          title.value = proyecto.nombre || "Untitled"; // Cargar título
+          description.value = proyecto.descripcion || ""; // Cargar descripción
           htmlEditorInstance.setValue(html.value);
           cssEditorInstance.setValue(css.value);
           jsEditorInstance.setValue(js.value);
@@ -368,6 +371,7 @@ export default {
     const openSettingsModal = () => {
       showSettingsModal.value = true;
       modalTitle.value = title.value;
+      modalDescription.value = description.value; // Cargar la descripción actual
     };
 
     const closeSettingsModal = () => {
@@ -376,6 +380,8 @@ export default {
 
     const saveSettings = () => {
       title.value = modalTitle.value;
+      description.value = modalDescription.value; // Guardar la descripción
+      CambiosSinGuardarToTrue(); // Marcar que hay cambios sin guardar
       closeSettingsModal();
     };
 
@@ -391,6 +397,7 @@ export default {
         await guardarProyectoDB(
           {
             nombre: title.value || "",
+            descripcion: description.value || "", // Guardar la descripción en la BD
             user_id: appStore.loginInfo.id || null,
             html_code: html.value || "",
             css_code: css.value || "",
@@ -403,8 +410,6 @@ export default {
         console.error("Error al guardar el proyecto:", error);
       }
     };
-
-
 
     return {
       title,
@@ -442,6 +447,8 @@ export default {
       onDrag,
       stopDrag,
       CambiosSinGuardarToTrue,
+      isPrivate, // Agregado explícitamente para asegurar que se exporta
+      description, // Agregado explícitamente para asegurar que se exporta
       output: computed(() => {
         let jsContent = js.value;
         let scriptContent = `
