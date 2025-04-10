@@ -436,7 +436,7 @@ export default {
   background-color: #1e1e1e;
   font-family: 'Arial', sans-serif;
   color: #ffffff;
-  margin-left: -220px;
+  margin-left: -210px;
 }
 
 .header {
@@ -537,7 +537,7 @@ export default {
   background-color: white;
   height: 100vh;
   overflow: hidden;
-  margin-left: 20px;
+  margin-left: 10px;
 }
 
 .output-container.expanded {
