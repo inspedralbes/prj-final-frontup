@@ -3,10 +3,10 @@
     <div class="slider" :class="{ slide: showRegister }">
       <div>
     <button v-if="showRegister" class="atras" @click="gohome">
-      Home
+      FrontUp
     </button>
     <button v-else class="atras" @click="gohome">
-      Home
+      FrontUp
     </button>
   </div>
       <div class="Formulario">
@@ -489,15 +489,7 @@ body.login-page {
   display: flex;
   flex-direction: column;
 }
-footer {
-  position: absolute;  /* Lo posiciona de forma absoluta al fondo */
-  width: 100%;
-  height: 60px;  /* Ajusta la altura a la de tu footer */
-  background-color: #333;
-  color: white;
-  text-align: center;
-  z-index: 1; /* Asegura que el footer no se superponga al contenido */
-}
+
 
 .slider {
   width: 50%;
@@ -567,7 +559,7 @@ footer {
   width: 100%;
   margin: 0 auto;
   position: relative;
-  top: 70%;
+  top: 60%;
   left: 50%;
   transform: translate(-50%, -50%);
   height: 100%;
@@ -584,7 +576,7 @@ footer {
 }
 
 .input {
-  width: 100%;
+  width: 90%;
   border: 1px solid var(--primary-color);
   background-color: rgba(0, 0, 0, 0.4);
   border-radius: 50px;
@@ -634,7 +626,7 @@ footer {
 .show-password-btn {
   position: absolute;
   top: 70%;
-  left: 95%;
+  left: 87%;
   transform: translateY(-70%);
   background: none;
   border: none;
@@ -665,6 +657,7 @@ footer {
 .input-error {
   border-color: var(--invalid-color);
 }
+
 @media (max-width: 1080px) {
   .content {
     background: rgba(0, 0, 0, 0.6);
@@ -855,6 +848,6 @@ footer {
       text-align: left;
       margin-top: 5px;
     }
-  }
+  } 
 }
 </style>
