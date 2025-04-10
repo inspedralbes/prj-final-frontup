@@ -582,7 +582,7 @@ body.login-page {
   border-radius: 50px;
   padding: 0.8rem 0.7rem;
   font-size: var(--medium-font-size);
-  color: var(--title-color);
+  color: var(--text-color);
   outline: none;
   margin-top: 0.5rem;
 }
