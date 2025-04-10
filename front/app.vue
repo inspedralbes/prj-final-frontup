@@ -27,7 +27,7 @@
           </svg>
           <p class="label">Crear Projecte</p>
         </li>
-        <li class="leftsection-element" @click="navigateToMeusProjectes">
+        <li v-if="isLoged" class="leftsection-element" @click="navigateToMeusProjectes">
           <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
             stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -49,6 +49,15 @@
             <path d="M8 7v10M16 7v10M12 7v10" />
           </svg>
           <p class="label">Tots els Projectes</p>
+        </li>
+        <li v-if="isLoged" class="leftsection-element" @click="navigateToLikes">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
+            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+            </path>
+          </svg>
+          <p class="label">Likes</p>
         </li>
       </ul>
 
@@ -93,7 +102,7 @@ import { useLliureStore } from '~/stores/app'
 import { useAppStore } from '@/stores/app'
 import { useIdProyectoActualStore } from '@/stores/app'
 import useCommunicationManager from '@/stores/comunicationManager'
-import { ref, watch, onMounted, reactive } from 'vue'
+import { ref, watch, onMounted, reactive, computed  } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useBuscadorStore } from '@/stores/app'
 
@@ -101,11 +110,15 @@ const idProyectoActualStore = useIdProyectoActualStore();
 const theme = ref('')
 const themeIcon = ref('☀️')
 const loginText = ref('Login')
-
+const isLoged = computed(() => {
+  return localStorage.getItem('loginInfo') !== null
+})
 const appStore = useAppStore()
 const lliureStore = useLliureStore()
 const buscadorStore = useBuscadorStore()
 
+watch(() => appStore.isLoggedIn, (newValue) => {
+})
 const comunicationManager = useCommunicationManager();
 const router = useRouter()
 const route = useRoute()
@@ -174,7 +187,9 @@ const navigateToLliure = async () => {
 const navigateToNiveles = () => {
   router.push('/niveles');
 }
-
+const navigateToLikes = () => {
+  router.push('/likes');
+}
 const navigateToLogin = () => {
   router.push('/login');
 }
@@ -196,10 +211,11 @@ const navigateToTotsProjectes = () => {
 </script>
 
 <style>
-body{
+body {
   background-color: rgb(29, 32, 39);
   margin-left: 200px;
 }
+
 h2 {
   padding: 10px;
 }
@@ -223,6 +239,7 @@ h2 {
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 0.9;
@@ -233,13 +250,16 @@ h2 {
   0% {
     opacity: 0.9;
   }
+
   60% {
     opacity: 0.9;
   }
+
   100% {
     opacity: 0;
   }
 }
+
 .light-mode {
   background-color: #f7f7f7;
   color: #333;
@@ -301,7 +321,7 @@ h2 {
       rgba(36, 40, 50, 1) 0%,
       rgba(37, 28, 40, 1) 100%);
   border-radius: 0 10px 10px 0;
-  padding: 20px 0; 
+  padding: 20px 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -355,11 +375,12 @@ h2 {
   font-size: 0.95rem;
   margin: 0;
 }
+
 footer {
   background-image: linear-gradient(139deg,
-    rgba(34, 38, 47, 1) 0%,
-    rgba(32, 36, 42, 1) 50%,
-    rgba(28, 33, 42, 1) 100%);
+      rgba(34, 38, 47, 1) 0%,
+      rgba(32, 36, 42, 1) 50%,
+      rgba(28, 33, 42, 1) 100%);
   text-align: center;
   padding: 10px 20px;
   color: white;

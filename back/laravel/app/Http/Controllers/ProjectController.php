@@ -26,14 +26,15 @@ class ProjectController extends Controller
                 $query->orderBy('created_at', 'asc');
             } elseif ($sort === 'date_desc') {
                 $query->orderBy('created_at', 'desc');
+            } elseif ($sort === 'popular') {
+                $query->withCount('likes')->orderBy('likes_count', 'desc');
             }
         }
         
         $projects = $query->paginate(9);
-
+    
         return response()->json($projects, 200);
-    }
-
+    }  
     
     public function index(Request $request)
     {
@@ -57,6 +58,8 @@ class ProjectController extends Controller
                     $query->orderBy('created_at', 'asc');
                 } elseif ($sort === 'date_desc') {
                     $query->orderBy('created_at', 'desc');
+                } elseif ($sort === 'popular') {
+                    $query->withCount('likes')->orderBy('likes_count', 'desc');
                 }
             }
 

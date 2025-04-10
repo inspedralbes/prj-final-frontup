@@ -64,15 +64,13 @@ export default {
 .level-container {
   position: relative;
   height: 99vh;
-  width: 90%;
-  margin-left: 5%;
+  width: 98%;
   display: flex;
   flex-direction: column;
+  margin-left: 21px;
   align-items: center;
   justify-content: center;
   background-image: url('/fondo.png');
-  border: 1px solid #ddd;
-  border-radius: 10px;
   background-size: cover;
   background-position: center;
 }

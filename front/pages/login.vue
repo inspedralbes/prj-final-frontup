@@ -362,17 +362,19 @@ const login = async () => {
     });
     const data = await response.json();
     if (response.ok) {
-      appStore.setLoginInfo({
+      const loginInfo = {
         loggedIn: true,
         id: data.user.id,
         token: data.token,
         name: data.user.name,
         email: data.user.email,
-        nivel_html: data.user.nivel_html,
+        nivel: data.user.nivel_html,
         nivel_css: data.user.nivel_css,
         nivel_js: data.user.nivel_js,
         avatar: data.user.avatar,
-      });
+      };
+      appStore.setLoginInfo(loginInfo);
+      console.log("Login info:", loginInfo);
       router.push("/");
     } else {
       errorMessage.value = data.message || "Credenciales inválidas";
@@ -435,7 +437,7 @@ const register = async () => {
             token: loginData.token,
             name: loginData.user.name,
             email: loginData.user.email,
-            nivel: loginData.user.nivel,
+            nivel: data.user.nivel_html,
             nivel_css: loginData.user.nivel_css,
             nivel_js: loginData.user.nivel_js,
             avatar: avatarUrl,
@@ -600,6 +602,7 @@ body.login-page {
   margin: 0.9rem 0;
   transition: all 0.25s;
   cursor: pointer;
+
   &:hover {
     background-color: var(--secondary-color);
     color: var(--primary-color);
@@ -633,6 +636,7 @@ body.login-page {
   cursor: pointer;
   font-size: 18px;
 }
+
 .ojo {
   width: 20px;
   height: 20px;
@@ -650,6 +654,7 @@ body.login-page {
   margin-top: 5px;
   top: 50%;
 }
+
 .input-valid {
   border-color: var(--valid-color);
 }
@@ -657,6 +662,8 @@ body.login-page {
 .input-error {
   border-color: var(--invalid-color);
 }
+
+@media (max-width: 1080px) {
 
 @media (max-width: 1080px) {
   .content {
@@ -676,6 +683,7 @@ body.login-page {
     flex-direction: column;
     justify-content: center;
   }
+
   .slider {
     width: 100%;
     height: 100%;
@@ -684,6 +692,7 @@ body.login-page {
     transition: margin-left 0.9s ease;
     margin-left: 0;
   }
+
   .slider.slide {
     margin-left: 0%;
   }
@@ -701,6 +710,7 @@ body.login-page {
     display: flex;
     align-items: center;
   }
+
   .button {
     width: 40%;
     background-color: var(--primary-color);
@@ -714,11 +724,13 @@ body.login-page {
     margin: 0.5rem 20%;
     transition: all 0.25s;
     cursor: pointer;
+
     &:hover {
       background-color: var(--secondary-color);
       color: var(--primary-color);
     }
   }
+
   .input {
     width: 80%;
     border: 5px solid var(--primary-color);
@@ -740,6 +752,7 @@ body.login-page {
     cursor: pointer;
     font-size: 18px;
   }
+
   .input-valid {
     border-color: var(--valid-color);
   }
@@ -747,6 +760,7 @@ body.login-page {
   .input-error {
     border-color: var(--invalid-color);
   }
+
   .input-error-message {
     font-size: 25px;
     color: var(--invalid-color);

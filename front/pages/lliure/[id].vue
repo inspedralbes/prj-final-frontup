@@ -1,6 +1,6 @@
 <template>
   <div class="todo">
-    <header class="header">
+    <header class="header" v-show="!isExpanded">
       <button class="header-button" @click="goBack">Atrás</button>
       <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
         :readonly="!isEditing" />
@@ -12,8 +12,8 @@
       </div>
     </header>
 
-    <!-- Modal de configuración -->
-    <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
+     <!-- Modal de configuración -->
+     <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
       <div class="modal-content" @click.stop>
         <h2>Configuració del Projecte</h2>
         <form @submit.prevent="saveSettings">
@@ -116,18 +116,27 @@ import CodeMirror from "codemirror";
 import { useLliureStore } from "~/stores/app";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
+
 import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
 import "codemirror/mode/javascript/javascript";
+
+import "codemirror/addon/hint/show-hint";
+import "codemirror/addon/hint/show-hint.css";
+import "codemirror/addon/hint/html-hint";
+import "codemirror/addon/hint/anyword-hint";
+import "codemirror/addon/edit/closetag";
+import "codemirror/addon/edit/matchtags";
+import "codemirror/addon/hint/javascript-hint";
+
 // Importar la lógica de comunicación y el store de proyecto
 import useCommunicationManager from "@/stores/comunicationManager";
-import { useAppStore } from "@/stores/app";
-import { useIdProyectoActualStore } from "@/stores/app";
+import { useAppStore, useIdProyectoActualStore } from "@/stores/app"; 
 
 export default {
   setup() {
     const appStore = useAppStore();
-    const idProyectoActualStore = useIdProyectoActualStore(); // Para otros usos
+    const idProyectoActualStore = useIdProyectoActualStore();
     const router = useRouter();
     const route = useRoute();
     const {
@@ -157,8 +166,8 @@ export default {
     const messages = ref([{ type: "ai", content: "¡Hola! ¿En qué puedo ayudarte hoy?" }]);
     const messagesContainer = ref(null);
     const guardarParaSalir = ref(false);
-
     const isPrivate = ref(0);
+    const description = ref("");
 
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
@@ -216,16 +225,43 @@ export default {
         mode: "htmlmixed",
         theme: "dracula",
         lineNumbers: true,
+        autoCloseTags: true,
+        matchTags: { bothTags: true },
+        extraKeys: {
+          "Ctrl-Space": "autocomplete"
+        },
       });
+      htmlEditorInstance.on("inputRead", (editor, change) => {
+        if (change.text[0] === "<") {
+          editor.showHint({
+            completeSingle: false
+          });
+        }
+      });
+
+
       cssEditorInstance = CodeMirror(cssEditor.value, {
         mode: "css",
         theme: "dracula",
         lineNumbers: true,
+        extraKeys: {
+          "Ctrl-Space": "autocomplete",
+        },
       });
+      cssEditorInstance.on("inputRead", (editor, change) => {
+        if (change.text[0].match(/[a-zA-Z\-]/)) {
+          editor.showHint({ completeSingle: false });
+        }
+      });
+
+
       jsEditorInstance = CodeMirror(jsEditor.value, {
         mode: "javascript",
         theme: "dracula",
         lineNumbers: true,
+        extraKeys: {
+          "Ctrl-Space": "autocomplete" 
+        }
       });
 
       const projectId = route.params.id;
@@ -238,6 +274,8 @@ export default {
           html.value = proyecto.html_code || "";
           css.value = proyecto.css_code || "";
           js.value = proyecto.js_code || "";
+          title.value = proyecto.nombre || "Untitled";
+          description.value = proyecto.descripcion || "";
           htmlEditorInstance.setValue(html.value);
           cssEditorInstance.setValue(css.value);
           jsEditorInstance.setValue(js.value);
@@ -332,6 +370,7 @@ export default {
     const openSettingsModal = () => {
       showSettingsModal.value = true;
       modalTitle.value = title.value;
+      modalDescription.value = description.value; 
     };
 
     const closeSettingsModal = () => {
@@ -340,6 +379,8 @@ export default {
 
     const saveSettings = () => {
       title.value = modalTitle.value;
+      description.value = modalDescription.value;
+      CambiosSinGuardarToTrue();
       closeSettingsModal();
     };
 
@@ -355,6 +396,7 @@ export default {
         await guardarProyectoDB(
           {
             nombre: title.value || "",
+            descripcion: description.value || "",
             user_id: appStore.loginInfo.id || null,
             html_code: html.value || "",
             css_code: css.value || "",
@@ -367,8 +409,6 @@ export default {
         console.error("Error al guardar el proyecto:", error);
       }
     };
-
-
 
     return {
       title,
@@ -400,13 +440,14 @@ export default {
       closeGuardarParaSalir,
       saveSettings,
       guardarProyecto,
-      isPrivate,  
       isDragging,
       chatPosition,
       startDrag,
       onDrag,
       stopDrag,
       CambiosSinGuardarToTrue,
+      isPrivate,
+      description,
       output: computed(() => {
         let jsContent = js.value;
         let scriptContent = `
@@ -436,46 +477,58 @@ export default {
   background-color: #1e1e1e;
   font-family: 'Arial', sans-serif;
   color: #ffffff;
-  margin-left: -220px;
-  left: 0;
+  margin-left: -16vw;
 }
 
 .header {
+  left: 0;
+  right: 0;
+  height: 70px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 20px;
-  background-color: #2d2d2d;
-  color: #fff;
+  padding: 0 30px;
+  background-color: #1f1f1f;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 100;
 }
 
 .header-title {
-  font-size: 15px;
-  color: #fff;
-  background-color: #444;
-  border: none;
-  padding: 8px;
-  border-radius: 4px;
+  font-size: 18px;
+  color: #ffffff;
+  background-color: transparent;
+  border: 2px solid transparent;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
   text-align: center;
+  min-width: 180px;
+}
+
+.header-title:focus {
+  border-color: #4CAF50;
+  background-color: #292929;
+  outline: none;
 }
 
 .header-actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
 .header-button {
-  background-color: #555;
-  border: none;
+  background-color: #2e2e2e;
+  border: 1px solid #444;
   color: #fff;
-  padding: 8px 12px;
-  border-radius: 4px;
+  padding: 8px 14px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
 .header-button:hover {
-  background-color: #777;
+  background-color: #3a3a3a;
 }
 
 .editor-container {
@@ -523,6 +576,7 @@ export default {
   background-color: white;
   height: 100vh;
   overflow: hidden;
+  margin-left: 10px;
 }
 
 .output-container.expanded {
@@ -788,5 +842,33 @@ export default {
   100% {
     opacity: 0.6;
   }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+:deep(.CodeMirror-scrollbar-filler), 
+:deep(.CodeMirror-gutter-filler) {
+  background-color: transparent;
 }
 </style>

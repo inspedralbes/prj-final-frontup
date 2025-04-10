@@ -10,6 +10,7 @@
         <label for="sort" class="sort-label">Ordenar per:</label>
         <select id="sort" v-model="sortCriteria" class="sort-select">
           <option value="default">Destacats</option>
+          <option value="popular">Més Populars</option>
           <option value="date_asc">Data: Més antics primer</option>
           <option value="date_desc">Data: Més recents primer</option>
         </select>
