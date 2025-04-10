@@ -116,13 +116,22 @@ import CodeMirror from "codemirror";
 import { useLliureStore } from "~/stores/app";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
+
 import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
 import "codemirror/mode/javascript/javascript";
+
+import "codemirror/addon/hint/show-hint";
+import "codemirror/addon/hint/show-hint.css";
+import "codemirror/addon/hint/html-hint";
+import "codemirror/addon/hint/anyword-hint";
+import "codemirror/addon/edit/closetag";
+import "codemirror/addon/edit/matchtags";
+import "codemirror/addon/hint/javascript-hint";
+
 // Importar la lógica de comunicación y el store de proyecto
 import useCommunicationManager from "@/stores/comunicationManager";
-import { useAppStore } from "@/stores/app";
-import { useIdProyectoActualStore } from "@/stores/app";
+import { useAppStore, useIdProyectoActualStore } from "@/stores/app"; // si ambos están en el mismo archivo
 
 export default {
   setup() {
@@ -216,16 +225,43 @@ export default {
         mode: "htmlmixed",
         theme: "dracula",
         lineNumbers: true,
+        autoCloseTags: true,
+        matchTags: { bothTags: true },
+        extraKeys: {
+          "Ctrl-Space": "autocomplete"
+        },
       });
+      htmlEditorInstance.on("inputRead", (editor, change) => {
+        if (change.text[0] === "<") {
+          editor.showHint({
+            completeSingle: false
+          });
+        }
+      });
+
+
       cssEditorInstance = CodeMirror(cssEditor.value, {
         mode: "css",
         theme: "dracula",
         lineNumbers: true,
+        extraKeys: {
+          "Ctrl-Space": "autocomplete",
+        },
       });
+      cssEditorInstance.on("inputRead", (editor, change) => {
+        if (change.text[0].match(/[a-zA-Z\-]/)) {
+          editor.showHint({ completeSingle: false });
+        }
+      });
+
+
       jsEditorInstance = CodeMirror(jsEditor.value, {
         mode: "javascript",
         theme: "dracula",
         lineNumbers: true,
+        extraKeys: {
+          "Ctrl-Space": "autocomplete" 
+        }
       });
 
       const projectId = route.params.id;
@@ -400,7 +436,6 @@ export default {
       closeGuardarParaSalir,
       saveSettings,
       guardarProyecto,
-      isPrivate,  
       isDragging,
       chatPosition,
       startDrag,
@@ -436,7 +471,7 @@ export default {
   background-color: #1e1e1e;
   font-family: 'Arial', sans-serif;
   color: #ffffff;
-  margin-left: -210px;
+  margin-left: -16vw;
 }
 
 .header {
