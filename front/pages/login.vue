@@ -458,10 +458,10 @@ const register = async () => {
 </script>
 <style scoped, lang="scss">
 :root {
-  --background-image: url(https://i.imgur.com/NWC1ak5_d.webp?maxwidth=1520&fidelity=grand);
+  --background-image: url(deserd.png);
   --primary-color: #f2eeeb;
-  --secondary-color: #a57c6e;
-  --title-color: #a5a4a8;
+  --secondary-color: #5353ff;
+  --title-color: #333;
   --text-color: #848488;
   --valid-color: #00ff00;
   --invalid-color: #ff0000;
