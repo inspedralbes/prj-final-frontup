@@ -12,8 +12,8 @@
       </div>
     </header>
 
-     <!-- Modal de configuración -->
-     <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
+    <!-- Modal de configuración -->
+    <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
       <div class="modal-content" @click.stop>
         <h2>Configuració del Projecte</h2>
         <form @submit.prevent="saveSettings">
@@ -133,7 +133,7 @@ import "codemirror/addon/edit/closebrackets";
 
 // Importar la lógica de comunicación y el store de proyecto
 import useCommunicationManager from "@/stores/comunicationManager";
-import { useAppStore, useIdProyectoActualStore } from "@/stores/app"; 
+import { useAppStore, useIdProyectoActualStore } from "@/stores/app";
 
 export default {
   setup() {
@@ -265,7 +265,7 @@ export default {
         lineNumbers: true,
         autoCloseBrackets: true,
         extraKeys: {
-          "Ctrl-Space": "autocomplete" 
+          "Ctrl-Space": "autocomplete"
         }
       });
 
@@ -375,17 +375,18 @@ export default {
     const openSettingsModal = () => {
       showSettingsModal.value = true;
       modalTitle.value = title.value;
-      modalDescription.value = description.value; 
+      modalDescription.value = description.value;
     };
 
     const closeSettingsModal = () => {
       showSettingsModal.value = false;
     };
 
-    const saveSettings = () => {
+    const saveSettings = async () => {
       title.value = modalTitle.value;
       description.value = modalDescription.value;
       CambiosSinGuardarToTrue();
+      await guardarProyecto();
       closeSettingsModal();
     };
 
@@ -408,7 +409,7 @@ export default {
             js_code: js.value || "",
             statuts: isPrivate.value,
           },
-          idProyectoActualStore.id 
+          idProyectoActualStore.id
         );
       } catch (error) {
         console.error("Error al guardar el proyecto:", error);
@@ -869,10 +870,10 @@ export default {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.1) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
-:deep(.CodeMirror-scrollbar-filler), 
+:deep(.CodeMirror-scrollbar-filler),
 :deep(.CodeMirror-gutter-filler) {
   background-color: transparent;
 }
