@@ -128,6 +128,8 @@ import "codemirror/addon/hint/anyword-hint";
 import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/matchtags";
 import "codemirror/addon/hint/javascript-hint";
+import "codemirror/addon/edit/closebrackets";
+
 
 // Importar la lógica de comunicación y el store de proyecto
 import useCommunicationManager from "@/stores/comunicationManager";
@@ -226,6 +228,7 @@ export default {
         theme: "dracula",
         lineNumbers: true,
         autoCloseTags: true,
+        autoCloseBrackets: true,
         matchTags: { bothTags: true },
         extraKeys: {
           "Ctrl-Space": "autocomplete"
@@ -244,6 +247,7 @@ export default {
         mode: "css",
         theme: "dracula",
         lineNumbers: true,
+        autoCloseBrackets: true, 
         extraKeys: {
           "Ctrl-Space": "autocomplete",
         },
@@ -259,6 +263,7 @@ export default {
         mode: "javascript",
         theme: "dracula",
         lineNumbers: true,
+        autoCloseBrackets: true,
         extraKeys: {
           "Ctrl-Space": "autocomplete" 
         }
