@@ -52,13 +52,6 @@ class AuthenticatorController extends Controller
      */
     public function register(Request $request)
     {
-        // $name = $request->input('name'); 
-        // $email = $request->input('email'); 
-        // $password = $request->input('password'); 
-        // $data = [];
-        // $data['name'] = $name;
-        // $data['email'] = $email;
-        // $data['password'] = $password;
         $data = $request->validate([
             'name' => 'required|string|min:3',
             'email' => 'required|email|unique:users,email',
