@@ -7,41 +7,12 @@
       <div class="header-actions">
         <button class="header-button" @click="toggleChat">Xat IA</button>
         <button class="header-button" @click="guardarProyecto">Guardar</button>
-        <button class="header-button" @click="openSettingsModal">Configuració</button>
-        <button class="header-button">💡</button>
+        <select v-model="isPrivate" @change="savePrivacy" class="header-select">
+          <option :value="0">Público</option>
+          <option :value="1">Privado</option>
+        </select>
       </div>
     </header>
-
-    <!-- Modal de configuración -->
-    <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
-      <div class="modal-content" @click.stop>
-        <h2>Configuració del Projecte</h2>
-        <form @submit.prevent="saveSettings">
-          <div class="input-group">
-            <label for="project-title">Título del Proyecto</label>
-            <input type="text" id="project-title" v-model="modalTitle" class="modal-input"
-              placeholder="Escribe el título" />
-          </div>
-          <div class="input-group">
-            <label for="project-description">Descripción</label>
-            <textarea id="project-description" v-model="modalDescription" class="modal-textarea"
-              placeholder="Escribe la descripción del proyecto"></textarea>
-          </div>
-          <!-- Selector de privacidad -->
-          <div class="input-group">
-            <label for="project-privacy">Privacidad</label>
-            <select v-model="isPrivate" id="project-privacy" class="modal-input">
-              <option value="0">Público</option>
-              <option value="1">Privado</option>
-            </select>
-          </div>
-          <div class="modal-actions">
-            <button type="submit" class="modal-button">Guardar</button>
-            <button type="button" class="modal-button cancel" @click="closeSettingsModal">Cancel·lar</button>
-          </div>
-        </form>
-      </div>
-    </div>
 
     <!-- Modal para guardar antes de salir -->
     <div v-if="guardarParaSalir" class="modal-overlay" @click="closeGuardarParaSalir">
@@ -361,22 +332,17 @@ export default {
       }
     };
 
-    const openSettingsModal = () => {
-      showSettingsModal.value = true;
-      modalTitle.value = title.value;
-      modalDescription.value = description.value;
-    };
-
-    const closeSettingsModal = () => {
-      showSettingsModal.value = false;
-    };
-
     const saveSettings = async () => {
       title.value = modalTitle.value;
       description.value = modalDescription.value;
       CambiosSinGuardarToTrue();
       await guardarProyecto();
       closeSettingsModal();
+    };
+
+    const savePrivacy = async () => {
+      CambiosSinGuardarToTrue();
+      await guardarProyecto();
     };
 
     const guardarProyecto = async () => {
@@ -433,8 +399,6 @@ export default {
       sendMessage,
       toggleExpand,
       goBack,
-      openSettingsModal,
-      closeSettingsModal,
       closeGuardarParaSalir,
       saveSettings,
       guardarProyecto,
@@ -445,6 +409,7 @@ export default {
       stopDrag,
       CambiosSinGuardarToTrue,
       isPrivate,
+      savePrivacy,
       description,
       output: computed(() => {
         let jsContent = js.value;
@@ -868,5 +833,14 @@ export default {
 :deep(.CodeMirror-scrollbar-filler),
 :deep(.CodeMirror-gutter-filler) {
   background-color: transparent;
+}
+
+.header-select {
+  background-color: #2e2e2e;
+  color: #fff;
+  border: 1px solid #444;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 14px;
 }
 </style>
