@@ -14,6 +14,33 @@
       </div>
     </header>
 
+    <!-- Botones de layout -->
+    <div class="layout-buttons">
+  <!-- Sidebar izquierda -->
+  <button class="button-position" @click="setLayout('left')" aria-label="Sidebar izquierda">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <rect x="3" y="3" width="6" height="18"/>
+      <rect x="11" y="3" width="10" height="18" opacity="0.3"/>
+    </svg>
+  </button>
+
+  <!-- Sidebar derecha -->
+  <button class="button-position" @click="setLayout('right')" aria-label="Sidebar derecha">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <rect x="15" y="3" width="6" height="18"/>
+      <rect x="3"  y="3" width="10" height="18" opacity="0.3"/>
+    </svg>
+  </button>
+
+  <!-- Layout normal (editors arriba, salida abajo) -->
+  <button class="button-position" @click="setLayout('normal')" aria-label="Layout normal">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <rect x="3"  y="3"  width="18" height="6"/>
+      <rect x="3"  y="11" width="18" height="10" opacity="0.3"/>
+    </svg>
+  </button>
+</div>
+
     <!-- Modal para guardar antes de salir -->
     <div v-if="guardarParaSalir" class="modal-overlay" @click="closeGuardarParaSalir">
       <div class="modal-content" @click.stop>
@@ -53,29 +80,33 @@
       </div>
     </div>
 
-    <!-- Contenedor principal de editores -->
-    <div class="editor-container">
-      <div class="editor-box">
-        <div class="editor-label">HTML</div>
-        <div ref="htmlEditor" class="code-editor"></div>
+    <!-- Layout dinámico -->
+    <div :class="['layout', 'layout-' + layoutType]">
+      <!-- Contenedor principal de editores -->
+      <div class="editor-container">
+        <div class="editor-box">
+          <div class="editor-label">HTML</div>
+          <div ref="htmlEditor" class="code-editor"></div>
+        </div>
+        <div class="editor-box">
+          <div class="editor-label">CSS</div>
+          <div ref="cssEditor" class="code-editor"></div>
+        </div>
+        <div class="editor-box">
+          <div class="editor-label">JS</div>
+          <div ref="jsEditor" class="code-editor"></div>
+        </div>
       </div>
-      <div class="editor-box">
-        <div class="editor-label">CSS</div>
-        <div ref="cssEditor" class="code-editor"></div>
-      </div>
-      <div class="editor-box">
-        <div class="editor-label">JS</div>
-        <div ref="jsEditor" class="code-editor"></div>
-      </div>
-    </div>
 
-    <div class="output-container" :class="{ expanded: isExpanded }" ref="outputContainer">
-      <button class="expand-button" @click="toggleExpand">
-        <img v-if="!isExpanded" src="/assets/img/pantalla-grande.svg" alt="Maximitzar" width="30" />
-        <img v-if="isExpanded" src="/assets/img/pantalla-pequeña.svg" alt="Minimitzar" width="30" />
-      </button>
-      <div class="resize-bar" @mousedown="startResize"></div>
-      <iframe class="output" :srcdoc="output"></iframe>
+      <!-- Contenedor de salida -->
+      <div class="output-container" :class="{ expanded: isExpanded }" ref="outputContainer">
+        <button class="expand-button" @click="toggleExpand">
+          <img v-if="!isExpanded" src="/assets/img/pantalla-grande.svg" alt="Maximitzar" width="30" />
+          <img v-else src="/assets/img/pantalla-pequeña.svg" alt="Minimitzar" width="30" />
+        </button>
+        <div class="resize-bar" @mousedown="startResize"></div>
+        <iframe class="output" :srcdoc="output"></iframe>
+      </div>
     </div>
   </div>
 </template>
@@ -92,6 +123,14 @@ import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
 import "codemirror/mode/javascript/javascript";
 
+import "codemirror/addon/hint/show-hint";
+import "codemirror/addon/hint/show-hint.css";
+import "codemirror/addon/hint/html-hint";
+import "codemirror/addon/hint/anyword-hint";
+import "codemirror/addon/edit/closetag";
+import "codemirror/addon/edit/matchtags";
+import "codemirror/addon/hint/javascript-hint";
+import "codemirror/addon/edit/closebrackets";
 import useCommunicationManager from "@/stores/comunicationManager";
 import { useAppStore, useIdProyectoActualStore } from "@/stores/app";
 
@@ -130,6 +169,7 @@ export default {
     const guardarParaSalir = ref(false);
     const isPrivate = ref(0);
     const description = ref("");
+    const layoutType = ref('normal');
 
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
@@ -181,6 +221,9 @@ export default {
       guardarParaSalir.value = false;
     };
 
+    const setLayout = (dir) => {
+      layoutType.value = dir
+    }
     onMounted(async () => {
       lliureStore.toggleLliure();
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
@@ -202,12 +245,11 @@ export default {
         }
       });
 
-
       cssEditorInstance = CodeMirror(cssEditor.value, {
         mode: "css",
         theme: "dracula",
         lineNumbers: true,
-        autoCloseBrackets: true, 
+        autoCloseBrackets: true,
         extraKeys: {
           "Ctrl-Space": "autocomplete",
         },
@@ -217,7 +259,6 @@ export default {
           editor.showHint({ completeSingle: false });
         }
       });
-
 
       jsEditorInstance = CodeMirror(jsEditor.value, {
         mode: "javascript",
@@ -263,7 +304,6 @@ export default {
         CambiosSinGuardarToTrue();
       });
     });
-
 
     onUnmounted(() => {
       lliureStore.toggleLliure();
@@ -366,7 +406,7 @@ export default {
           },
           idProyectoActualStore.id
         );
-        if(response.success == false){
+        if (response.success == false) {
           console.log(response.message);
         }
       } catch (error) {
@@ -411,6 +451,8 @@ export default {
       isPrivate,
       savePrivacy,
       description,
+      layoutType,
+      setLayout,
       output: computed(() => {
         let jsContent = js.value;
         let scriptContent = `
@@ -489,6 +531,27 @@ export default {
   font-size: 14px;
   transition: background-color 0.3s ease;
 }
+.button-position {
+  background-color: #2e2e2e;
+  border: 1px solid #444;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+.button-position svg {
+  width: 20px;
+  height: 20px;
+}
+
+.layout-buttons {
+  display: flex;
+  gap: 12px;
+  align-self: flex-end;      /* sitúa el bloque a la derecha */
+  margin: 20px 20px 0 0;     /* separaciones: top, right, bottom, left */
+}
 
 .header-button:hover {
   background-color: #3a3a3a;
@@ -524,7 +587,7 @@ export default {
 
 .code-editor {
   margin-top: 40px;
-  width: 29vw;
+  width: 100%;
   height: 300px;
   border: 1px solid #444;
   border-radius: 4px;
@@ -835,6 +898,7 @@ export default {
   background-color: transparent;
 }
 
+
 .header-select {
   background-color: #2e2e2e;
   color: #fff;
@@ -843,4 +907,35 @@ export default {
   border-radius: 6px;
   font-size: 14px;
 }
+.layout {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+.layout-normal {
+  flex-direction: column;
+}
+.layout-left {
+  flex-direction: row;
+}
+.layout-right {
+  flex-direction: row-reverse;
+}
+
+.layout-left  .editor-container,
+.layout-right .editor-container {
+  display: flex;           
+  flex-direction: column; 
+  width: 45vw;             
+  max-width: 50vw;         
+  max-height: 90vh;
+  overflow-y: auto;        
+}
+
+.layout-left  .output-container,
+.layout-right .output-container {
+  flex: 1;
+}
+
 </style>
