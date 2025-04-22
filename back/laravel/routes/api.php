@@ -34,6 +34,7 @@ Route::get('/projects/{id}', [ProjectController::class, 'show']);
 Route::put('/projects/{id}', [ProjectController::class, 'update']); 
 Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
 Route::get('/projectsAllPaginado', [ProjectController::class, 'index']);
+Route::get('/projects/{id}/preview', [ProjectController::class, 'preview'])->name('projects.preview');
 
 
 Route::post('/register', [AuthenticatorController::class, 'register']);

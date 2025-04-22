@@ -32,9 +32,26 @@ class ProjectController extends Controller
         }
         
         $projects = $query->paginate(9);
+
+        $projects->getCollection()->transform(function ($project) {
+            $project->preview_url = $this->generatePreviewUrl($project);
+            return $project;
+        });
     
         return response()->json($projects, 200);
     }  
+
+    protected function generatePreviewUrl($project)
+    {
+    return route('projects.preview', ['id' => $project->id]);
+    }
+
+    public function preview($id)
+    {
+    $project = Project::findOrFail($id);
+    
+    return view('projects.preview', compact('project'));
+    }
     
     public function index(Request $request)
     {

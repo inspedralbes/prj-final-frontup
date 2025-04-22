@@ -1,6 +1,21 @@
 <template>
   <router-link :to="`/lliure/${project.id}`" class="project-card-link">
     <div class="project-card">
+      <div class="project-preview" v-if="project.preview_url">
+        <iframe 
+          v-if="isWebPreview"
+          :src="project.preview_url" 
+          frameborder="0"
+          class="preview-iframe"
+          sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+        ></iframe>
+        <img 
+          v-else
+          :src="project.preview_url" 
+          alt="Preview del proyecto"
+          class="preview-image"
+        />
+      </div>
       <h2 class="project-title">{{ project.nombre }}</h2>
       <p class="project-date">
         <strong>Data de creació:</strong> {{ formattedDate }}
@@ -118,6 +133,12 @@ export default {
       isLoading.value = false;
     };
 
+    const isWebPreview = computed(() => {
+      return props.project.preview_url && 
+             (props.project.preview_url.startsWith('http://') || 
+              props.project.preview_url.startsWith('https://'));
+    });
+
     onMounted(() => {
       loadLikeData();
     });
@@ -127,6 +148,7 @@ export default {
       likeCount,
       isLoggedIn,
       handleLikeClick,
+      isWebPreview,
       formattedDate: () => {
         return new Date(props.project.created_at).toLocaleDateString("ca-ES", {
           year: "numeric",
@@ -151,12 +173,37 @@ export default {
 <style scoped>
 .project-card {
   background-color: #2c2c2c;
-  padding: 15px;
   border-radius: 10px;
   text-align: center;
   color: #ddd;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s ease-in-out;
+  padding: 20px;
+  font-size: 18px;
+}
+
+.project-preview {
+  width: 100%;
+  height: 250px; 
+  background-color: #1a1a1a;
+  overflow: hidden;
+  margin-bottom: 15px;
+  border-radius: 10px;
+}
+
+.preview-iframe, .preview-image {
+  width: 100%;
+  height: 100%;
+}
+
+.preview-iframe {
+  border: none;
+  background: white;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .project-card:hover {
@@ -164,13 +211,13 @@ export default {
 }
 
 .project-title {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: bold;
   margin-bottom: 10px;
 }
 
 .project-date {
-  font-size: 14px;
+  font-size: 16px;
   color: #aaa;
 }
 
