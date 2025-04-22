@@ -9,7 +9,7 @@ const useCommunicationManager = () => {
   const state = reactive({
     loading: false,
     error: null,
-    token: localStorage.getItem('auth_token'),
+    token: localStorage.getItem('token'),
   });
 
   const request = async (url, method = 'GET', data = null) => {
@@ -97,18 +97,18 @@ const useCommunicationManager = () => {
   };
 
   const guardarProyectoDB = async (proyecto, id) => {
-    console.log('id pasado', id);
-    console.log('proyecto pasado', proyecto);
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`${laravelURL}/projects/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(proyecto),
       });
-
+      console.log('token que se manda',token);
       if (!response.ok) {
         throw new Error('Error en la solicitud: ' + response.status);
       }

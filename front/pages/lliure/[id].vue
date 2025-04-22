@@ -119,7 +119,7 @@ import "codemirror/theme/dracula.css";
 import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
 import "codemirror/mode/javascript/javascript";
-// Importar la lógica de comunicación y el store de proyecto
+
 import useCommunicationManager from "@/stores/comunicationManager";
 import { useAppStore } from "@/stores/app";
 import { useIdProyectoActualStore } from "@/stores/app";
@@ -127,7 +127,7 @@ import { useIdProyectoActualStore } from "@/stores/app";
 export default {
   setup() {
     const appStore = useAppStore();
-    const idProyectoActualStore = useIdProyectoActualStore(); // Para otros usos
+    const idProyectoActualStore = useIdProyectoActualStore();
     const router = useRouter();
     const route = useRoute();
     const {
@@ -352,7 +352,7 @@ export default {
       }
 
       try {
-        await guardarProyectoDB(
+        const response = await guardarProyectoDB(
           {
             nombre: title.value || "",
             user_id: appStore.loginInfo.id || null,
@@ -363,6 +363,9 @@ export default {
           },
           idProyectoActualStore.id 
         );
+        if(response.success == false){
+          console.log(response.message);
+        }
       } catch (error) {
         console.error("Error al guardar el proyecto:", error);
       }

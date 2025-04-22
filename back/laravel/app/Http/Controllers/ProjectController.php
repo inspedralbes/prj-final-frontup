@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Project;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
@@ -128,12 +129,26 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         if (request()->expectsJson()) {
-            $project->update(request()->all());
+            $userId = Auth::id();
+            if($userId == $project->user_id){
+                $project->update(request()->all());
+    
+                return response()->json([
+                    'user' => $userId,
+                    'user_project' => $project->user_id,
+                    'success' => true,
+                    'message' => 'Proyecto actualizado correctamente'
+                ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Proyecto actualizado correctamente'
-            ]);
+            }
+            else{
+                return response()->json([
+                    'user' => $userId,
+                    'user_project' => $project->user_id,
+                    'success' => false,
+                    'message' => 'Para actualizar debes ser el creador'
+                ]);
+            }
         }
 
         return view('projects.edit', compact('project'));
@@ -144,7 +159,8 @@ class ProjectController extends Controller
     {
         if ($request->is('api/*')) {
             $project = Project::find($id);
-
+            $userId = Auth::id();
+        
             if (!$project) {
                 return response()->json([
                     'message' => 'Proyecto no encontrado'
@@ -159,13 +175,27 @@ class ProjectController extends Controller
                 'statuts'   => 'nullable|boolean',
             ]);
 
-            $project->update($validatedData);
+            
+            if($userId == $project->user_id){
+                $project->update($validatedData);
+    
+                return response()->json([
+                    'user' => $userId,
+                    'user_project' => $project->user_id,
+                    'success' => true,
+                    'message' => 'Proyecto actualizado con éxito',
+                    'project' => $project,
+                ], 200);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Proyecto actualizado con éxito',
-                'project' => $project,
-            ], 200);
+            }
+            else{
+                return response()->json([
+                    'user' => $userId,
+                    'user_project' => $project->user_id,
+                    'success' => false,
+                    'message' => 'Para actualizar debes ser el creador'
+                ]);
+            }
         }
 
         $project = Project::find($id);
