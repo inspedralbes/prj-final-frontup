@@ -64,15 +64,6 @@
       <div class="leftsection-separator"></div>
 
       <ul class="leftsection-list">
-        <li class="leftsection-element" @click="toggleTheme">
-          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
-            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="5" />
-            <path
-              d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-          </svg>
-          <p class="label">{{ themeIcon }}</p>
-        </li>
         <li class="leftsection-element" @click="navigateToProfile" v-if="appStore.isLoggedIn">
           <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
             stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -108,7 +99,6 @@ import { useBuscadorStore } from '@/stores/app'
 
 const idProyectoActualStore = useIdProyectoActualStore();
 const theme = ref('')
-const themeIcon = ref('☀️')
 const loginText = ref('Login')
 const isLoged = computed(() => {
   return localStorage.getItem('loginInfo') !== null
@@ -142,16 +132,6 @@ watch(() => route.path, () => {
 const show = ref(false)
 const message = ref('')
 
-const toggleTheme = () => {
-  if (theme.value === '') {
-    theme.value = 'light-mode'
-    themeIcon.value = '🌙'
-  } else {
-    theme.value = ''
-    themeIcon.value = '☀️'
-  }
-  document.body.className = theme.value
-}
 const showAlert = (alertMessage) => {
   message.value = alertMessage
   show.value = true
@@ -258,43 +238,6 @@ h2 {
   100% {
     opacity: 0;
   }
-}
-
-.light-mode {
-  background-color: #f7f7f7;
-  color: #333;
-}
-
-.light-mode .todo {
-  background-color: #f5ebeb;
-}
-
-.light-mode .leftsection-card {
-  background-color: #eee0e0;
-}
-
-.light-mode .btn {
-  background-color: #eee;
-  color: #333;
-  border: 1px solid #ccc;
-}
-
-.light-mode .btn:hover {
-  background-color: #ddd;
-}
-
-.light-mode header {
-  background-color: #cfc8c8;
-}
-
-.light-mode h2 {
-  color: black;
-}
-
-.light-mode .search-box {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  color: #333;
 }
 
 .volver-btn {
