@@ -12,6 +12,29 @@
       </div>
     </header>
 
+    <!-- Indicador de usuarios colaborando -->
+    <div v-if="connectedUsers.length > 1" class="collaboration-indicator">
+      <div class="users-connected">
+        <span>{{ usersDisplay }}</span>
+        <div class="user-avatars">
+          <div v-for="user in connectedUsers" :key="user.id" class="user-avatar" :title="user.name">
+            {{ user.name.charAt(0).toUpperCase() }}
+          </div>
+        </div>
+      </div>
+      <div class="editor-indicators">
+        <div v-if="activeEditors.html" class="editor-badge html">
+          {{ activeEditors.html.name }} editando HTML
+        </div>
+        <div v-if="activeEditors.css" class="editor-badge css">
+          {{ activeEditors.css.name }} editando CSS
+        </div>
+        <div v-if="activeEditors.js" class="editor-badge js">
+          {{ activeEditors.js.name }} editando JS
+        </div>
+      </div>
+    </div>
+
     <!-- Modal de configuración -->
     <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
       <div class="modal-content" @click.stop>
@@ -114,6 +137,7 @@ import { ref, onMounted, computed, onUnmounted, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import CodeMirror from "codemirror";
 import { useLliureStore } from "~/stores/app";
+import { io } from "socket.io-client";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
 
@@ -129,7 +153,6 @@ import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/matchtags";
 import "codemirror/addon/hint/javascript-hint";
 import "codemirror/addon/edit/closebrackets";
-
 
 // Importar la lógica de comunicación y el store de proyecto
 import useCommunicationManager from "@/stores/comunicationManager";
@@ -150,6 +173,12 @@ export default {
     } = useCommunicationManager();
     const lliureStore = useLliureStore();
 
+    // Nuevo - para Socket.IO y colaboración
+    const socket = ref(null);
+    const userId = ref(crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15));
+    const connectedUsers = ref([]);
+    const activeEditors = ref({});
+    
     const isDragging = ref(false);
     const chatPosition = ref({ x: 20, y: 20 });
     const dragStartPosition = ref({ x: 0, y: 0 });
@@ -221,6 +250,215 @@ export default {
       guardarParaSalir.value = false;
     };
 
+    // Nuevo - Configurar listeners de socket
+    const setupSocketListeners = () => {
+      if (!socket.value) return;
+      
+      // Inicialización del proyecto - recibir estado actual
+      socket.value.on('project:init', (data) => {
+        if (data.html && !html.value) {
+          html.value = data.html;
+          htmlEditorInstance.setValue(data.html);
+        }
+        if (data.css && !css.value) {
+          css.value = data.css;
+          cssEditorInstance.setValue(data.css);
+        }
+        if (data.js && !js.value) {
+          js.value = data.js;
+          jsEditorInstance.setValue(data.js);
+        }
+        activeEditors.value = data.activeEditors || {};
+      });
+      
+      // Actualizar lista de usuarios
+      socket.value.on('users:update', (users) => {
+        connectedUsers.value = users;
+      });
+      
+      // Cambios en HTML
+      socket.value.on('code:html:change', (data) => {
+        if (data.userId !== userId.value) {
+          // Guardar posición del cursor actual
+          const cursor = htmlEditorInstance.getCursor();
+          // Actualizar contenido
+          htmlEditorInstance.setValue(data.content);
+          html.value = data.content;
+          // Restaurar la posición del cursor
+          htmlEditorInstance.setCursor(cursor);
+        }
+      });
+      
+      // Cambios en CSS
+      socket.value.on('code:css:change', (data) => {
+        if (data.userId !== userId.value) {
+          const cursor = cssEditorInstance.getCursor();
+          cssEditorInstance.setValue(data.content);
+          css.value = data.content;
+          cssEditorInstance.setCursor(cursor);
+        }
+      });
+      
+      // Cambios en JS
+      socket.value.on('code:js:change', (data) => {
+        if (data.userId !== userId.value) {
+          const cursor = jsEditorInstance.getCursor();
+          jsEditorInstance.setValue(data.content);
+          js.value = data.content;
+          jsEditorInstance.setCursor(cursor);
+        }
+      });
+      
+      // Registrar cuando alguien comienza a editar
+      socket.value.on('editor:focus', (data) => {
+        activeEditors.value[data.editor] = data.user;
+      });
+      
+      // Registrar cuando alguien deja de editar
+      socket.value.on('editor:blur', (data) => {
+        if (activeEditors.value[data.editor]?.id === data.userId) {
+          delete activeEditors.value[data.editor];
+        }
+      });
+      
+      // Cambios en los metadatos del proyecto
+      socket.value.on('project:update', (data) => {
+        if (data.userId !== userId.value) {
+          if (data.title) title.value = data.title;
+          if (data.description) description.value = data.description;
+          if (data.isPrivate !== undefined) isPrivate.value = data.isPrivate;
+        }
+      });
+    };
+
+    // Nuevo - Configurar editores para colaboración
+    const setupCollaborativeEditors = () => {
+      // Función de debounce para limitar las actualizaciones
+      const debounce = (fn, delay) => {
+        let timer;
+        return function(...args) {
+          clearTimeout(timer);
+          timer = setTimeout(() => fn.apply(this, args), delay);
+        };
+      };
+      
+      const sendHtmlChanges = debounce((content) => {
+        if (socket.value) {
+          socket.value.emit('code:html:change', {
+            content,
+            userId: userId.value,
+            projectId: route.params.id
+          });
+        }
+      }, 300);
+      
+      const sendCssChanges = debounce((content) => {
+        if (socket.value) {
+          socket.value.emit('code:css:change', {
+            content,
+            userId: userId.value,
+            projectId: route.params.id
+          });
+        }
+      }, 300);
+      
+      const sendJsChanges = debounce((content) => {
+        if (socket.value) {
+          socket.value.emit('code:js:change', {
+            content,
+            userId: userId.value,
+            projectId: route.params.id
+          });
+        }
+      }, 300);
+      
+      // Reconfigurar los event listeners de CodeMirror
+      htmlEditorInstance.on("change", (instance) => {
+        html.value = instance.getValue();
+        CambiosSinGuardarToTrue();
+        sendHtmlChanges(html.value);
+      });
+      
+      cssEditorInstance.on("change", (instance) => {
+        css.value = instance.getValue();
+        CambiosSinGuardarToTrue();
+        sendCssChanges(css.value);
+      });
+      
+      jsEditorInstance.on("change", (instance) => {
+        js.value = instance.getValue();
+        CambiosSinGuardarToTrue();
+        sendJsChanges(js.value);
+      });
+      
+      // Añadir eventos de focus/blur para mostrar quién está editando
+      htmlEditorInstance.on("focus", () => {
+        if (socket.value) {
+          socket.value.emit('editor:focus', {
+            editor: 'html',
+            userId: userId.value,
+            user: {
+              id: userId.value,
+              name: appStore.loginInfo?.name || "Usuario"
+            }
+          });
+        }
+      });
+      
+      htmlEditorInstance.on("blur", () => {
+        if (socket.value) {
+          socket.value.emit('editor:blur', {
+            editor: 'html',
+            userId: userId.value
+          });
+        }
+      });
+      
+      cssEditorInstance.on("focus", () => {
+        if (socket.value) {
+          socket.value.emit('editor:focus', {
+            editor: 'css',
+            userId: userId.value,
+            user: {
+              id: userId.value,
+              name: appStore.loginInfo?.name || "Usuario"
+            }
+          });
+        }
+      });
+      
+      cssEditorInstance.on("blur", () => {
+        if (socket.value) {
+          socket.value.emit('editor:blur', {
+            editor: 'css',
+            userId: userId.value
+          });
+        }
+      });
+      
+      jsEditorInstance.on("focus", () => {
+        if (socket.value) {
+          socket.value.emit('editor:focus', {
+            editor: 'js',
+            userId: userId.value,
+            user: {
+              id: userId.value,
+              name: appStore.loginInfo?.name || "Usuario"
+            }
+          });
+        }
+      });
+      
+      jsEditorInstance.on("blur", () => {
+        if (socket.value) {
+          socket.value.emit('editor:blur', {
+            editor: 'js',
+            userId: userId.value
+          });
+        }
+      });
+    };
+
     onMounted(async () => {
       lliureStore.toggleLliure();
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
@@ -242,7 +480,6 @@ export default {
         }
       });
 
-
       cssEditorInstance = CodeMirror(cssEditor.value, {
         mode: "css",
         theme: "dracula",
@@ -257,7 +494,6 @@ export default {
           editor.showHint({ completeSingle: false });
         }
       });
-
 
       jsEditorInstance = CodeMirror(jsEditor.value, {
         mode: "javascript",
@@ -286,26 +522,29 @@ export default {
           jsEditorInstance.setValue(js.value);
           isPrivate.value = proyecto.statuts || 0;
         }
+        
+        // Nuevo - Inicializar Socket.IO
+        socket.value = io("http://localhost:5000", {
+          query: {
+            projectId,
+            userId: userId.value,
+            userName: appStore.loginInfo?.name || `Usuario${Math.floor(Math.random() * 1000)}`
+          }
+        });
+        
+        // Configurar listeners y eventos
+        setupSocketListeners();
+        setupCollaborativeEditors();
       } else {
         console.error("No se encontró un ID de proyecto válido en la ruta.");
       }
-
-      htmlEditorInstance.on("change", (instance) => {
-        html.value = instance.getValue();
-        CambiosSinGuardarToTrue();
-      });
-      cssEditorInstance.on("change", (instance) => {
-        css.value = instance.getValue();
-        CambiosSinGuardarToTrue();
-      });
-      jsEditorInstance.on("change", (instance) => {
-        js.value = instance.getValue();
-        CambiosSinGuardarToTrue();
-      });
     });
 
-
     onUnmounted(() => {
+      // Desconectar socket al salir
+      if (socket.value) {
+        socket.value.disconnect();
+      }
       lliureStore.toggleLliure();
       idProyectoActualStore.vaciarId();
     });
@@ -399,22 +638,39 @@ export default {
       }
 
       try {
-        await guardarProyectoDB(
-          {
-            nombre: title.value || "",
-            descripcion: description.value || "",
-            user_id: appStore.loginInfo.id || null,
-            html_code: html.value || "",
-            css_code: css.value || "",
-            js_code: js.value || "",
-            statuts: isPrivate.value,
-          },
-          idProyectoActualStore.id
-        );
+        const projectData = {
+          nombre: title.value || "",
+          descripcion: description.value || "",
+          user_id: appStore.loginInfo.id || null,
+          html_code: html.value || "",
+          css_code: css.value || "",
+          js_code: js.value || "",
+          statuts: isPrivate.value,
+        };
+        
+        await guardarProyectoDB(projectData, idProyectoActualStore.id);
+        
+        // Notificar cambios en el proyecto a otros usuarios
+        if (socket.value) {
+          socket.value.emit('project:update', {
+            title: title.value,
+            description: description.value,
+            isPrivate: isPrivate.value,
+            userId: userId.value,
+            projectId: idProyectoActualStore.id
+          });
+        }
       } catch (error) {
         console.error("Error al guardar el proyecto:", error);
       }
     };
+
+    // Nuevo - Mostrar información de los usuarios conectados
+    const usersDisplay = computed(() => {
+      return connectedUsers.value.length > 1 
+        ? `Colaborando con ${connectedUsers.value.length - 1} usuario(s)` 
+        : 'Solo tú estás editando';
+    });
 
     return {
       title,
@@ -454,6 +710,10 @@ export default {
       CambiosSinGuardarToTrue,
       isPrivate,
       description,
+      // Nuevo - para la colaboración
+      connectedUsers,
+      activeEditors,
+      usersDisplay,
       output: computed(() => {
         let jsContent = js.value;
         let scriptContent = `
