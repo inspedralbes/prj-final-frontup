@@ -184,7 +184,7 @@ export default {
 
 .project-preview {
   width: 100%;
-  height: 250px; 
+  height: 200px; 
   background-color: #1a1a1a;
   overflow: hidden;
   margin-bottom: 15px;
@@ -199,6 +199,7 @@ export default {
 .preview-iframe {
   border: none;
   background: white;
+  
 }
 
 .preview-image {
