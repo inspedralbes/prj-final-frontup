@@ -2,7 +2,6 @@
   <div class="todo">
     <header class="header" v-show="!isExpanded">
       <button class="header-button" @click="goBack">Atrás</button>
-      <button class="header-button" @click="generarCodigo">Generar Código</button>
       <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
         :readonly="!isEditing" />
       <div class="header-actions">
@@ -12,29 +11,6 @@
         <button class="header-button">💡</button>
       </div>
     </header>
-
-    <!-- Indicador de usuarios colaborando -->
-    <div v-if="connectedUsers.length > 1" class="collaboration-indicator">
-      <div class="users-connected">
-        <span>{{ usersDisplay }}</span>
-        <div class="user-avatars">
-          <div v-for="user in connectedUsers" :key="user.id" class="user-avatar" :title="user.name">
-            {{ user.name.charAt(0).toUpperCase() }}
-          </div>
-        </div>
-      </div>
-      <div class="editor-indicators">
-        <div v-if="activeEditors.html" class="editor-badge html">
-          {{ activeEditors.html.name }} editando HTML
-        </div>
-        <div v-if="activeEditors.css" class="editor-badge css">
-          {{ activeEditors.css.name }} editando CSS
-        </div>
-        <div v-if="activeEditors.js" class="editor-badge js">
-          {{ activeEditors.js.name }} editando JS
-        </div>
-      </div>
-    </div>
 
     <!-- Modal de configuración -->
     <div v-if="showSettingsModal" class="modal-overlay" @click="closeSettingsModal">
@@ -138,7 +114,6 @@ import { ref, onMounted, computed, onUnmounted, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import CodeMirror from "codemirror";
 import { useLliureStore } from "~/stores/app";
-import { io } from "socket.io-client";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
 
@@ -155,7 +130,6 @@ import "codemirror/addon/edit/matchtags";
 import "codemirror/addon/hint/javascript-hint";
 import "codemirror/addon/edit/closebrackets";
 
-// Importar la lógica de comunicación y el store de proyecto
 import useCommunicationManager from "@/stores/comunicationManager";
 import { useAppStore, useIdProyectoActualStore } from "@/stores/app";
 
@@ -170,21 +144,10 @@ export default {
       chatIA,
       state,
       borrarProyectoDB,
-      useProyectoStore
+      useProyectoStore,
     } = useCommunicationManager();
     const lliureStore = useLliureStore();
 
-    // Socket.IO y colaboración
-    const socket = ref(null);
-    const userId = ref(
-      crypto.randomUUID
-        ? crypto.randomUUID()
-        : Math.random().toString(36).substring(2, 15)
-    );
-    const connectedUsers = ref([]);
-    const activeEditors = ref({});
-
-    // Estados internos
     const isDragging = ref(false);
     const chatPosition = ref({ x: 20, y: 20 });
     const dragStartPosition = ref({ x: 0, y: 0 });
@@ -200,38 +163,50 @@ export default {
     const isChatVisible = ref(false);
     const newMessage = ref("");
     const cambiadoSinGuardar = ref(false);
-    const messages = ref([
-      { type: "ai", content: "¡Hola! ¿En qué puedo ayudarte hoy?" }
-    ]);
+    const messages = ref([{ type: "ai", content: "¡Hola! ¿En qué puedo ayudarte hoy?" }]);
     const messagesContainer = ref(null);
     const guardarParaSalir = ref(false);
     const isPrivate = ref(0);
     const description = ref("");
 
-    // Referencias a editores
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
     const jsEditor = ref(null);
+
     let htmlEditorInstance, cssEditorInstance, jsEditorInstance;
 
-    // Gestión de arrastre del chat
     const startDrag = (event) => {
       isDragging.value = true;
       dragStartPosition.value = {
         x: event.clientX - chatPosition.value.x,
-        y: event.clientY - chatPosition.value.y
+        y: event.clientY - chatPosition.value.y,
       };
       document.addEventListener("mousemove", onDrag);
       document.addEventListener("mouseup", stopDrag);
+    };
+
+    const CambiosSinGuardarToTrue = () => {
+      console.log("entrado en cambio a true", cambiadoSinGuardar.value);
+      cambiadoSinGuardar.value = true;
+    };
+
+    const CambiosSinGuardarToFalse = () => {
+      cambiadoSinGuardar.value = false;
+      console.log("entrado a cambio a false", cambiadoSinGuardar.value);
     };
 
     const onDrag = (event) => {
       if (isDragging.value) {
         chatPosition.value = {
           x: event.clientX - dragStartPosition.value.x,
-          y: event.clientY - dragStartPosition.value.y
+          y: event.clientY - dragStartPosition.value.y,
         };
       }
+    };
+
+    const volverHome = async () => {
+      console.log("css.value", css.value);
+      router.push("/");
     };
 
     const stopDrag = () => {
@@ -240,188 +215,12 @@ export default {
       document.removeEventListener("mouseup", stopDrag);
     };
 
-    const CambiosSinGuardarToTrue = () => {
-      cambiadoSinGuardar.value = true;
-    };
-    const CambiosSinGuardarToFalse = () => {
-      cambiadoSinGuardar.value = false;
-    };
-
-    // ---- Nuevo método: Generar código IA con fetch ----
-    const generarCodigo = async () => {
-      try {
-        const payload = {
-          pregunta: "Genera un snippet útil para aquest projecte",
-          html: html.value,
-          css: css.value,
-          js: js.value
-        };
-        const res = await fetch("http://localhost:5000/generar-codigo", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error(`Error ${res.status}`);
-        const snippet = await res.text();
-
-        // Heurística básica para detectar lenguaje
-        if (snippet.trim().startsWith("<")) {
-          htmlEditorInstance.setValue(snippet);
-          html.value = snippet;
-        } else if (/\{[^}]+\}/.test(snippet)) {
-          cssEditorInstance.setValue(snippet);
-          css.value = snippet;
-        } else {
-          jsEditorInstance.setValue(snippet);
-          js.value = snippet;
-        }
-        CambiosSinGuardarToTrue();
-      } catch (error) {
-        console.error("Error generando código:", error);
-        alert("Hubo un problema al generar el código.");
-      }
-    };
-
-    // Volver a home
-    const volverHome = async () => {
-      router.push("/");
-    };
-
-    // Configurar listeners de socket para colaboración
-    const setupSocketListeners = () => {
-      if (!socket.value) return;
-      socket.value.on("project:init", (data) => {
-        if (data.html && !html.value) {
-          html.value = data.html;
-          htmlEditorInstance.setValue(data.html);
-        }
-        if (data.css && !css.value) {
-          css.value = data.css;
-          cssEditorInstance.setValue(data.css);
-        }
-        if (data.js && !js.value) {
-          js.value = data.js;
-          jsEditorInstance.setValue(data.js);
-        }
-        activeEditors.value = data.activeEditors || {};
-      });
-      socket.value.on("users:update", (users) => {
-        connectedUsers.value = users;
-      });
-      socket.value.on("code:html:change", (data) => {
-        if (data.userId !== userId.value) {
-          const cursor = htmlEditorInstance.getCursor();
-          htmlEditorInstance.setValue(data.content);
-          html.value = data.content;
-          htmlEditorInstance.setCursor(cursor);
-        }
-      });
-      socket.value.on("code:css:change", (data) => {
-        if (data.userId !== userId.value) {
-          const cursor = cssEditorInstance.getCursor();
-          cssEditorInstance.setValue(data.content);
-          css.value = data.content;
-          cssEditorInstance.setCursor(cursor);
-        }
-      });
-      socket.value.on("code:js:change", (data) => {
-        if (data.userId !== userId.value) {
-          const cursor = jsEditorInstance.getCursor();
-          jsEditorInstance.setValue(data.content);
-          js.value = data.content;
-          jsEditorInstance.setCursor(cursor);
-        }
-      });
-      socket.value.on("editor:focus", (data) => {
-        activeEditors.value[data.editor] = data.user;
-      });
-      socket.value.on("editor:blur", (data) => {
-        if (activeEditors.value[data.editor]?.id === data.userId) {
-          delete activeEditors.value[data.editor];
-        }
-      });
-      socket.value.on("project:update", (data) => {
-        if (data.userId !== userId.value) {
-          if (data.title) title.value = data.title;
-          if (data.description) description.value = data.description;
-          if (data.isPrivate !== undefined) isPrivate.value = data.isPrivate;
-        }
-      });
-    };
-
-    // Configurar editores colaborativos
-    const setupCollaborativeEditors = () => {
-      const debounce = (fn, delay) => {
-        let timer;
-        return function (...args) {
-          clearTimeout(timer);
-          timer = setTimeout(() => fn.apply(this, args), delay);
-        };
-      };
-      const sendHtmlChanges = debounce((content) => {
-        socket.value?.emit("code:html:change", {
-          content,
-          userId: userId.value,
-          projectId: route.params.id
-        });
-      }, 300);
-      const sendCssChanges = debounce((content) => {
-        socket.value?.emit("code:css:change", {
-          content,
-          userId: userId.value,
-          projectId: route.params.id
-        });
-      }, 300);
-      const sendJsChanges = debounce((content) => {
-        socket.value?.emit("code:js:change", {
-          content,
-          userId: userId.value,
-          projectId: route.params.id
-        });
-      }, 300);
-
-      htmlEditorInstance.on("change", (inst) => { 
-        html.value = inst.getValue(); 
-        CambiosSinGuardarToTrue(); 
-        sendHtmlChanges(html.value); 
-      });
-      cssEditorInstance.on("change", (inst) => { 
-        css.value = inst.getValue(); 
-        CambiosSinGuardarToTrue(); 
-        sendCssChanges(css.value); 
-      });
-      jsEditorInstance.on("change", (inst) => { 
-        js.value = inst.getValue(); 
-        CambiosSinGuardarToTrue(); 
-        sendJsChanges(js.value); 
-      });
-
-      ["html", "css", "js"].forEach((ed) => {
-        const inst =
-          ed === "html"
-            ? htmlEditorInstance
-            : ed === "css"
-            ? cssEditorInstance
-            : jsEditorInstance;
-        inst.on("focus", () => {
-          socket.value?.emit("editor:focus", {
-            editor: ed,
-            userId: userId.value,
-            user: { id: userId.value, name: appStore.loginInfo?.name || "Usuario" }
-          });
-        });
-        inst.on("blur", () => {
-          socket.value?.emit("editor:blur", {
-            editor: ed,
-            userId: userId.value
-          });
-        });
-      });
+    const closeGuardarParaSalir = () => {
+      guardarParaSalir.value = false;
     };
 
     onMounted(async () => {
       lliureStore.toggleLliure();
-
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
         mode: "htmlmixed",
         theme: "dracula",
@@ -429,34 +228,49 @@ export default {
         autoCloseTags: true,
         autoCloseBrackets: true,
         matchTags: { bothTags: true },
-        extraKeys: { "Ctrl-Space": "autocomplete" }
+        extraKeys: {
+          "Ctrl-Space": "autocomplete"
+        },
       });
-      htmlEditorInstance.on("inputRead", (e, c) => {
-        if (c.text[0] === "<") e.showHint({ completeSingle: false });
+      htmlEditorInstance.on("inputRead", (editor, change) => {
+        if (change.text[0] === "<") {
+          editor.showHint({
+            completeSingle: false
+          });
+        }
       });
+
 
       cssEditorInstance = CodeMirror(cssEditor.value, {
         mode: "css",
         theme: "dracula",
         lineNumbers: true,
-        autoCloseBrackets: true,
-        extraKeys: { "Ctrl-Space": "autocomplete" }
+        autoCloseBrackets: true, 
+        extraKeys: {
+          "Ctrl-Space": "autocomplete",
+        },
       });
-      cssEditorInstance.on("inputRead", (e, c) => {
-        if (c.text[0].match(/[a-zA-Z\-]/)) e.showHint({ completeSingle: false });
+      cssEditorInstance.on("inputRead", (editor, change) => {
+        if (change.text[0].match(/[a-zA-Z\-]/)) {
+          editor.showHint({ completeSingle: false });
+        }
       });
+
 
       jsEditorInstance = CodeMirror(jsEditor.value, {
         mode: "javascript",
         theme: "dracula",
         lineNumbers: true,
         autoCloseBrackets: true,
-        extraKeys: { "Ctrl-Space": "autocomplete" }
+        extraKeys: {
+          "Ctrl-Space": "autocomplete"
+        }
       });
 
       const projectId = route.params.id;
       if (projectId) {
         idProyectoActualStore.id = projectId;
+
         const proyectoStore = useProyectoStore();
         const proyecto = await proyectoStore.obtenerProyecto(projectId);
         if (proyecto) {
@@ -470,25 +284,26 @@ export default {
           jsEditorInstance.setValue(js.value);
           isPrivate.value = proyecto.statuts || 0;
         }
-
-        socket.value = io("http://localhost:5000", {
-          query: {
-            projectId,
-            userId: userId.value,
-            userName:
-              appStore.loginInfo?.name || `Usuario${Math.floor(Math.random() * 1000)}`
-          }
-        });
-
-        setupSocketListeners();
-        setupCollaborativeEditors();
       } else {
         console.error("No se encontró un ID de proyecto válido en la ruta.");
       }
+
+      htmlEditorInstance.on("change", (instance) => {
+        html.value = instance.getValue();
+        CambiosSinGuardarToTrue();
+      });
+      cssEditorInstance.on("change", (instance) => {
+        css.value = instance.getValue();
+        CambiosSinGuardarToTrue();
+      });
+      jsEditorInstance.on("change", (instance) => {
+        js.value = instance.getValue();
+        CambiosSinGuardarToTrue();
+      });
     });
 
+
     onUnmounted(() => {
-      socket.value?.disconnect();
       lliureStore.toggleLliure();
       idProyectoActualStore.vaciarId();
     });
@@ -498,28 +313,29 @@ export default {
       guardarParaSalir.value = false;
       router.push("/");
     };
+
     const toggleChat = () => {
       isChatVisible.value = !isChatVisible.value;
     };
+
     const sendMessage = async () => {
       if (!newMessage.value.trim() || state.loading) return;
-      messages.value.push({ type: "user", content: newMessage.value });
+
+      const userMessage = newMessage.value;
       newMessage.value = "";
+
+      messages.value.push({ type: "user", content: userMessage });
       messages.value.push({ type: "loading", content: "" });
+
       try {
-        const resp = await chatIA(
-          messages.value[messages.value.length - 2].content,
-          html.value,
-          css.value,
-          js.value
-        );
+        const response = await chatIA(userMessage, html.value, css.value, js.value);
         messages.value.pop();
-        messages.value.push({ type: "ai", content: resp });
-      } catch (e) {
+        messages.value.push({ type: "ai", content: response });
+      } catch (error) {
         messages.value.pop();
         messages.value.push({
           type: "ai",
-          content: "❌ Error al obtener respuesta. Intenta nuevamente."
+          content: "❌ Error al obtener respuesta. Intenta nuevamente.",
         });
       } finally {
         await nextTick();
@@ -528,37 +344,42 @@ export default {
         }
       }
     };
+
     const toggleExpand = () => {
       isExpanded.value = !isExpanded.value;
     };
+
     const goBack = async () => {
       if (!cambiadoSinGuardar.value) {
         if (html.value === "" && css.value === "" && js.value === "") {
           try {
-            const id =
-              idProyectoActualStore.id ||
+            let id =
+              idProyectoActualStore?.id ||
               Number(localStorage.getItem("idProyectoActual"));
-            if (id) await borrarProyectoDB(id);
-          } catch (e) {
-            console.error(e);
+            if (id) {
+              await borrarProyectoDB(id);
+            }
+          } catch (error) {
+            console.error("Error al borrar el proyecto:", error);
           }
         }
         router.push("/");
       } else {
         guardarParaSalir.value = true;
+        console.log("¿Se muestra el guardar para salir?", guardarParaSalir.value);
       }
     };
+
     const openSettingsModal = () => {
       showSettingsModal.value = true;
       modalTitle.value = title.value;
       modalDescription.value = description.value;
     };
+
     const closeSettingsModal = () => {
       showSettingsModal.value = false;
     };
-    const closeGuardarParaSalir = () => {
-      guardarParaSalir.value = false;
-    };
+
     const saveSettings = async () => {
       title.value = modalTitle.value;
       description.value = modalDescription.value;
@@ -566,39 +387,35 @@ export default {
       await guardarProyecto();
       closeSettingsModal();
     };
+
     const guardarProyecto = async () => {
       CambiosSinGuardarToFalse();
+
       if (!idProyectoActualStore.id) {
         console.error("ID del proyecto es null o no se encuentra.");
         return;
       }
+
       try {
-        const projectData = {
-          nombre: title.value,
-          descripcion: description.value,
-          user_id: appStore.loginInfo.id || null,
-          html_code: html.value,
-          css_code: css.value,
-          js_code: js.value,
-          statuts: isPrivate.value
-        };
-        await guardarProyectoDB(projectData, idProyectoActualStore.id);
-        socket.value?.emit("project:update", {
-          title: title.value,
-          description: description.value,
-          isPrivate: isPrivate.value,
-          userId: userId.value,
-          projectId: idProyectoActualStore.id
-        });
-      } catch (e) {
-        console.error("Error al guardar el proyecto:", e);
+        const response = await guardarProyectoDB(
+          {
+            nombre: title.value || "",
+            descripcion: description.value || "",
+            user_id: appStore.loginInfo.id || null,
+            html_code: html.value || "",
+            css_code: css.value || "",
+            js_code: js.value || "",
+            statuts: isPrivate.value,
+          },
+          idProyectoActualStore.id
+        );
+        if(response.success == false){
+          console.log(response.message);
+        }
+      } catch (error) {
+        console.error("Error al guardar el proyecto:", error);
       }
     };
-    const usersDisplay = computed(() =>
-      connectedUsers.value.length > 1
-        ? `Colaborando con ${connectedUsers.value.length - 1} usuario(s)`
-        : "Solo tú estás editando"
-    );
 
     return {
       title,
@@ -619,7 +436,7 @@ export default {
       messagesContainer,
       state,
       guardarParaSalir,
-      generarCodigo,
+      guardarProyecto2,
       volverHome,
       toggleChat,
       sendMessage,
@@ -630,28 +447,35 @@ export default {
       closeGuardarParaSalir,
       saveSettings,
       guardarProyecto,
-      guardarProyecto2,
       isDragging,
       chatPosition,
       startDrag,
       onDrag,
       stopDrag,
       CambiosSinGuardarToTrue,
-      CambiosSinGuardarToFalse,
       isPrivate,
       description,
-      connectedUsers,
-      activeEditors,
-      usersDisplay,
       output: computed(() => {
-        const script = `try { ${js.value} } catch(e) { console.error(e) }`;
-        return `<html><head><style>${css.value}</style></head><body>${html.value}<script>${script}<\/script></body></html>`;
-      })
+        let jsContent = js.value;
+        let scriptContent = `
+          try {
+            ${jsContent}
+          } catch (e) {
+            console.error('Error in JavaScript:', e);
+          }
+        `;
+        return `
+          <html>
+            <head><style>${css.value}</style></head>
+            <body>${html.value}
+              <script>${scriptContent}<\/script>
+            </body>
+          </html>`;
+      }),
     };
-  }
+  },
 };
 </script>
-
 
 <style scoped>
 .todo {
@@ -660,7 +484,7 @@ export default {
   background-color: #1e1e1e;
   font-family: 'Arial', sans-serif;
   color: #ffffff;
-  margin-left: -16vw;
+  margin-left: -210px;
 }
 
 .header {
