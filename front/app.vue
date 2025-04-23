@@ -60,7 +60,13 @@
           <p class="label">Likes</p>
         </li>
       </ul>
-
+      <div class="collaboration-section">
+        <div class="join-collaboration">
+          <input type="text" v-model="collaborationCode" placeholder="Codi de col·laboració" class="collaboration-input"
+            maxlength="6" />
+          <button class="join-button" @click="joinCollaboration">Unir-se</button>
+        </div>
+      </div>
       <div class="leftsection-separator"></div>
 
       <ul class="leftsection-list">
@@ -93,10 +99,11 @@ import { useLliureStore } from '~/stores/app'
 import { useAppStore } from '@/stores/app'
 import { useIdProyectoActualStore } from '@/stores/app'
 import useCommunicationManager from '@/stores/comunicationManager'
-import { ref, watch, onMounted, reactive, computed  } from 'vue'
+import { ref, watch, onMounted, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useBuscadorStore } from '@/stores/app'
 
+// Definir todas las variables y referencias primero
 const idProyectoActualStore = useIdProyectoActualStore();
 const theme = ref('')
 const loginText = ref('Login')
@@ -106,32 +113,15 @@ const isLoged = computed(() => {
 const appStore = useAppStore()
 const lliureStore = useLliureStore()
 const buscadorStore = useBuscadorStore()
-
-watch(() => appStore.isLoggedIn, (newValue) => {
-})
 const comunicationManager = useCommunicationManager();
 const router = useRouter()
 const route = useRoute()
-
-const updateBuscadorState = () => {
-  if (route.path === '/' || route.name === 'index') {
-    buscadorStore.activarBuscador();
-  } else {
-    buscadorStore.desactivarBuscador();
-  }
-}
-
-onMounted(() => {
-  updateBuscadorState()
-})
-
-// Observar cambios en la ruta para actualizar el estado automáticamente
-watch(() => route.path, () => {
-  updateBuscadorState()
-})
+const collaborationCode = ref('');
 const show = ref(false)
 const message = ref('')
+const projecte = reactive({ result: {} });
 
+// Funciones de alerta y mensajes
 const showAlert = (alertMessage) => {
   message.value = alertMessage
   show.value = true
@@ -139,7 +129,21 @@ const showAlert = (alertMessage) => {
     show.value = false
   }, 3000)
 }
-const projecte = reactive({ result: {} });
+
+// Función para unirse a una colaboración
+const joinCollaboration = () => {
+  if (!collaborationCode.value || collaborationCode.value.length !== 6) {
+    showAlert('El codi de col·laboració ha de tenir 6 caràcters');
+    return;
+  }
+  // Necesitamos verificar si el código existe en el servidor
+  // Esto lo haremos en el servidor Node.js con Socket.IO
+  // Por ahora, redirigimos al usuario a la página principal con el código como parámetro
+  // para que posteriormente sea procesado
+  router.push(`/?code=${collaborationCode.value}`);
+};
+
+// Funciones de navegación
 const navigateToLliure = async () => {
   if (appStore.loginInfo.id != null) {
     try {
@@ -188,7 +192,38 @@ const navigateToHome = () => {
 const navigateToTotsProjectes = () => {
   router.push("/totsProjectes");
 }
+
+// Buscador state management
+const updateBuscadorState = () => {
+  if (route.path === '/' || route.name === 'index') {
+    buscadorStore.activarBuscador();
+  } else {
+    buscadorStore.desactivarBuscador();
+  }
+}
+
+// Watchers y hooks - después de definir todas las variables y funciones
+watch(() => appStore.isLoggedIn, (newValue) => {
+})
+
+watch(route, () => {
+  if (route.query.code) {
+    const projectId = route.query.projectId;
+    if (projectId) {
+      router.push(`/lliure/${projectId}?code=${route.query.code}`);
+    }
+  }
+});
+
+watch(() => route.path, () => {
+  updateBuscadorState()
+})
+
+onMounted(() => {
+  updateBuscadorState()
+})
 </script>
+
 
 <style>
 body {
