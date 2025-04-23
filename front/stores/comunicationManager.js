@@ -1,10 +1,46 @@
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import { defineStore } from 'pinia';
+import { io } from 'socket.io-client';
 
 const useCommunicationManager = () => {
   const config = useRuntimeConfig(); 
   const laravelURL = config.public.apiLaravelUrl;
   const nodeURL = config.public.nodeUrl;
+
+  // Socket.io
+  const socket = ref(null);
+
+  const connect = () => {
+    if (!socket.value) {
+      socket.value = io(nodeURL, {
+        transports: ['websocket'],
+        withCredentials: true,
+      });
+
+      socket.value.on('connect', () => {
+        console.log('Conectado al servidor WebSocket');
+      });
+
+      socket.value.on('disconnect', () => {
+        console.log('Desconectado del servidor WebSocket');
+      });
+
+      // Puedes manejar otros eventos aquí
+    }
+  };
+
+  const disconnect = () => {
+    if (socket.value) {
+      socket.value.disconnect();
+      socket.value = null;
+    }
+  };
+
+  const joinRoom = (roomId) => {
+    if (socket.value) {
+      socket.value.emit('joinRoom', roomId);
+    }
+  };
 
   const state = reactive({
     loading: false,
@@ -142,6 +178,7 @@ const useCommunicationManager = () => {
       throw error;
     }
   };
+
   const addLike = async (projectId) => {
     try {
       const token = localStorage.getItem('token');
@@ -284,6 +321,7 @@ const useCommunicationManager = () => {
       return [];
     }
   };
+
   const getUserAllLikes = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -309,6 +347,7 @@ const useCommunicationManager = () => {
       return [];
     }
   };
+
   const chatIA = async (mensaje, html, css, js) => {
     try {
       const response = await fetch(`${nodeURL}/pregunta`, {
@@ -386,6 +425,9 @@ const useCommunicationManager = () => {
     toggleLike,
     getUserLikes,
     getUserAllLikes,
+    connect,
+    disconnect,
+    joinRoom,
   };
 };
 

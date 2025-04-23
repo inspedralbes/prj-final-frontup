@@ -114,6 +114,24 @@ const appStore = useAppStore()
 const lliureStore = useLliureStore()
 const buscadorStore = useBuscadorStore()
 const comunicationManager = useCommunicationManager();
+comunicationManager.connect();
+// After calling connect()
+onMounted(() => {
+  updateBuscadorState();
+  
+  // Add detailed logging for socket connection
+  console.log('Communication manager:', comunicationManager);
+  console.log('Socket property:', comunicationManager.socket);
+  if (comunicationManager.socket && comunicationManager.socket.value) {
+    console.log('Socket value:', comunicationManager.socket.value);
+  }
+  
+  // Ensure socket is connected
+  if (!comunicationManager.socket) {
+    console.warn('Socket not initialized, connecting...');
+    comunicationManager.connect();
+  }
+})
 const router = useRouter()
 const route = useRoute()
 const collaborationCode = ref('');
@@ -130,18 +148,34 @@ const showAlert = (alertMessage) => {
   }, 3000)
 }
 
-// Función para unirse a una colaboración
 const joinCollaboration = () => {
-  if (!collaborationCode.value || collaborationCode.value.length !== 6) {
+  const roomId = collaborationCode.value.trim();
+  if (!roomId || roomId.length !== 6) {
     showAlert('El codi de col·laboració ha de tenir 6 caràcters');
     return;
   }
-  // Necesitamos verificar si el código existe en el servidor
-  // Esto lo haremos en el servidor Node.js con Socket.IO
-  // Por ahora, redirigimos al usuario a la página principal con el código como parámetro
-  // para que posteriormente sea procesado
-  router.push(`/?code=${collaborationCode.value}`);
+
+  // Get the socket from comunicationManager
+  const socket = comunicationManager.socket;
+  
+  if (!socket) {
+    showAlert('Error de connexió amb el servidor');
+    console.error('Socket is not initialized');
+    return;
+  }
+
+  // Now use the socket
+  socket.emit('check-room', { roomId }, ({ exists, projectId }) => {
+    if (!exists) {
+      showAlert('El codi no existeix o ha caducat');
+      return;
+    }
+    // Si existe, navegamos a /lliure/:projectId?code=roomId
+    router.push(`/lliure/${projectId}?code=${roomId}`);
+  });
 };
+
+
 
 // Funciones de navegación
 const navigateToLliure = async () => {
