@@ -114,8 +114,9 @@
 <script>
 import { ref, onMounted, computed, onUnmounted, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import CodeMirror from "codemirror";
 import { useLliureStore } from "~/stores/app";
+import useCommunicationManager from "@/stores/comunicationManager";
+import CodeMirror from "codemirror";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
 
@@ -131,13 +132,9 @@ import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/matchtags";
 import "codemirror/addon/hint/javascript-hint";
 import "codemirror/addon/edit/closebrackets";
-import useCommunicationManager from "@/stores/comunicationManager";
-import { useAppStore, useIdProyectoActualStore } from "@/stores/app";
 
 export default {
   setup() {
-    const appStore = useAppStore();
-    const idProyectoActualStore = useIdProyectoActualStore();
     const router = useRouter();
     const route = useRoute();
     const {
@@ -268,7 +265,6 @@ export default {
 
       const projectId = route.params.id;
       if (projectId) {
-        idProyectoActualStore.id = projectId;
 
         const proyectoStore = useProyectoStore();
         const proyecto = await proyectoStore.obtenerProyecto(projectId);
@@ -302,7 +298,6 @@ export default {
 
     onUnmounted(() => {
       lliureStore.toggleLliure();
-      idProyectoActualStore.vaciarId();
     });
 
     const guardarProyecto2 = () => {
@@ -351,7 +346,6 @@ export default {
         if (html.value === "" && css.value === "" && js.value === "") {
           try {
             let id =
-              idProyectoActualStore?.id ||
               Number(localStorage.getItem("idProyectoActual"));
             if (id) {
               await borrarProyectoDB(id);
@@ -373,12 +367,7 @@ export default {
     };
 
     const guardarProyecto = async () => {
-      markClean();
-
-      if (!idProyectoActualStore.id) {
-        console.error("ID del proyecto es null o no se encuentra.");
-        return;
-      }
+      markClean()
 
       try {
         const response = await guardarProyectoDB(
@@ -390,7 +379,6 @@ export default {
             js_code: js.value || "",
             statuts: isPrivate.value,
           },
-          idProyectoActualStore.id
         );
         if (response.success == false) {
           console.log(response.message);
