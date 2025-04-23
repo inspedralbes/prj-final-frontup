@@ -369,7 +369,6 @@ export default {
     const initSocketConnection = () => {
       socket.value = io("http://localhost:5000");
       
-      // Configurar listeners para los eventos de socket
       socket.value.on("connect", () => {
         console.log("Conectado al servidor de socket");
       });
@@ -422,7 +421,6 @@ export default {
       lliureStore.toggleLliure();
       idProyectoActualStore.vaciarId();
       
-      // Desconectar el socket al desmontar
       if (socket.value) {
         socket.value.disconnect();
       }
@@ -454,7 +452,6 @@ export default {
 
     const copyShareCode = () => {
       navigator.clipboard.writeText(shareCode.value);
-      // Mostrar mensaje de confirmación
       alert("Codi copiat al portapapers");
     };
 
@@ -637,7 +634,6 @@ export default {
       CambiosSinGuardarToTrue,
       isPrivate,
       description,
-      // Nuevas propiedades para colaboración
       showShareModal,
       shareCode,
       generateShareCode,

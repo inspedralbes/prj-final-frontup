@@ -103,7 +103,6 @@ import { ref, watch, onMounted, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useBuscadorStore } from '@/stores/app'
 
-// Definir todas las variables y referencias primero
 const idProyectoActualStore = useIdProyectoActualStore();
 const theme = ref('')
 const loginText = ref('Login')
@@ -121,7 +120,6 @@ onMounted(() => {
 
 });
 
-
 const router = useRouter()
 const route = useRoute()
 const collaborationCode = ref('');
@@ -129,7 +127,6 @@ const show = ref(false)
 const message = ref('')
 const projecte = reactive({ result: {} });
 
-// Funciones de alerta y mensajes
 const showAlert = (alertMessage) => {
   message.value = alertMessage
   show.value = true
@@ -157,7 +154,6 @@ const joinCollaboration = () => {
       showAlert('El codi no existeix o ha caducat');
       return;
     }
-    // ¡Redirigimos al proyecto correcto!
     router.push(`/lliure/${projectId}?code=${code}`);
   });
 };
@@ -165,7 +161,6 @@ const joinCollaboration = () => {
 
 
 
-// Funciones de navegación
 const navigateToLliure = async () => {
   if (appStore.loginInfo.id != null) {
     try {
@@ -215,16 +210,6 @@ const navigateToTotsProjectes = () => {
   router.push("/totsProjectes");
 }
 
-// Buscador state management
-const updateBuscadorState = () => {
-  if (route.path === '/' || route.name === 'index') {
-    buscadorStore.activarBuscador();
-  } else {
-    buscadorStore.desactivarBuscador();
-  }
-}
-
-// Watchers y hooks - después de definir todas las variables y funciones
 watch(() => appStore.isLoggedIn, (newValue) => {
 })
 
@@ -237,13 +222,6 @@ watch(route, () => {
   }
 });
 
-watch(() => route.path, () => {
-  updateBuscadorState()
-})
-
-onMounted(() => {
-  updateBuscadorState()
-})
 </script>
 
 

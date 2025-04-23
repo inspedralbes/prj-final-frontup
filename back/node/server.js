@@ -60,7 +60,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: '*', // En producción, limitar a tu dominio
+        origin: '*',
         methods: ['GET', 'POST']
     }
 });
@@ -76,7 +76,7 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
     console.log(`Usuario conectado: ${socket.id}`);
 
-    // Crear una nueva room para colaboración
+    // Crear una nova room
     socket.on('create-room', ({ roomId, projectId, initialData }) => {
         console.log(`Creando room: ${roomId} para proyecto: ${projectId}`);
 
@@ -89,16 +89,15 @@ io.on('connection', (socket) => {
             users: [socket.id]
         });
 
-        // Mapear el proyecto a esta room
         projectRooms.set(projectId, roomId);
 
-        // Unir al socket a la room
+        // Unir el socket a la room
         socket.join(roomId);
 
         // Notificar al creador
         socket.emit('room-created', { roomId });
 
-        console.log(`Room ${roomId} creada con éxito`);
+        console.log(`Room ${roomId} creada amb èxit`);
     });
 
     // Unirse a una room existente
@@ -106,7 +105,7 @@ io.on('connection', (socket) => {
         const room = rooms.get(roomId);
 
         if (!room) {
-            socket.emit('error', { message: 'La sala no existe' });
+            socket.emit('error', { message: 'La sala no existeix' });
             return;
         }
 
@@ -127,15 +126,13 @@ io.on('connection', (socket) => {
     });
 
 
-    // Manejar cambios en HTML
     socket.on('html-change', ({ code, roomId }) => {
         const room = rooms.get(roomId);
         if (!room) return;
 
-        // Actualizar el estado en el servidor
         room.html = code;
 
-        // Enviar a todos los demás en la room
+        // Enviar els canvis a les altres persones de la room
         socket.to(roomId).emit('html-change', code);
     });
 
@@ -144,10 +141,8 @@ io.on('connection', (socket) => {
         const room = rooms.get(roomId);
         if (!room) return;
 
-        // Actualizar el estado en el servidor
         room.css = code;
 
-        // Enviar a todos los demás en la room
         socket.to(roomId).emit('css-change', code);
     });
 
@@ -156,14 +151,12 @@ io.on('connection', (socket) => {
         const room = rooms.get(roomId);
         if (!room) return;
 
-        // Actualizar el estado en el servidor
         room.js = code;
 
-        // Enviar a todos los demás en la room
         socket.to(roomId).emit('js-change', code);
     });
 
-    // Verificar si un código de room existe
+    // Verificar si un código de room existeix
     socket.on('check-room', ({ roomId }, callback) => {
         const roomExists = rooms.has(roomId);
 
@@ -181,11 +174,9 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Manejar desconexión
     socket.on('disconnect', () => {
         console.log(`Usuario desconectado: ${socket.id}`);
 
-        // Eliminar usuario de las rooms a las que pertenecía
         rooms.forEach((room, roomId) => {
             const userIndex = room.users.indexOf(socket.id);
             if (userIndex !== -1) {

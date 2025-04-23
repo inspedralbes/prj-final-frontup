@@ -22,7 +22,7 @@ const useCommunicationManager = () => {
   
       socket.value.on('disconnect', () => {
         console.log('Desconectado del servidor WebSocket');
-        socket.value = false; // Indicar que la conexión se ha perdido
+        socket.value = false; // Indicar que la conexión s'ha perdut
       });
     }
   };
