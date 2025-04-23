@@ -59,6 +59,13 @@
           </svg>
           <p class="label">Likes</p>
         </li>
+        <li class="leftsection-element" @click="navigateToCreadorNiveles">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
+            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3h18v18H3zM12 8v8m-4-4h8" />
+          </svg>
+          <p class="label">Creador Niveles</p>
+        </li>
       </ul>
 
       <div class="leftsection-separator"></div>
@@ -125,7 +132,6 @@ onMounted(() => {
   updateBuscadorState()
 })
 
-// Observar cambios en la ruta para actualizar el estado automáticamente
 watch(() => route.path, () => {
   updateBuscadorState()
 })
@@ -167,6 +173,11 @@ const navigateToLliure = async () => {
 const navigateToNiveles = () => {
   router.push('/niveles');
 }
+
+const navigateToCreadorNiveles = () => {
+  router.push('/creadorNiveles');
+}
+
 const navigateToLikes = () => {
   router.push('/likes');
 }
