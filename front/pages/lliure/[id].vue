@@ -553,6 +553,7 @@ export default {
   border-radius: 6px;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
   background-color: #2d2d2d;
+  overflow: hidden;
 }
 
 .editor-label {
