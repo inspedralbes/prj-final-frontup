@@ -367,7 +367,7 @@ export default {
     });
 
     const initSocketConnection = () => {
-      socket.value = io("http://localhost:3001");
+      socket.value = io("http://localhost:5000");
       
       // Configurar listeners para los eventos de socket
       socket.value.on("connect", () => {
