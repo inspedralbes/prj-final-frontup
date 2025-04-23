@@ -7,6 +7,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\LikesController;
+use App\Http\Controllers\NivellUsuariController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [UserController::class, 'getUser']);
@@ -25,6 +26,9 @@ Route::middleware('auth:sanctum')->group(function () {
     //Todas las publicaciones a las que le ha dado like un usuario
     Route::get('/likes/allUserLikes', [LikesController::class, 'userAllLikes']);
     Route::put('/projects/{id}', [ProjectController::class, 'update']); 
+    Route::apiResource('nivells_usuaris', NivellUsuariController::class)->only([
+        'index', 'store', 'show', 'update', 'destroy'
+    ]);
 });
 //contador de likes para un proyecto
 Route::get('/likes/count/{projectId}', [LikesController::class, 'likeCount']);

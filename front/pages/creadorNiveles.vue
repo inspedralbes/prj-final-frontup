@@ -126,7 +126,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 
@@ -134,6 +134,17 @@ const router = useRouter()
 const appStore = useAppStore()
 
 const isSubmitting = ref(false)
+
+// Función de notificación
+const showNotification = (message, type = 'success') => {
+  // Implementación básica con alertas
+  // En un proyecto real, usa un sistema de notificaciones UI
+  if (type === 'error') {
+    alert(`Error: ${message}`);
+  } else {
+    alert(message);
+  }
+};
 
 const level = ref({
   title: '',
@@ -173,17 +184,40 @@ const handleSubmit = async () => {
   isSubmitting.value = true
 
   try {
-    // Aquí iría la llamada a tu API
-    // const response = await $fetch('/api/levels', {
-    //   method: 'POST',
-    //   body: level.value
-    // })
+    const response = await $fetch('http://localhost:8000/api/nivells_usuaris', {
+      method: 'POST',
+      body: JSON.stringify({
+        title: level.value.title,
+        description: level.value.description,
+        difficulty: level.value.difficulty,
+        initial_html: level.value.initialHTML,
+        initial_css: level.value.initialCSS,
+        initial_js: level.value.initialJS,
+        expected_html: level.value.expectedHTML,
+        expected_css: level.value.expectedCSS,
+        expected_js: level.value.expectedJS
+      }),
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
     
     showNotification('Nivel creado exitosamente!', 'success')
     router.push('/niveles')
   } catch (error) {
     console.error('Error creating level:', error)
-    showNotification('Error al crear el nivel', 'error')
+    let errorMsg = 'Error al crear el nivel'
+    
+    if (error.data) {
+      errorMsg = error.data.message || JSON.stringify(error.data)
+    } else if (error.response?.data) {
+      errorMsg = error.response.data.message || JSON.stringify(error.response.data)
+    }
+    
+    showNotification(errorMsg, 'error')
   } finally {
     isSubmitting.value = false
   }
