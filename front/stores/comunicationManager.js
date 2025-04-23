@@ -7,25 +7,24 @@ const useCommunicationManager = () => {
   const laravelURL = config.public.apiLaravelUrl;
   const nodeURL = config.public.nodeUrl;
 
-  // Socket.io
-  const socket = ref(null);
+  const socket = ref(false);
 
   const connect = () => {
-    if (!socket.value) {
+    if (!socket.value && !socket.value) {
       socket.value = io(nodeURL, {
         transports: ['websocket'],
         withCredentials: true,
       });
-
+  
       socket.value.on('connect', () => {
         console.log('Conectado al servidor WebSocket');
+        socket.value = true; // Indicar que la conexión fue exitosa
       });
-
+  
       socket.value.on('disconnect', () => {
         console.log('Desconectado del servidor WebSocket');
+        socket.value = false; // Indicar que la conexión se ha perdido
       });
-
-      // Puedes manejar otros eventos aquí
     }
   };
 
@@ -428,6 +427,7 @@ const useCommunicationManager = () => {
     connect,
     disconnect,
     joinRoom,
+    socket,
   };
 };
 

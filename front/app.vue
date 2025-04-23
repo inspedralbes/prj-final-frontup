@@ -117,21 +117,17 @@ const comunicationManager = useCommunicationManager();
 comunicationManager.connect();
 // After calling connect()
 onMounted(() => {
-  updateBuscadorState();
-  
-  // Add detailed logging for socket connection
-  console.log('Communication manager:', comunicationManager);
-  console.log('Socket property:', comunicationManager.socket);
-  if (comunicationManager.socket && comunicationManager.socket.value) {
-    console.log('Socket value:', comunicationManager.socket.value);
+  comunicationManager.connect();
+
+  comunicationManager.socket.value?.on('connect', () => {
+    console.log('Socket conectado desde App.vue');
+  });
+
+  // Evita errores así:
+  if (comunicationManager.socket.value) {
+    comunicationManager.socket.value.emit('joinRoom', '123456');
   }
-  
-  // Ensure socket is connected
-  if (!comunicationManager.socket) {
-    console.warn('Socket not initialized, connecting...');
-    comunicationManager.connect();
-  }
-})
+});
 const router = useRouter()
 const route = useRoute()
 const collaborationCode = ref('');
