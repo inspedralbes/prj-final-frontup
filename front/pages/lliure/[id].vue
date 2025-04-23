@@ -157,9 +157,6 @@ export default {
     const css = ref("");
     const js = ref("");
     const isEditing = ref(false);
-    const showSettingsModal = ref(false);
-    const modalTitle = ref("");
-    const modalDescription = ref("");
     const isExpanded = ref(false);
     const isChatVisible = ref(false);
     const newMessage = ref("");
@@ -168,7 +165,6 @@ export default {
     const messagesContainer = ref(null);
     const guardarParaSalir = ref(false);
     const isPrivate = ref(0);
-    const description = ref("");
     const layoutType = ref('normal');
 
     const htmlEditor = ref(null);
@@ -187,12 +183,12 @@ export default {
       document.addEventListener("mouseup", stopDrag);
     };
 
-    const CambiosSinGuardarToTrue = () => {
+    const markDirty = () => {
       console.log("entrado en cambio a true", cambiadoSinGuardar.value);
       cambiadoSinGuardar.value = true;
     };
 
-    const CambiosSinGuardarToFalse = () => {
+    const markClean = () => {
       cambiadoSinGuardar.value = false;
       console.log("entrado a cambio a false", cambiadoSinGuardar.value);
     };
@@ -281,7 +277,6 @@ export default {
           css.value = proyecto.css_code || "";
           js.value = proyecto.js_code || "";
           title.value = proyecto.nombre || "Untitled";
-          description.value = proyecto.descripcion || "";
           htmlEditorInstance.setValue(html.value);
           cssEditorInstance.setValue(css.value);
           jsEditorInstance.setValue(js.value);
@@ -293,15 +288,15 @@ export default {
 
       htmlEditorInstance.on("change", (instance) => {
         html.value = instance.getValue();
-        CambiosSinGuardarToTrue();
+        markDirty();
       });
       cssEditorInstance.on("change", (instance) => {
         css.value = instance.getValue();
-        CambiosSinGuardarToTrue();
+        markDirty();
       });
       jsEditorInstance.on("change", (instance) => {
         js.value = instance.getValue();
-        CambiosSinGuardarToTrue();
+        markDirty();
       });
     });
 
@@ -372,21 +367,13 @@ export default {
       }
     };
 
-    const saveSettings = async () => {
-      title.value = modalTitle.value;
-      description.value = modalDescription.value;
-      CambiosSinGuardarToTrue();
-      await guardarProyecto();
-      closeSettingsModal();
-    };
-
     const savePrivacy = async () => {
-      CambiosSinGuardarToTrue();
+      markDirty();
       await guardarProyecto();
     };
 
     const guardarProyecto = async () => {
-      CambiosSinGuardarToFalse();
+      markClean();
 
       if (!idProyectoActualStore.id) {
         console.error("ID del proyecto es null o no se encuentra.");
@@ -397,7 +384,6 @@ export default {
         const response = await guardarProyectoDB(
           {
             nombre: title.value || "",
-            descripcion: description.value || "",
             user_id: appStore.loginInfo.id || null,
             html_code: html.value || "",
             css_code: css.value || "",
@@ -423,9 +409,6 @@ export default {
       cssEditor,
       jsEditor,
       isEditing,
-      showSettingsModal,
-      modalTitle,
-      modalDescription,
       isExpanded,
       isChatVisible,
       newMessage,
@@ -440,17 +423,15 @@ export default {
       toggleExpand,
       goBack,
       closeGuardarParaSalir,
-      saveSettings,
       guardarProyecto,
       isDragging,
       chatPosition,
       startDrag,
       onDrag,
       stopDrag,
-      CambiosSinGuardarToTrue,
+      markDirty,
       isPrivate,
       savePrivacy,
-      description,
       layoutType,
       setLayout,
       output: computed(() => {
