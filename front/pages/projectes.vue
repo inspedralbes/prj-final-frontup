@@ -17,10 +17,10 @@
       </div>
     </div>
 
-    <div v-if="loading" class="loading">Cargant projectes...</div>
+    <div v-if="loading" class="loading">Carregant projectes...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else>
-      <div v-if="projects.length === 0" class="no-projectes">
+      <div v-if="projects.length === 0" class="no-projects">
         No hi ha projectes disponibles.
       </div>
       <div class="projects-list">
@@ -44,7 +44,7 @@
 import Item from '~/components/item.vue';
 
 export default {
-  name: "TotsProjectes",
+  name: "Projectes",
   components: {
     Item,
   },
@@ -122,23 +122,23 @@ export default {
         this.fetchProjects(this.currentPage);
       }
     },
-    navigateToProject(id) {
-      this.$router.push(`/lliure/${id}`);
-    },
   },
 };
 </script>
 
 <style scoped>
 .container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   max-width: 100%;
   margin: auto;
   padding: 30px;
+  padding-top: 80px;
   text-align: center;
   background-color: #252323;
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  height: 120vh;
 }
 
 .title {
@@ -200,25 +200,26 @@ export default {
   color: #ff4d4d;
 }
 
-.no-projectes {
+.no-projects {
   font-size: 18px;
   color: #ffb74d;
 }
 
 .projects-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  padding: 10px;
 }
 
 .pagination {
-  margin-top: 20px;
+  margin-top: auto;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 15px;
   color: white;
+  padding-top: 10px;
 }
 
 .page-btn {

@@ -12,3 +12,5 @@ Route::get('/', function () {
 Route::resource('users', UserController::class);
 
 Route::resource('projects', ProjectController::class);
+// web.php
+Route::get('/projects/{id}/preview', [ProjectController::class, 'preview'])->name('projects.preview');

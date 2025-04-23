@@ -83,6 +83,13 @@ class LikesController extends Controller
     {
         $userId = Auth::id();
         $likes = Likes::with('project')->where('user_id', $userId)->get();
+
+        $likes->each(function ($like) {
+            if ($like->project) {
+                $like->project->preview_url = $this->generatePreviewUrl($like->project);
+            }
+        });
+
         return response()->json($likes);
     }
     public function userAllLikes()
@@ -92,8 +99,18 @@ class LikesController extends Controller
         $likedProjects = Likes::where('user_id', $userId)
             ->with('project')
             ->get()
-            ->pluck('project');
+            ->pluck('project')
+            ->filter() 
+        ->map(function ($project) {
+            $project->preview_url = $this->generatePreviewUrl($project);
+            return $project;
+        });
 
         return response()->json($likedProjects);
+    }
+
+    protected function generatePreviewUrl($project)
+    {
+    return route('projects.preview', ['id' => $project->id]);
     }
 }
