@@ -112,22 +112,20 @@ io.on('connection', (socket) => {
 
         console.log(`Usuario ${socket.id} uniéndose a room: ${roomId}`);
 
-        // Añadir usuario a la room
         room.users.push(socket.id);
         socket.join(roomId);
 
-        // Enviar el estado actual del proyecto al nuevo usuario
         socket.emit('initial-state', {
             html: room.html,
             css: room.css,
             js: room.js
         });
 
-        // Notificar a otros usuarios en la room
         socket.to(roomId).emit('user-joined', { userId: socket.id });
 
-        console.log(`Usuario ${socket.id} unido a room ${roomId}`);
+        socket.emit('joinedRoom', { projectId }); // <-- esto es clave
     });
+
 
     // Manejar cambios en HTML
     socket.on('html-change', ({ code, roomId }) => {

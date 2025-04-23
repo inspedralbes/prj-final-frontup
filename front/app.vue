@@ -114,20 +114,14 @@ const appStore = useAppStore()
 const lliureStore = useLliureStore()
 const buscadorStore = useBuscadorStore()
 const comunicationManager = useCommunicationManager();
-comunicationManager.connect();
-// After calling connect()
+const roomId = computed(() => route.params.id || 'default-room');
+
 onMounted(() => {
   comunicationManager.connect();
 
-  comunicationManager.socket.value?.on('connect', () => {
-    console.log('Socket conectado desde App.vue');
-  });
-
-  // Evita errores así:
-  if (comunicationManager.socket.value) {
-    comunicationManager.socket.value.emit('joinRoom', '123456');
-  }
 });
+
+
 const router = useRouter()
 const route = useRoute()
 const collaborationCode = ref('');
@@ -145,31 +139,29 @@ const showAlert = (alertMessage) => {
 }
 
 const joinCollaboration = () => {
-  const roomId = collaborationCode.value.trim();
-  if (!roomId || roomId.length !== 6) {
+  const code = collaborationCode.value.trim();
+  if (!code || code.length !== 6) {
     showAlert('El codi de col·laboració ha de tenir 6 caràcters');
     return;
   }
 
-  // Get the socket from comunicationManager
-  const socket = comunicationManager.socket;
-  
-  if (!socket) {
+  const sock = comunicationManager.socket.value;
+  if (!sock || typeof sock.emit !== 'function') {
     showAlert('Error de connexió amb el servidor');
-    console.error('Socket is not initialized');
     return;
   }
 
-  // Now use the socket
-  socket.emit('check-room', { roomId }, ({ exists, projectId }) => {
+  console.log('Botón presionado, código ingresado:', code);
+  sock.emit('check-room', { roomId: code }, ({ exists, projectId }) => {
     if (!exists) {
       showAlert('El codi no existeix o ha caducat');
       return;
     }
-    // Si existe, navegamos a /lliure/:projectId?code=roomId
-    router.push(`/lliure/${projectId}?code=${roomId}`);
+    // ¡Redirigimos al proyecto correcto!
+    router.push(`/lliure/${projectId}?code=${code}`);
   });
 };
+
 
 
 

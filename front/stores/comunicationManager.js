@@ -15,10 +15,9 @@ const useCommunicationManager = () => {
         transports: ['websocket'],
         withCredentials: true,
       });
-  
+      
       socket.value.on('connect', () => {
         console.log('Conectado al servidor WebSocket');
-        socket.value = true; // Indicar que la conexión fue exitosa
       });
   
       socket.value.on('disconnect', () => {
