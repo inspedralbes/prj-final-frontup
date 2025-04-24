@@ -9,7 +9,7 @@
 // app.use(express.json());
 
 // const genAI = new GoogleGenerativeAI("AIzaSyBvVgFpTT270F8-TEZIy4zeWYnGr8c-PR0");
-// const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+// const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 // app.post("/pregunta", async (req, res) => {
 //     try {
