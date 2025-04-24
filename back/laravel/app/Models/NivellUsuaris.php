@@ -10,10 +10,11 @@ class NivellUsuaris extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $table = 'nivells_usuaris';
+
     protected $fillable = [
         'title',
         'description',
-        'difficulty',
         'initial_html',
         'initial_css',
         'initial_js',

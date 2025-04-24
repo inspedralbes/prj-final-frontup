@@ -12,7 +12,6 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description');
-            $table->enum('difficulty', ['beginner', 'intermediate', 'advanced'])->default('intermediate');
             $table->text('initial_html');
             $table->text('initial_css');
             $table->text('initial_js');

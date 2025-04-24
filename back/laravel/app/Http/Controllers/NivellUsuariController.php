@@ -9,11 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class NivellUsuariController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth')->except(['index', 'show']);
-    }
-
     public function index()
     {
         return NivellUsuaris::with('user')->latest()->get();
@@ -24,7 +19,6 @@ class NivellUsuariController extends Controller
         $level = NivellUsuaris::create([
             'title' => $request->title,
             'description' => $request->description,
-            'difficulty' => $request->difficulty ?? 'intermediate',
             'initial_html' => $request->initial_html,
             'initial_css' => $request->initial_css,
             'initial_js' => $request->initial_js,
