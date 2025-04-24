@@ -123,17 +123,21 @@ const useCommunicationManager = () => {
   };
 
   const borrarProyectoDB = async (id) => {
-    console.log('id pasado', id);
-
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`${laravelURL}/projects/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
       });
-
+  
       if (!response.ok) {
         throw new Error('Error en la solicitud: ' + response.status);
       }
-
+  
       const data = await response.json();
       console.log('Respuesta del servidor:', data);
       return data;
@@ -142,6 +146,7 @@ const useCommunicationManager = () => {
       throw error;
     }
   };
+  
   const addLike = async (projectId) => {
     try {
       const token = localStorage.getItem('token');
