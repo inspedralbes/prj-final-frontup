@@ -60,7 +60,13 @@
           <p class="label">Likes</p>
         </li>
       </ul>
-
+      <li class="leftsection-element" @click="showCollaborationModal = true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#7e8590"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 20v-6h4v6m-7-8h10V4H7z" />
+        </svg>
+        <p class="label">Unir-se a Projecte</p>
+      </li>
       <div class="leftsection-separator"></div>
 
       <ul class="leftsection-list">
@@ -81,6 +87,16 @@
         </li>
       </ul>
     </div>
+    <div v-if="showCollaborationModal" class="modal-overlay" @click.self="showCollaborationModal = false">
+      <div class="modal">
+        <h3>Introdueix el codi</h3>
+        <input type="text" v-model="collaborationCode" maxlength="6" placeholder="Codi de col·laboració" />
+        <div class="modal-actions">
+          <button @click="joinCollaboration">Unir-se</button>
+          <button class="cancel" @click="showCollaborationModal = false">Cancel·lar</button>
+        </div>
+      </div>
+    </div>
   </div>
   <NuxtPage />
   <footer>
@@ -93,10 +109,11 @@ import { useLliureStore } from '~/stores/app'
 import { useAppStore } from '@/stores/app'
 import { useIdProyectoActualStore } from '@/stores/app'
 import useCommunicationManager from '@/stores/comunicationManager'
-import { ref, watch, onMounted, reactive, computed  } from 'vue'
+import { ref, watch, onMounted, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useBuscadorStore } from '@/stores/app'
 
+const showCollaborationModal = ref(false);
 const idProyectoActualStore = useIdProyectoActualStore();
 const theme = ref('')
 const loginText = ref('Login')
@@ -106,31 +123,20 @@ const isLoged = computed(() => {
 const appStore = useAppStore()
 const lliureStore = useLliureStore()
 const buscadorStore = useBuscadorStore()
-
-watch(() => appStore.isLoggedIn, (newValue) => {
-})
 const comunicationManager = useCommunicationManager();
-const router = useRouter()
-const route = useRoute()
-
-const updateBuscadorState = () => {
-  if (route.path === '/' || route.name === 'index') {
-    buscadorStore.activarBuscador();
-  } else {
-    buscadorStore.desactivarBuscador();
-  }
-}
+const roomId = computed(() => route.params.id || 'default-room');
 
 onMounted(() => {
-  updateBuscadorState()
-})
+  comunicationManager.connect();
 
-// Observar cambios en la ruta para actualizar el estado automáticamente
-watch(() => route.path, () => {
-  updateBuscadorState()
-})
+});
+
+const router = useRouter()
+const route = useRoute()
+const collaborationCode = ref('');
 const show = ref(false)
 const message = ref('')
+const projecte = reactive({ result: {} });
 
 const showAlert = (alertMessage) => {
   message.value = alertMessage
@@ -139,7 +145,33 @@ const showAlert = (alertMessage) => {
     show.value = false
   }, 3000)
 }
-const projecte = reactive({ result: {} });
+
+const joinCollaboration = () => {
+  const code = collaborationCode.value.trim();
+  if (!code || code.length !== 6) {
+    showAlert('El codi de col·laboració ha de tenir 6 caràcters');
+    return;
+  }
+
+  const sock = comunicationManager.socket.value;
+  if (!sock || typeof sock.emit !== 'function') {
+    showAlert('Error de connexió amb el servidor');
+    return;
+  }
+
+  console.log('Botón presionado, código ingresado:', code);
+  sock.emit('check-room', { roomId: code }, ({ exists, projectId }) => {
+    if (!exists) {
+      showAlert('El codi no existeix o ha caducat');
+      return;
+    }
+    router.push(`/lliure/${projectId}?code=${code}`);
+  });
+};
+
+
+
+
 const navigateToLliure = async () => {
   if (appStore.loginInfo.id != null) {
     try {
@@ -188,7 +220,21 @@ const navigateToHome = () => {
 const navigateToTotsProjectes = () => {
   router.push("/totsProjectes");
 }
+
+watch(() => appStore.isLoggedIn, (newValue) => {
+})
+
+watch(route, () => {
+  if (route.query.code) {
+    const projectId = route.query.projectId;
+    if (projectId) {
+      router.push(`/lliure/${projectId}?code=${route.query.code}`);
+    }
+  }
+});
+
 </script>
+
 
 <style>
 body {
@@ -328,4 +374,107 @@ footer {
   padding: 10px 20px;
   color: white;
 }
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(10, 10, 10, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+  animation: fadeInOverlay 0.25s ease-out;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal {
+  background: linear-gradient(135deg, #2a2d3a, #232539);
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  color: #eceff4;
+  animation: popIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.modal h3 {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  letter-spacing: 0.03em;
+  color: #81a1c1;
+  text-transform: uppercase;
+}
+
+.modal input {
+  width: 80%;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+  font-size: 1rem;
+  border: 1px solid #4c566a;
+  border-radius: 6px;
+  background-color: #2e3440;
+  color: #eceff4;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.modal input:focus {
+  outline: none;
+  border-color: #81a1c1;
+  box-shadow: 0 0 0 3px rgba(129, 161, 193, 0.3);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 0.75rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s, filter 0.2s;
+}
+
+.modal-actions button:not(.cancel) {
+  background: linear-gradient(90deg, #5e81ac, #81a1c1);
+  color: #fff;
+}
+.modal-actions button:not(.cancel):hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+
+.modal-actions .cancel {
+  background: linear-gradient(90deg, #bf616a, #d08770);
+  color: #eceff4;
+}
+.modal-actions .cancel:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+
+
 </style>

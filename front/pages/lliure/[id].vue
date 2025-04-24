@@ -10,9 +10,16 @@
         <select v-model="isPrivate" @change="savePrivacy" class="header-select">
           <option :value="0">Público</option>
           <option :value="1">Privado</option>
+        <button class="header-button" @click="generateShareCode">Compartir</button>
         </select>
       </div>
     </header>
+
+    <!-- Indicador de colaboración activa -->
+    <div v-if="isCollaborating" class="collaboration-active">
+      <span class="collaboration-indicator"></span>
+      <span>Collaboración activa: {{ activeUsers }} usuarios</span>
+    </div>
 
     <!-- Botones de layout -->
     <div class="layout-buttons">
@@ -40,6 +47,21 @@
     </svg>
   </button>
 </div>
+
+    <!-- Modal para compartir código de colaboración -->
+    <div v-if="showShareModal" class="modal-overlay" @click="closeShareModal">
+      <div class="modal-content" @click.stop>
+        <h2>Codi de col·laboració</h2>
+        <div class="share-code-container">
+          <p class="share-code">{{ shareCode }}</p>
+          <button class="modal-button copy-button" @click="copyShareCode">Copiar</button>
+        </div>
+        <p class="share-instructions">Comparteix aquest codi amb altres usuaris perquè puguin unir-se i editar aquest projecte en temps real.</p>
+        <div class="modal-actions">
+          <button type="button" class="modal-button" @click="closeShareModal">Tancar</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Modal para guardar antes de salir -->
     <div v-if="guardarParaSalir" class="modal-overlay" @click="closeGuardarParaSalir">
@@ -112,12 +134,13 @@
 </template>
 
 <script>
-import { ref, onMounted, computed, onUnmounted, nextTick } from "vue";
+import { ref, onMounted, computed, onUnmounted, nextTick, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import CodeMirror from "codemirror";
 import { useLliureStore } from "~/stores/app";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
+import { io } from "socket.io-client";
 
 import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
@@ -166,6 +189,13 @@ export default {
     const guardarParaSalir = ref(false);
     const isPrivate = ref(0);
     const layoutType = ref('normal');
+
+    // Nuevas variables para la colaboración en tiempo real
+    const showShareModal = ref(false);
+    const shareCode = ref("");
+    const socket = ref(null);
+    const isCollaborating = ref(false);
+    const activeUsers = ref(1);
 
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
@@ -286,24 +316,154 @@ export default {
         console.error("No se encontró un ID de proyecto válido en la ruta.");
       }
 
+      // Inicializar conexión de socket
+      initSocketConnection();
+
+      // Verificar si hay un código de colaboración en la URL
+      const collabCode = route.query.code;
+      if (collabCode) {
+        joinCollaborationSession(collabCode);
+      }
+
+      // Modificar los event listeners para incluir la emisión de cambios por socket
       htmlEditorInstance.on("change", (instance) => {
-        html.value = instance.getValue();
+        const newValue = instance.getValue();
+        html.value = newValue;
         markDirty();
+        
+        if (isCollaborating.value) {
+          socket.value.emit("html-change", {
+            code: newValue,
+            roomId: shareCode.value
+          });
+        }
       });
+      
       cssEditorInstance.on("change", (instance) => {
-        css.value = instance.getValue();
+        const newValue = instance.getValue();
+        css.value = newValue;
         markDirty();
+        
+        if (isCollaborating.value) {
+          socket.value.emit("css-change", {
+            code: newValue,
+            roomId: shareCode.value
+          });
+        }
       });
+      
       jsEditorInstance.on("change", (instance) => {
-        js.value = instance.getValue();
+        const newValue = instance.getValue();
+        js.value = newValue;
         markDirty();
+        
+        if (isCollaborating.value) {
+          socket.value.emit("js-change", {
+            code: newValue,
+            roomId: shareCode.value
+          });
+        }
       });
     });
+    const initSocketConnection = () => {
+      socket.value = io("http://localhost:5000");
+      
+      socket.value.on("connect", () => {
+        console.log("Conectado al servidor de socket");
+      });
+      
+      socket.value.on("html-change", (newValue) => {
+        if (newValue !== html.value) {
+          html.value = newValue;
+          htmlEditorInstance.setValue(newValue);
+        }
+      });
+      
+      socket.value.on("css-change", (newValue) => {
+        if (newValue !== css.value) {
+          css.value = newValue;
+          cssEditorInstance.setValue(newValue);
+        }
+      });
+      
+      socket.value.on("js-change", (newValue) => {
+        if (newValue !== js.value) {
+          js.value = newValue;
+          jsEditorInstance.setValue(newValue);
+        }
+      });
+      
+      socket.value.on("initial-state", ({ html: htmlCode, css: cssCode, js: jsCode }) => {
+        html.value = htmlCode;
+        css.value = cssCode;
+        js.value = jsCode;
+        
+        htmlEditorInstance.setValue(htmlCode);
+        cssEditorInstance.setValue(cssCode);
+        jsEditorInstance.setValue(jsCode);
+      });
+      
+      socket.value.on("user-joined", () => {
+        activeUsers.value++;
+      });
+      
+      socket.value.on("user-left", () => {
+        activeUsers.value = Math.max(1, activeUsers.value - 1);
+      });
+      
+      socket.value.on("room-users", ({ count }) => {
+        activeUsers.value = count;
+      });
+    };
 
     onUnmounted(() => {
       lliureStore.toggleLliure();
       idProyectoActualStore.vaciarId();
+      
+      if (socket.value) {
+        socket.value.disconnect();
+      }
     });
+
+    const generateShareCode = () => {
+      // Generar un código aleatorio de 6 caracteres alfanuméricos
+      const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+      shareCode.value = randomCode;
+      
+      // Crear la room en el servidor
+      socket.value.emit("create-room", {
+        roomId: randomCode,
+        projectId: idProyectoActualStore.id,
+        initialData: {
+          html: html.value,
+          css: css.value,
+          js: js.value
+        }
+      });
+      
+      isCollaborating.value = true;
+      showShareModal.value = true;
+    };
+
+    const closeShareModal = () => {
+      showShareModal.value = false;
+    };
+
+    const copyShareCode = () => {
+      navigator.clipboard.writeText(shareCode.value);
+      alert("Codi copiat al portapapers");
+    };
+
+    const joinCollaborationSession = (code) => {
+      shareCode.value = code;
+      
+      socket.value.emit("join-room", {
+        roomId: code,
+        projectId: idProyectoActualStore.id
+      });
+      
+      isCollaborating.value = true;
+    };
 
     const guardarProyecto2 = () => {
       guardarProyecto();
@@ -381,7 +541,7 @@ export default {
       }
 
       try {
-        const response = await guardarProyectoDB(
+        const response = const response = await guardarProyectoDB(
           {
             nombre: title.value || "",
             user_id: appStore.loginInfo.id || null,
@@ -395,9 +555,33 @@ export default {
         if (response.success == false) {
           console.log(response.message);
         }
+        if(response.success == false) {
+          console.log(response.message);
+        }
       } catch (error) {
         console.error("Error al guardar el proyecto:", error);
       }
+    };
+
+    // Agregar escuchadores para eventos de resize (para el editor y output)
+    let isResizing = false;
+    const outputContainer = ref(null);
+    const startResize = (event) => {
+      isResizing = true;
+      document.addEventListener('mousemove', handleResize);
+      document.addEventListener('mouseup', stopResize);
+    };
+
+    const handleResize = (event) => {
+      if (!isResizing || !outputContainer.value) return;
+      const newHeight = window.innerHeight - event.clientY;
+      outputContainer.value.style.height = `${newHeight}px`;
+    };
+
+    const stopResize = () => {
+      isResizing = false;
+      document.removeEventListener('mousemove', handleResize);
+      document.removeEventListener('mouseup', stopResize);
     };
 
     return {
@@ -434,6 +618,16 @@ export default {
       savePrivacy,
       layoutType,
       setLayout,
+      showShareModal,
+      shareCode,
+      generateShareCode,
+      closeShareModal,
+      copyShareCode,
+      joinCollaborationSession,
+      isCollaborating,
+      activeUsers,
+      outputContainer,
+      startResize,
       output: computed(() => {
         let jsContent = js.value;
         let scriptContent = `
@@ -463,6 +657,7 @@ export default {
   background-color: #1e1e1e;
   font-family: 'Arial', sans-serif;
   color: #ffffff;
+  margin-left: -210px;
   margin-left: -210px;
 }
 
