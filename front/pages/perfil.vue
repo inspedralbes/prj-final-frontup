@@ -466,7 +466,7 @@ const logout = () => {
 }
 
 /* Responsive styles */
-@media (min-width: 768px) {
+@media (min-width: 1080px) {
   .profile-content {
     flex-direction: row;
     flex-wrap: wrap;
@@ -481,7 +481,7 @@ const logout = () => {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1080px) {
   .profile-card {
     padding: 1.5rem;
   }

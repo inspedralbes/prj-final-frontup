@@ -663,7 +663,7 @@ body.login-page {
   border-color: var(--invalid-color);
 }
 
-@media (max-width: 1080px) {
+
 
 @media (max-width: 1080px) {
   .content {
@@ -865,6 +865,5 @@ body.login-page {
     }
   } 
   
-}
 }
 </style>
