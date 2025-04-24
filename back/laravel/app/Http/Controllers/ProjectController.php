@@ -248,6 +248,7 @@ class ProjectController extends Controller
     public function destroy(Request $request, $id)
     {
         $project = Project::find($id);
+        $userId = Auth::id();
 
         if (!$project) {
             return response()->json([
@@ -255,9 +256,14 @@ class ProjectController extends Controller
             ], 404);
         }
 
-        $project->delete();
         if ($request->is('api/*')) {
-            return response()->json(['success', 'Proyecto eliminado']);
+            if($userId == $project->user_id){
+                $project->delete();
+                return response()->json(['success', 'Proyecto eliminado']);
+            }
+            else{
+                return response()->json(['error', 'No tienes permiso para eliminar este proyecto']);
+            }
         }
         $projects = Project::all();
         return redirect()->route('projects.index')->with('success', 'Proyecto eliminado con éxito');
