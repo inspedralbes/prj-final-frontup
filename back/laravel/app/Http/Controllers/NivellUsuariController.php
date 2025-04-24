@@ -34,9 +34,10 @@ class NivellUsuariController extends Controller
         ], 201);
     }
 
-    public function show(NivellUsuaris $level)
-    {
-        return $level->load('user');
+    public function show($id)
+    { 
+    $level = NivellUsuaris::with('user')->findOrFail($id);
+    return $level;
     }
 
     public function update(Request $request, NivellUsuaris $level)

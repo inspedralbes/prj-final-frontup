@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('nivells_usuaris', NivellUsuariController::class)->only([
         'index', 'store', 'show', 'update', 'destroy'
     ]);
+    Route::get('/nivelUsuari/{id}', [NivellUsuariController::class, 'show']);
 });
 //contador de likes para un proyecto
 Route::get('/likes/count/{projectId}', [LikesController::class, 'likeCount']);

@@ -6,7 +6,6 @@
     </div>
 
     <form @submit.prevent="handleSubmit" class="level-creator-form">
-      
       <div class="form-section">
         <div class="form-group">
           <label for="level-title" class="form-label">Título del Nivel</label>
@@ -17,7 +16,7 @@
             required
             class="form-input"
             placeholder="Ej: Crear un layout responsive con CSS Grid"
-          >
+          />
         </div>
 
         <div class="form-group">
@@ -36,31 +35,18 @@
       <div class="form-section">
         <h3 class="section-title">Código Inicial</h3>
         <p class="section-description">Define el código inicial que verán los usuarios al comenzar el nivel</p>
-        
         <div class="code-editors-grid">
           <div class="editor-section">
             <label class="form-label">HTML Inicial</label>
-            <textarea
-              v-model="level.initialHTML"
-              class="code-textarea"
-              spellcheck="false"
-            ></textarea>
+            <textarea v-model="level.initialHTML" class="code-textarea" spellcheck="false"></textarea>
           </div>
           <div class="editor-section">
             <label class="form-label">CSS Inicial</label>
-            <textarea
-              v-model="level.initialCSS"
-              class="code-textarea"
-              spellcheck="false"
-            ></textarea>
+            <textarea v-model="level.initialCSS" class="code-textarea" spellcheck="false"></textarea>
           </div>
           <div class="editor-section">
             <label class="form-label">JS Inicial</label>
-            <textarea
-              v-model="level.initialJS"
-              class="code-textarea"
-              spellcheck="false"
-            ></textarea>
+            <textarea v-model="level.initialJS" class="code-textarea" spellcheck="false"></textarea>
           </div>
         </div>
       </div>
@@ -68,36 +54,23 @@
       <div class="form-section">
         <h3 class="section-title">Solución Esperada</h3>
         <p class="section-description">Opcional: Define el código solución para validación automática</p>
-        
         <div class="editor-section">
           <label class="form-label">HTML Esperado</label>
-          <textarea
-            v-model="level.expectedHTML"
-            class="code-textarea"
-            spellcheck="false"
-          ></textarea>
+          <textarea v-model="level.expectedHTML" class="code-textarea" spellcheck="false"></textarea>
         </div>
         <div class="editor-section">
           <label class="form-label">CSS Esperado</label>
-          <textarea
-            v-model="level.expectedCSS"
-            class="code-textarea"
-            spellcheck="false"
-          ></textarea>
+          <textarea v-model="level.expectedCSS" class="code-textarea" spellcheck="false"></textarea>
         </div>
         <div class="editor-section">
           <label class="form-label">JS Esperado</label>
-          <textarea
-            v-model="level.expectedJS"
-            class="code-textarea"
-            spellcheck="false"
-          ></textarea>
+          <textarea v-model="level.expectedJS" class="code-textarea" spellcheck="false"></textarea>
         </div>
       </div>
 
       <div class="form-section">
         <h3 class="section-title">Vista Previa</h3>
-        <iframe 
+        <iframe
           class="preview-frame"
           sandbox="allow-scripts allow-same-origin"
           :srcdoc="previewContent"
@@ -105,18 +78,8 @@
       </div>
 
       <div class="form-actions">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          @click="handleCancel"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          class="btn btn-primary"
-          :disabled="isSubmitting"
-        >
+        <button type="button" class="btn btn-secondary" @click="handleCancel">Cancelar</button>
+        <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
           <span v-if="isSubmitting">Publicando...</span>
           <span v-else>Publicar Nivel</span>
         </button>
@@ -129,22 +92,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
+import Swal from 'sweetalert2'
 
 const router = useRouter()
 const appStore = useAppStore()
 
 const isSubmitting = ref(false)
-
-// Función de notificación
-const showNotification = (message, type = 'success') => {
-  // Implementación básica con alertas
-  // En un proyecto real, usa un sistema de notificaciones UI
-  if (type === 'error') {
-    alert(`Error: ${message}`);
-  } else {
-    alert(message);
-  }
-};
 
 const level = ref({
   title: '',
@@ -174,6 +127,22 @@ const previewContent = computed(() => {
     </html>
   `
 })
+
+const showNotification = (message, type = 'success') => {
+  if (type === 'error') {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: message,
+    })
+  } else {
+    Swal.fire({
+      icon: 'success',
+      title: 'Éxito',
+      text: message,
+    })
+  }
+}
 
 const handleSubmit = async () => {
   if (!appStore.isLoggedIn) {
@@ -224,9 +193,18 @@ const handleSubmit = async () => {
 }
 
 const handleCancel = () => {
-  if (confirm('¿Seguro que quieres cancelar? Los cambios no se guardarán.')) {
-    router.push('/niveles')
-  }
+  Swal.fire({
+    title: '¿Seguro que quieres cancelar?',
+    text: 'Los cambios no se guardarán.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, cancelar',
+    cancelButtonText: 'No, regresar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      router.push('/')
+    }
+  })
 }
 
 onMounted(() => {
