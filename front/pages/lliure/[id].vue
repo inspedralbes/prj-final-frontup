@@ -5,12 +5,12 @@
       <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
         :readonly="!isEditing" />
       <div class="header-actions">
+        <button class="header-button" @click="generateShareCode">Compartir</button>
         <button class="header-button" @click="toggleChat">Xat IA</button>
         <button class="header-button" @click="guardarProyecto">Guardar</button>
         <select v-model="isPrivate" @change="savePrivacy" class="header-select">
           <option :value="0">Público</option>
           <option :value="1">Privado</option>
-        <button class="header-button" @click="generateShareCode">Compartir</button>
         </select>
       </div>
     </header>
@@ -541,7 +541,7 @@ export default {
       }
 
       try {
-        const response = const response = await guardarProyectoDB(
+        const response = await guardarProyectoDB(
           {
             nombre: title.value || "",
             user_id: appStore.loginInfo.id || null,
