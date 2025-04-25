@@ -13,25 +13,36 @@ class NivellUsuariController extends Controller
     {
         return NivellUsuaris::with('user')->latest()->get();
     }
-
+    
     public function store(Request $request)
     {
-        $level = NivellUsuaris::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'initial_html' => $request->initial_html,
-            'initial_css' => $request->initial_css,
-            'initial_js' => $request->initial_js,
-            'expected_html' => $request->expected_html,
-            'expected_css' => $request->expected_css,
-            'expected_js' => $request->expected_js,
-            'user_id' => Auth::id()
-        ]);
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'initial_html' => 'nullable|string',
+        'initial_css' => 'nullable|string',
+        'initial_js' => 'nullable|string',
+        'expected_html' => 'nullable|string',
+        'expected_css' => 'nullable|string',
+        'expected_js' => 'nullable|string',
+    ]);
 
-        return response()->json([
-            'message' => 'Nivel creado exitosamente',
-            'level' => $level
-        ], 201);
+    $level = NivellUsuaris::create([
+        'title' => $validated['title'],
+        'description' => $validated['description'],
+        'initial_html' => $validated['initial_html'] ?? '',
+        'initial_css' => $validated['initial_css'] ?? '',
+        'initial_js' => $validated['initial_js'] ?? '',
+        'expected_html' => $validated['expected_html'] ?? '',
+        'expected_css' => $validated['expected_css'] ?? '',
+        'expected_js' => $validated['expected_js'] ?? '',
+        'user_id' => Auth::id(),
+    ]);
+
+    return response()->json([
+        'message' => 'Nivel creado exitosamente',
+        'level' => $level
+    ], 201);
     }
 
     public function show($id)

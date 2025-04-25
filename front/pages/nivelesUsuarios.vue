@@ -1,24 +1,24 @@
 <template>
-    <div class="level-list-container">
-      <div class="level-list-header">
-        <h2 class="level-list-title">Niveles Publicados</h2>
-        <p class="level-list-subtitle">Explora los niveles creados por la comunidad FrontUp</p>
-      </div>
-  
-      <div v-if="isLoading" class="loading">Cargando niveles...</div>
-      <div v-else-if="levels.length === 0" class="empty-state">No hay niveles publicados todavía.</div>
-      <div v-else class="levels-grid">
-        <div v-for="level in levels" :key="level.id" class="level-card">
-          <h3 class="level-card-title">{{ level.title }}</h3>
-          <p class="level-card-description">{{ level.description }}</p>
-          <div class="level-card-meta">
-            <span>Autor ID: {{ level.user_id }}</span>
-          </div>
-          <router-link :to="`/nivelUsuari/${level.id}`" class="btn btn-primary">Ver Nivel</router-link>
+  <div class="level-list-container">
+    <div class="level-list-header">
+      <h2 class="level-list-title">Nivells Publicats</h2>
+      <p class="level-list-subtitle">Explora els nivells creats per la comunitat FrontUp</p>
+    </div>
+
+    <div v-if="isLoading" class="loading">Carregant nivells...</div>
+    <div v-else-if="levels.length === 0" class="empty-state">Encara no hi ha cap nivell publicat.</div>
+    <div v-else class="levels-grid">
+      <div v-for="level in levels" :key="level.id" class="level-card">
+        <h3 class="level-card-title">{{ level.title }}</h3>
+        <p class="level-card-description">{{ level.description }}</p>
+        <div class="level-card-meta">
+          <span>Autor: {{ level.user.name }}</span>
         </div>
+        <router-link :to="`/nivelUsuari/${level.id}`" class="btn btn-primary">Veure Nivell</router-link>
       </div>
     </div>
-  </template>
+  </div>
+</template>
   
   <script setup>
   import { ref, onMounted } from 'vue'

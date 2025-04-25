@@ -1,40 +1,40 @@
 <template>
   <div class="level-creator-container">
     <div class="level-creator-header">
-      <h2 class="level-creator-title">Crear Nuevo Nivel</h2>
-      <p class="level-creator-subtitle">Comparte tu conocimiento con la comunidad FrontUp</p>
+      <h2 class="level-creator-title">Crear Nou Nivell</h2>
+      <p class="level-creator-subtitle">Comparteix el teu coneixement amb la comunitat FrontUp</p>
     </div>
 
     <form @submit.prevent="handleSubmit" class="level-creator-form">
       <div class="form-section">
         <div class="form-group">
-          <label for="level-title" class="form-label">Título del Nivel</label>
+          <label for="level-title" class="form-label">Títol del Nivell</label>
           <input
             id="level-title"
             v-model="level.title"
             type="text"
             required
             class="form-input"
-            placeholder="Ej: Crear un layout responsive con CSS Grid"
+            placeholder="Ex: Crear un disseny responsive amb CSS Grid"
           />
         </div>
 
         <div class="form-group">
-          <label for="level-description" class="form-label">Descripción</label>
+          <label for="level-description" class="form-label">Descripció</label>
           <textarea
             id="level-description"
             v-model="level.description"
             required
             rows="3"
             class="form-textarea"
-            placeholder="Describe en detalle el objetivo del nivel y los conceptos que se practicarán"
+            placeholder="Descriu en detall l'objectiu del nivell i els conceptes que es practicaran"
           ></textarea>
         </div>
       </div>
 
       <div class="form-section">
-        <h3 class="section-title">Código Inicial</h3>
-        <p class="section-description">Define el código inicial que verán los usuarios al comenzar el nivel</p>
+        <h3 class="section-title">Codi Inicial</h3>
+        <p class="section-description">Defineix el codi inicial que veuran els usuaris en començar el nivell</p>
         <div class="code-editors-grid">
           <div class="editor-section">
             <label class="form-label">HTML Inicial</label>
@@ -52,24 +52,24 @@
       </div>
 
       <div class="form-section">
-        <h3 class="section-title">Solución Esperada</h3>
-        <p class="section-description">Opcional: Define el código solución para validación automática</p>
+        <h3 class="section-title">Solució Esperada</h3>
+        <p class="section-description">Opcional: Defineix el codi de la solució per a la validació automàtica</p>
         <div class="editor-section">
-          <label class="form-label">HTML Esperado</label>
+          <label class="form-label">HTML Esperat</label>
           <textarea v-model="level.expectedHTML" class="code-textarea" spellcheck="false"></textarea>
         </div>
         <div class="editor-section">
-          <label class="form-label">CSS Esperado</label>
+          <label class="form-label">CSS Esperat</label>
           <textarea v-model="level.expectedCSS" class="code-textarea" spellcheck="false"></textarea>
         </div>
         <div class="editor-section">
-          <label class="form-label">JS Esperado</label>
+          <label class="form-label">JS Esperat</label>
           <textarea v-model="level.expectedJS" class="code-textarea" spellcheck="false"></textarea>
         </div>
       </div>
 
       <div class="form-section">
-        <h3 class="section-title">Vista Previa</h3>
+        <h3 class="section-title">Previsualització</h3>
         <iframe
           class="preview-frame"
           sandbox="allow-scripts allow-same-origin"
@@ -78,10 +78,10 @@
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-secondary" @click="handleCancel">Cancelar</button>
+        <button type="button" class="btn btn-secondary" @click="handleCancel">Cancel·lar</button>
         <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
-          <span v-if="isSubmitting">Publicando...</span>
-          <span v-else>Publicar Nivel</span>
+          <span v-if="isSubmitting">Publicant...</span>
+          <span v-else>Publicar Nivell</span>
         </button>
       </div>
     </form>
@@ -138,7 +138,7 @@ const showNotification = (message, type = 'success') => {
   } else {
     Swal.fire({
       icon: 'success',
-      title: 'Éxito',
+      title: 'Èxit',
       text: message,
     })
   }
@@ -146,7 +146,7 @@ const showNotification = (message, type = 'success') => {
 
 const handleSubmit = async () => {
   if (!appStore.isLoggedIn) {
-    showNotification('Debes iniciar sesión para crear niveles', 'error')
+    showNotification('Has d’iniciar sessió per crear nivells', 'error')
     return router.push('/login')
   }
 
@@ -174,7 +174,7 @@ const handleSubmit = async () => {
       }
     })
     
-    showNotification('Nivel creado exitosamente!', 'success')
+    showNotification('Nivell creat amb èxit!', 'success')
     router.push('/niveles')
   } catch (error) {
     console.error('Error creating level:', error)
@@ -194,12 +194,12 @@ const handleSubmit = async () => {
 
 const handleCancel = () => {
   Swal.fire({
-    title: '¿Seguro que quieres cancelar?',
-    text: 'Los cambios no se guardarán.',
+    title: 'Segur que vols cancel·lar?',
+    text: 'Els canvis no es guardaran.',
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonText: 'Sí, cancelar',
-    cancelButtonText: 'No, regresar'
+    confirmButtonText: 'Sí, cancel·la',
+    cancelButtonText: 'No, tornar enrere'
   }).then((result) => {
     if (result.isConfirmed) {
       router.push('/')
@@ -208,22 +208,26 @@ const handleCancel = () => {
 }
 
 onMounted(() => {
-  level.value.initialHTML = `<!-- Escribe tu HTML aquí -->
-<div class="card">
-  <h1>Hola Mundo</h1>
-  <p>Este es un nivel básico</p>
-</div>`
+  level.value.initialHTML = `<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+        
+    </body>
+    </html>`
+    level.value.expectedHTML = level.value.initialHTML
 
-  level.value.initialCSS = `/* Estilos básicos */
-.card {
-  padding: 1rem;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}`
+  level.value.initialCSS = `/* Afegeix estils aqui */
 
-  level.value.initialJS = `// Código JavaScript opcional
-console.log('Nivel iniciado')`
+`
+
+  level.value.initialJS = `// Afegeix aqui el codi JavaScript
+  
+`
 })
 </script>
 

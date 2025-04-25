@@ -1,7 +1,5 @@
 <template>
     <div class="level-viewer-container" v-if="level">
-      <button @click="goBack" class="back-button">Volver a los niveles</button>
-  
       <h2 class="level-title">{{ level.title }}</h2>
       <p class="level-description">{{ level.description }}</p>
   
@@ -26,6 +24,7 @@
       <div class="verify-container">
         <button @click="checkLevel" class="verify-button">Verificar Nivel</button>
       </div>
+      
     </div>
   
     <div v-else class="loading">Cargando nivel...</div>
@@ -78,10 +77,6 @@
       </html>
     `
   })
-  
-  const goBack = () => {
-    router.push('/nivelesUsuarios')
-  }
   
   const checkLevel = () => {
     const isCorrect =
@@ -161,12 +156,6 @@
     resize: vertical;
   }
   
-  .code-input:focus {
-    outline: none;
-    border-color: #00bcd4;
-    background-color: #333;
-  }
-  
   .preview-frame {
     width: 100%;
     height: 400px;
@@ -183,25 +172,11 @@
     color: #999;
   }
   
-  .back-button {
-    background-color: #00bcd4;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-bottom: 1.5rem;
-  }
-  
-  .back-button:hover {
-    background-color: #008c9e;
-  }
-  
   .verify-container {
-    margin-top: 2rem;
-    display: flex;
-    justify-content: center;
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem; 
   }
   
   .verify-button {
