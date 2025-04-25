@@ -9,9 +9,7 @@
     <div :class="['navbar', { show: navbarVisible, hide: !navbarVisible }]">
       <div :class="'leftsection-card'">
         <ul class="leftsection-list">
-          <li>
-            <br /> <!-- Guarrada pero cumple su funcion -->
-          </li>
+          
           <li class="leftsection-element" @click="navigateToHome">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -625,7 +623,7 @@ footer {
   .navbar {
     display: block;
     position: fixed;
-    top: 0;
+    top: 30px;
     left: 0;
     width: 250px;
     height: 100vh;
