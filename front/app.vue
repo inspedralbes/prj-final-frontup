@@ -7,7 +7,6 @@
         </div>
         <div class="landing" :class="{ hidden: isHidden }" id="landing">
           
-
           <div class="leftsection-card">
             <ul class="leftsection-list">
               <li class="leftsection-element" @click="navigateToHome">
@@ -325,11 +324,7 @@ const navigateToHome = () => {
 const navigateToTotsProjectes = () => {
   router.push("/totsProjectes");
 };
-const isHidden = ref(false);
 
-function toggleLanding() {
-  isHidden.value = !isHidden.value;
-}
 </script>
 
 <style>
@@ -557,9 +552,8 @@ footer {
 /* Botón toggle */
 #toggleBtn {
   position: absolute;
-  top: 20px;
-  left: 40px; /* Justo al borde del landing */
-  z-index: 1001;
+  top: 50px;
+  left: 50px; /* Justo al borde del landing */
   padding: 10px;
   background: #333;
   color: #fff;
@@ -570,9 +564,7 @@ footer {
 }
 
 /* Cuando el landing está oculto */
-#toggleBtn.moved {
-  left: 0; /* Pegado al borde izquierdo de la pantalla */
-}
+
 
 
 }
