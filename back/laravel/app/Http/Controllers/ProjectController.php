@@ -265,6 +265,7 @@ class ProjectController extends Controller
                 return response()->json(['error', 'No tienes permiso para eliminar este proyecto']);
             }
         }
+        $project->delete();
         $projects = Project::all();
         return redirect()->route('projects.index')->with('success', 'Proyecto eliminado con éxito');
     }
