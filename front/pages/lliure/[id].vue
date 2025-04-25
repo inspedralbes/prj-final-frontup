@@ -23,30 +23,30 @@
 
     <!-- Botones de layout -->
     <div class="layout-buttons">
-  <!-- Sidebar izquierda -->
-  <button class="button-position" @click="setLayout('left')" aria-label="Sidebar izquierda">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <rect x="3" y="3" width="6" height="18"/>
-      <rect x="11" y="3" width="10" height="18" opacity="0.3"/>
-    </svg>
-  </button>
+      <!-- Sidebar izquierda -->
+      <button class="button-position" @click="setLayout('left')" aria-label="Sidebar izquierda">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="3" y="3" width="6" height="18" />
+          <rect x="11" y="3" width="10" height="18" opacity="0.3" />
+        </svg>
+      </button>
 
-  <!-- Sidebar derecha -->
-  <button class="button-position" @click="setLayout('right')" aria-label="Sidebar derecha">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <rect x="15" y="3" width="6" height="18"/>
-      <rect x="3"  y="3" width="10" height="18" opacity="0.3"/>
-    </svg>
-  </button>
+      <!-- Sidebar derecha -->
+      <button class="button-position" @click="setLayout('right')" aria-label="Sidebar derecha">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="15" y="3" width="6" height="18" />
+          <rect x="3" y="3" width="10" height="18" opacity="0.3" />
+        </svg>
+      </button>
 
-  <!-- Layout normal (editors arriba, salida abajo) -->
-  <button class="button-position" @click="setLayout('normal')" aria-label="Layout normal">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <rect x="3"  y="3"  width="18" height="6"/>
-      <rect x="3"  y="11" width="18" height="10" opacity="0.3"/>
-    </svg>
-  </button>
-</div>
+      <!-- Layout normal (editors arriba, salida abajo) -->
+      <button class="button-position" @click="setLayout('normal')" aria-label="Layout normal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="3" y="3" width="18" height="6" />
+          <rect x="3" y="11" width="18" height="10" opacity="0.3" />
+        </svg>
+      </button>
+    </div>
 
     <!-- Modal para compartir código de colaboración -->
     <div v-if="showShareModal" class="modal-overlay" @click="closeShareModal">
@@ -56,7 +56,8 @@
           <p class="share-code">{{ shareCode }}</p>
           <button class="modal-button copy-button" @click="copyShareCode">Copiar</button>
         </div>
-        <p class="share-instructions">Comparteix aquest codi amb altres usuaris perquè puguin unir-se i editar aquest projecte en temps real.</p>
+        <p class="share-instructions">Comparteix aquest codi amb altres usuaris perquè puguin unir-se i editar aquest
+          projecte en temps real.</p>
         <div class="modal-actions">
           <button type="button" class="modal-button" @click="closeShareModal">Tancar</button>
         </div>
@@ -330,7 +331,7 @@ export default {
         const newValue = instance.getValue();
         html.value = newValue;
         markDirty();
-        
+
         if (isCollaborating.value) {
           socket.value.emit("html-change", {
             code: newValue,
@@ -338,12 +339,12 @@ export default {
           });
         }
       });
-      
+
       cssEditorInstance.on("change", (instance) => {
         const newValue = instance.getValue();
         css.value = newValue;
         markDirty();
-        
+
         if (isCollaborating.value) {
           socket.value.emit("css-change", {
             code: newValue,
@@ -351,12 +352,12 @@ export default {
           });
         }
       });
-      
+
       jsEditorInstance.on("change", (instance) => {
         const newValue = instance.getValue();
         js.value = newValue;
         markDirty();
-        
+
         if (isCollaborating.value) {
           socket.value.emit("js-change", {
             code: newValue,
@@ -367,60 +368,123 @@ export default {
     });
     const initSocketConnection = () => {
       socket.value = io("http://localhost:5000");
-      
+
       socket.value.on("connect", () => {
         console.log("Conectado al servidor de socket");
       });
-      
+
       socket.value.on("html-change", (newValue) => {
         if (newValue !== html.value) {
           html.value = newValue;
           htmlEditorInstance.setValue(newValue);
         }
       });
-      
+
       socket.value.on("css-change", (newValue) => {
         if (newValue !== css.value) {
           css.value = newValue;
           cssEditorInstance.setValue(newValue);
         }
       });
-      
+
       socket.value.on("js-change", (newValue) => {
         if (newValue !== js.value) {
           js.value = newValue;
           jsEditorInstance.setValue(newValue);
         }
       });
-      
+
       socket.value.on("initial-state", ({ html: htmlCode, css: cssCode, js: jsCode }) => {
         html.value = htmlCode;
         css.value = cssCode;
         js.value = jsCode;
-        
+
         htmlEditorInstance.setValue(htmlCode);
         cssEditorInstance.setValue(cssCode);
         jsEditorInstance.setValue(jsCode);
       });
-      
-      socket.value.on("user-joined", () => {
-        activeUsers.value++;
+
+      // Evento cuando un usuario se une a la sala
+      // Modify your user-joined event handler
+      socket.value.on("user-joined", (data) => {
+        console.log("Usuario unido a la sala:", data);
+
+        // Increment the active users count directly when we receive a join notification
+        activeUsers.value += 1;
+        console.log("Active users incremented to:", activeUsers.value);
+
+        // Still request the official count from the server as a backup
+        if (isCollaborating.value && shareCode.value) {
+          socket.value.emit("get-room-users", { roomId: shareCode.value });
+        }
       });
-      
-      socket.value.on("user-left", () => {
+
+      // Similarly, update the user-left handler to decrement directly
+      socket.value.on("user-left", (data) => {
+        console.log("Usuario abandonó la sala:", data);
+
+        // Decrement but don't go below 1
         activeUsers.value = Math.max(1, activeUsers.value - 1);
+        console.log("Active users decremented to:", activeUsers.value);
+
+        // Still request the official count as a backup
+        if (isCollaborating.value && shareCode.value) {
+          socket.value.emit("get-room-users", { roomId: shareCode.value });
+        }
       });
-      
-      socket.value.on("room-users", ({ count }) => {
-        activeUsers.value = count;
+
+      // Evento cuando un usuario abandona la sala
+      socket.value.on("user-left", (data) => {
+        console.log("Usuario abandonó la sala:", data);
+        // En lugar de decrementar localmente, solicitamos explícitamente el conteo actualizado
+        if (isCollaborating.value && shareCode.value) {
+          socket.value.emit("get-room-users", { roomId: shareCode.value });
+        }
+      });
+
+      // Evento con la información actualizada de usuarios en la sala
+      // Modify your room-users event handler
+      socket.value.on("room-users", (data) => {
+        console.log("Room users data received:", data);
+        console.log("Data type:", typeof data);
+        // Check if data is an array of users
+        if (Array.isArray(data)) {
+          activeUsers.value = data.length;
+          console.log("Is array with length:", data.length);
+          console.log("Updated active users to:", activeUsers.value);
+        }
+        // Check if data contains a users array
+        else if (data && Array.isArray(data.users)) {
+          activeUsers.value = data.users.length;
+          console.log("Updated active users to:", activeUsers.value);
+        }
+        // Check if data has a direct count property
+        else if (data && typeof data.count === 'number') {
+          activeUsers.value = data.count;
+          console.log("Updated active users to:", activeUsers.value);
+        }
+        // If it's just a number
+        else if (typeof data === 'number') {
+          activeUsers.value = data;
+          console.log("Updated active users to:", activeUsers.value);
+        }
+        else {
+          console.error("Unexpected data format for room-users:", data);
+        }
       });
     };
 
     onUnmounted(() => {
       lliureStore.toggleLliure();
       idProyectoActualStore.vaciarId();
-      
+
       if (socket.value) {
+        if (isCollaborating.value && shareCode.value) {
+          console.log("Abandonando sala:", shareCode.value);
+          socket.value.emit("leave-room", {
+            roomId: shareCode.value
+          });
+        }
         socket.value.disconnect();
       }
     });
@@ -429,7 +493,7 @@ export default {
       // Generar un código aleatorio de 6 caracteres alfanuméricos
       const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
       shareCode.value = randomCode;
-      
+
       // Crear la room en el servidor
       socket.value.emit("create-room", {
         roomId: randomCode,
@@ -440,9 +504,15 @@ export default {
           js: js.value
         }
       });
-      
+
       isCollaborating.value = true;
       showShareModal.value = true;
+
+      // Solicitar explícitamente el conteo de usuarios con un pequeño retraso
+      // para asegurarnos de que la sala se creó correctamente
+      setTimeout(() => {
+        socket.value.emit("get-room-users", { roomId: randomCode });
+      }, 500);
     };
 
     const closeShareModal = () => {
@@ -456,13 +526,19 @@ export default {
 
     const joinCollaborationSession = (code) => {
       shareCode.value = code;
-      
+
       socket.value.emit("join-room", {
         roomId: code,
         projectId: idProyectoActualStore.id
       });
-      
+
       isCollaborating.value = true;
+
+      // Solicitar explícitamente el conteo de usuarios tras unirse
+      // con un pequeño retraso para dar tiempo al servidor a procesar la unión
+      setTimeout(() => {
+        socket.value.emit("get-room-users", { roomId: code });
+      }, 500);
     };
 
     const guardarProyecto2 = () => {
@@ -555,7 +631,7 @@ export default {
         if (response.success == false) {
           console.log(response.message);
         }
-        if(response.success == false) {
+        if (response.success == false) {
           console.log(response.message);
         }
       } catch (error) {
@@ -707,6 +783,7 @@ export default {
   font-size: 14px;
   transition: background-color 0.3s ease;
 }
+
 .button-position {
   background-color: #2e2e2e;
   border: 1px solid #444;
@@ -717,6 +794,7 @@ export default {
   font-size: 14px;
   transition: background-color 0.3s ease;
 }
+
 .button-position svg {
   width: 20px;
   height: 20px;
@@ -725,8 +803,10 @@ export default {
 .layout-buttons {
   display: flex;
   gap: 12px;
-  align-self: flex-end;      /* sitúa el bloque a la derecha */
-  margin: 20px 20px 0 0;     /* separaciones: top, right, bottom, left */
+  align-self: flex-end;
+  /* sitúa el bloque a la derecha */
+  margin: 20px 20px 0 0;
+  /* separaciones: top, right, bottom, left */
 }
 
 .header-button:hover {
@@ -1084,35 +1164,38 @@ export default {
   border-radius: 6px;
   font-size: 14px;
 }
+
 .layout {
   display: flex;
   width: 100%;
   height: 100%;
   transition: all 0.3s ease;
 }
+
 .layout-normal {
   flex-direction: column;
 }
+
 .layout-left {
   flex-direction: row;
 }
+
 .layout-right {
   flex-direction: row-reverse;
 }
 
-.layout-left  .editor-container,
+.layout-left .editor-container,
 .layout-right .editor-container {
-  display: flex;           
-  flex-direction: column; 
-  width: 45vw;             
-  max-width: 50vw;         
+  display: flex;
+  flex-direction: column;
+  width: 45vw;
+  max-width: 50vw;
   max-height: 90vh;
-  overflow-y: auto;        
+  overflow-y: auto;
 }
 
-.layout-left  .output-container,
+.layout-left .output-container,
 .layout-right .output-container {
   flex: 1;
 }
-
 </style>
