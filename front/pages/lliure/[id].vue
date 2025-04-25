@@ -196,6 +196,13 @@ export default {
     const socket = ref(null);
     const isCollaborating = ref(false);
     const activeUsers = ref(1);
+    
+    // Flag para controlar las actualizaciones externas
+    const isApplyingExternalChanges = ref({
+      html: false,
+      css: false,
+      js: false
+    });
 
     const htmlEditor = ref(null);
     const cssEditor = ref(null);
@@ -250,6 +257,7 @@ export default {
     const setLayout = (dir) => {
       layoutType.value = dir
     }
+    
     onMounted(async () => {
       lliureStore.toggleLliure();
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
@@ -326,7 +334,11 @@ export default {
       }
 
       // Modificar los event listeners para incluir la emisión de cambios por socket
+      // y prevenir loops de actualización
       htmlEditorInstance.on("change", (instance) => {
+        // Ignorar cambios que vienen de actualizaciones remotas
+        if (isApplyingExternalChanges.value.html) return;
+        
         const newValue = instance.getValue();
         html.value = newValue;
         markDirty();
@@ -340,6 +352,9 @@ export default {
       });
       
       cssEditorInstance.on("change", (instance) => {
+        // Ignorar cambios que vienen de actualizaciones remotas
+        if (isApplyingExternalChanges.value.css) return;
+        
         const newValue = instance.getValue();
         css.value = newValue;
         markDirty();
@@ -353,6 +368,9 @@ export default {
       });
       
       jsEditorInstance.on("change", (instance) => {
+        // Ignorar cambios que vienen de actualizaciones remotas
+        if (isApplyingExternalChanges.value.js) return;
+        
         const newValue = instance.getValue();
         js.value = newValue;
         markDirty();
@@ -365,6 +383,7 @@ export default {
         }
       });
     });
+    
     const initSocketConnection = () => {
       socket.value = io("http://localhost:5000");
       
@@ -374,33 +393,71 @@ export default {
       
       socket.value.on("html-change", (newValue) => {
         if (newValue !== html.value) {
-          html.value = newValue;
-          htmlEditorInstance.setValue(newValue);
+          try {
+            isApplyingExternalChanges.value.html = true;
+            html.value = newValue;
+            htmlEditorInstance.setValue(newValue);
+          } finally {
+            // Usar setTimeout para asegurar que se ejecuta después de los eventos internos de CodeMirror
+            setTimeout(() => {
+              isApplyingExternalChanges.value.html = false;
+            }, 0);
+          }
         }
       });
       
       socket.value.on("css-change", (newValue) => {
         if (newValue !== css.value) {
-          css.value = newValue;
-          cssEditorInstance.setValue(newValue);
+          try {
+            isApplyingExternalChanges.value.css = true;
+            css.value = newValue;
+            cssEditorInstance.setValue(newValue);
+          } finally {
+            setTimeout(() => {
+              isApplyingExternalChanges.value.css = false;
+            }, 0);
+          }
         }
       });
       
       socket.value.on("js-change", (newValue) => {
         if (newValue !== js.value) {
-          js.value = newValue;
-          jsEditorInstance.setValue(newValue);
+          try {
+            isApplyingExternalChanges.value.js = true;
+            js.value = newValue;
+            jsEditorInstance.setValue(newValue);
+          } finally {
+            setTimeout(() => {
+              isApplyingExternalChanges.value.js = false;
+            }, 0);
+          }
         }
       });
       
       socket.value.on("initial-state", ({ html: htmlCode, css: cssCode, js: jsCode }) => {
-        html.value = htmlCode;
-        css.value = cssCode;
-        js.value = jsCode;
-        
-        htmlEditorInstance.setValue(htmlCode);
-        cssEditorInstance.setValue(cssCode);
-        jsEditorInstance.setValue(jsCode);
+        try {
+          isApplyingExternalChanges.value = {
+            html: true,
+            css: true,
+            js: true
+          };
+          
+          html.value = htmlCode;
+          css.value = cssCode;
+          js.value = jsCode;
+          
+          htmlEditorInstance.setValue(htmlCode);
+          cssEditorInstance.setValue(cssCode);
+          jsEditorInstance.setValue(jsCode);
+        } finally {
+          setTimeout(() => {
+            isApplyingExternalChanges.value = {
+              html: false,
+              css: false,
+              js: false
+            };
+          }, 0);
+        }
       });
       
       socket.value.on("user-joined", () => {
@@ -413,6 +470,15 @@ export default {
       
       socket.value.on("room-users", ({ count }) => {
         activeUsers.value = count;
+      });
+      
+      // Error handling
+      socket.value.on("connect_error", (error) => {
+        console.error("Error de conexión:", error);
+      });
+      
+      socket.value.on("error", ({ message }) => {
+        console.error("Error de socket:", message);
       });
     };
 
@@ -455,6 +521,8 @@ export default {
     };
 
     const joinCollaborationSession = (code) => {
+      if (!code) return;
+      
       shareCode.value = code;
       
       socket.value.emit("join-room", {
@@ -463,6 +531,18 @@ export default {
       });
       
       isCollaborating.value = true;
+      
+      // Agregar un timeout para detectar si la unión falla
+      const joinTimeout = setTimeout(() => {
+        if (activeUsers.value <= 1) {
+          console.warn("No se pudo unir a la sesión de colaboración o no hay otros usuarios presentes");
+        }
+      }, 5000);
+      
+      // Limpiar el timeout cuando recibimos información de usuarios en la sala
+      socket.value.once("room-users", () => {
+        clearTimeout(joinTimeout);
+      });
     };
 
     const guardarProyecto2 = () => {
@@ -555,9 +635,6 @@ export default {
         if (response.success == false) {
           console.log(response.message);
         }
-        if(response.success == false) {
-          console.log(response.message);
-        }
       } catch (error) {
         console.error("Error al guardar el proyecto:", error);
       }
@@ -582,6 +659,21 @@ export default {
       isResizing = false;
       document.removeEventListener('mousemove', handleResize);
       document.removeEventListener('mouseup', stopResize);
+    };
+
+    // Función para desconectar la sesión de colaboración
+    const leaveCollaborationSession = () => {
+      if (socket.value) {
+        socket.value.disconnect();
+        socket.value = null;
+      }
+      
+      isCollaborating.value = false;
+      shareCode.value = "";
+      activeUsers.value = 0;
+      
+      // Reiniciar la conexión para uso no colaborativo
+      initSocketConnection();
     };
 
     return {
@@ -624,6 +716,7 @@ export default {
       closeShareModal,
       copyShareCode,
       joinCollaborationSession,
+      leaveCollaborationSession,
       isCollaborating,
       activeUsers,
       outputContainer,
