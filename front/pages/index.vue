@@ -348,6 +348,7 @@ export default {
 }
 
 }
+
 @media (max-width: 450px) {
   .main-container {
     margin-left: -70%;
