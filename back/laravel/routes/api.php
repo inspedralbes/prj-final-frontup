@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     //Todas las publicaciones a las que le ha dado like un usuario
     Route::get('/likes/allUserLikes', [LikesController::class, 'userAllLikes']);
     Route::put('/projects/{id}', [ProjectController::class, 'update']); 
+    Route::delete('/projects/{id}', [ProjectController::class, 'destroy']); 
 });
 //contador de likes para un proyecto
 Route::get('/likes/count/{projectId}', [LikesController::class, 'likeCount']);
@@ -32,7 +33,6 @@ Route::get('/likes/count/{projectId}', [LikesController::class, 'likeCount']);
 Route::get('/projects/all', [ProjectController::class, 'indexAll']); 
 Route::post('/projects', [ProjectController::class, 'store']);      
 Route::get('/projects/{id}', [ProjectController::class, 'show']);   
-Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
 Route::get('/projectsAllPaginado', [ProjectController::class, 'index']);
 Route::get('/projects/{id}/preview', [ProjectController::class, 'preview'])->name('projects.preview');
 

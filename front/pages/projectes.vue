@@ -24,7 +24,10 @@
         No hi ha projectes disponibles.
       </div>
       <div class="projects-list">
-        <Item v-for="project in projects" :key="project.id" :project="project" />
+        <div v-for="project in projects" :key="project.id" class="project-card">
+          <Item :project="project" />
+          <button @click="deleteProject(project.id)" class="delete-btn">🗑️ Eliminar</button>
+        </div>
       </div>
 
       <div class="pagination">
@@ -42,6 +45,7 @@
 
 <script>
 import Item from '~/components/item.vue';
+import useCommunicationManager from '~/stores/comunicationManager';
 
 export default {
   name: "Projectes",
@@ -122,6 +126,16 @@ export default {
         this.fetchProjects(this.currentPage);
       }
     },
+    async deleteProject(id) {
+      if (!confirm('Segur que vols eliminar aquest projecte?')) return;
+      try {
+        const manager = useCommunicationManager();
+        await manager.borrarProyectoDB(id);
+        this.fetchProjects(this.currentPage);
+      } catch (err) {
+        alert('Error eliminant el projecte: ' + err.message);
+      }
+    }, 
   },
 };
 </script>
@@ -239,5 +253,20 @@ export default {
 
 .page-btn:hover:not(:disabled) {
   background-color: #777;
+}
+
+.delete-btn {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.delete-btn:hover {
+  background-color: #e60000;
 }
 </style>
