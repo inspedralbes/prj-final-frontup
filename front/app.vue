@@ -3,9 +3,14 @@
     <div v-if="show" class="leftsection-alert">
       {{ message }}
     </div>
-    <button class="toggle-navbar-btn" @click="navbarVisible = !navbarVisible">
-      {{ navbarVisible ? "✕" : "☰" }}
-    </button>
+    <header class="top-navbar">
+      <button class="toggle-navbar-btn" @click="navbarVisible = !navbarVisible">
+        {{ navbarVisible ? "✕" : "☰" }}
+      </button>
+    </header>
+      
+    
+    
     <div :class="['navbar', { show: navbarVisible, hide: !navbarVisible }]">
       <div :class="'leftsection-card'">
         <ul class="leftsection-list">
@@ -487,9 +492,10 @@ footer {
     rgba(28, 33, 42, 1) 100%
   );
   text-align: center;
-  padding: 10px 20px;
+  padding: 10px 0px;
   color: white;
 }
+
 
 .modal-overlay {
   position: fixed;
@@ -606,6 +612,8 @@ footer {
   display: none;
 }
 
+
+
 @media (max-width: 800px) {
   .toggle-navbar-btn {
     display: block;
@@ -619,11 +627,24 @@ footer {
     left: 23px;
     z-index: 1001;
   }
+  .top-navbar {
+  width: 100%;
+  height: 60px; 
+  background-color: rgb(29, 32, 39);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1002; 
+}
 
   .navbar {
     display: block;
     position: fixed;
-    top: 30px;
+    top: 50px;
     left: 0;
     width: 250px;
     height: 100vh;
@@ -640,5 +661,81 @@ footer {
       transform: translateX(-100%);
     }
   }
+
+  footer {
+  background-image: linear-gradient(
+    139deg,
+    rgba(34, 38, 47, 1) 0%,
+    rgba(32, 36, 42, 1) 50%,
+    rgba(28, 33, 42, 1) 100%
+  );
+  text-align: center;
+  padding: 10px 0px;
+  color: white;
+  margin-left: -35%;
+}
+}
+
+
+@media (max-width: 450px) {
+  .toggle-navbar-btn {
+    display: block;
+    background-color: rgb(29, 32, 39);
+    color: #7e8590;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+    position: fixed;
+    top: 15px;
+    left: 23px;
+    z-index: 1001;
+  }
+
+  .top-navbar {
+  width: 100%;
+  height: 50px; 
+  background-color: rgb(29, 32, 39);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1002; 
+}
+
+  .navbar {
+    display: block;
+    position: fixed;
+    top: 50px;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.4s ease-in-out;
+    transform: translateX(-100%);
+    z-index: 1000;
+
+    &.show {
+      transform: translateX(0);
+    }
+
+    &.hide {
+      transform: translateX(-100%);
+    }
+  }
+  footer {
+  background-image: linear-gradient(
+    139deg,
+    rgba(34, 38, 47, 1) 0%,
+    rgba(32, 36, 42, 1) 50%,
+    rgba(28, 33, 42, 1) 100%
+  );
+  text-align: center;
+  padding: 10px 0px;
+  color: white;
+  margin-left: -80%;
+} 
 }
 </style>
