@@ -683,7 +683,7 @@ footer {
 @media (max-width: 450px) {
   .toggle-navbar-btn {
     display: block;
-    background-color: transparent;
+    background-color: black;
     color: #7e8590;
     font-size: 24px;
     border: none;

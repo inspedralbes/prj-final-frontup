@@ -160,12 +160,12 @@ button:hover {
   .boton-container {
     width: 90%;
     max-width: 300px;
-    height: auto; /* Esto evita que se achiquen si el contenido crece */
+    height: auto;
     position: relative;
   }
 
   .boton-container button {
-    position: relative; /* evita problemas con position: absolute */
+    position: relative; 
     height: 250px;
   }
 
