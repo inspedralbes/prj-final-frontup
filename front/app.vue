@@ -3,18 +3,21 @@
     <div v-if="show" class="leftsection-alert">
       {{ message }}
     </div>
-    <header class="top-navbar">
+      <header class="top-navbar">
       <button class="toggle-navbar-btn" @click="navbarVisible = !navbarVisible">
         {{ navbarVisible ? "✕" : "☰" }}
       </button>
-    </header>
+    </header>  
       
     
     
     <div :class="['navbar', { show: navbarVisible, hide: !navbarVisible }]">
       <div :class="'leftsection-card'">
         <ul class="leftsection-list">
-          
+          <li>
+            <br>
+            <br>
+          </li>
           <li class="leftsection-element" @click="navigateToHome">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -429,13 +432,13 @@ h2 {
     rgba(37, 28, 40, 1) 100%
   );
   border-radius: 0 10px 10px 0;
-  padding: 20px 0;
+  padding: 0px 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
   position: fixed;
   left: 0;
-  top: 0;
+  top: -55px;
   z-index: 1000;
 }
 
@@ -680,21 +683,21 @@ footer {
 @media (max-width: 450px) {
   .toggle-navbar-btn {
     display: block;
-    background-color: rgb(29, 32, 39);
+    background-color: transparent;
     color: #7e8590;
     font-size: 24px;
     border: none;
     cursor: pointer;
     position: fixed;
-    top: 15px;
+    top: 10px;
     left: 23px;
     z-index: 1001;
   }
 
   .top-navbar {
-  width: 100%;
+  width: 50%;
   height: 50px; 
-  background-color: rgb(29, 32, 39);
+  background-color: transparent;
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -735,7 +738,7 @@ footer {
   text-align: center;
   padding: 10px 0px;
   color: white;
-  margin-left: -80%;
+  margin-left: -90%;
 } 
 }
 </style>
