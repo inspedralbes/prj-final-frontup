@@ -89,7 +89,6 @@ io.on('connection', (socket) => {
             js: room.js
         });
 
-        socket.to(roomId).emit('user-joined', { userId: socket.id });
         socket.emit('joinedRoom', { projectId });
     });
 
@@ -134,25 +133,8 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Manejar desconexió
-    socket.on('disconnect', () => {
-        console.log(`Usuario desconectado: ${socket.id}`);
-        rooms.forEach((room, roomId) => {
-            const userIndex = room.users.indexOf(socket.id);
-            if (userIndex !== -1) {
-                room.users.splice(userIndex, 1);
-                if (room.users.length === 0) {
-                    rooms.delete(roomId);
-                    if (projectRooms.get(room.projectId) === roomId) {
-                        projectRooms.delete(room.projectId);
-                    }
-                    console.log(`Room ${roomId} eliminada por inactividad`);
-                } else {
-                    io.to(roomId).emit('user-left', { userId: socket.id });
-                }
-            }
-        });
-    });
+
+    
 });
 
 const PORT = 5000;

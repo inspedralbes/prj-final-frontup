@@ -460,42 +460,7 @@ export default {
           }, 0);
         }
       });
-
-      // Evento cuando un usuario se une a la sala
-      // Modify your user-joined event handler
-      socket.value.on("user-joined", (data) => {
-        console.log("Usuario unido a la sala:", data);
-
-        // Increment the active users count directly when we receive a join notification
-        activeUsers.value += 1;
-        console.log("Active users incremented to:", activeUsers.value);
-
-        // Still request the official count from the server as a backup
-        if (isCollaborating.value && shareCode.value) {
-          socket.value.emit("get-room-users", { roomId: shareCode.value });
-        }
-      });
-
-      // Similarly, update the user-left handler to decrement directly
-      socket.value.on("user-left", (data) => {
-        console.log("Usuario abandonó la sala:", data);
-
-        // Decrement but don't go below 1
-        activeUsers.value = Math.max(1, activeUsers.value - 1);
-      });
       
-      socket.value.on("room-users", ({ count }) => {
-        activeUsers.value = count;
-      });
-      
-      // Error handling
-      socket.value.on("connect_error", (error) => {
-        console.error("Error de conexión:", error);
-      });
-      
-      socket.value.on("error", ({ message }) => {
-        console.error("Error de socket:", message);
-      });
     };
 
     onUnmounted(() => {
@@ -505,20 +470,16 @@ export default {
       if (socket.value) {
         if (isCollaborating.value && shareCode.value) {
           console.log("Abandonando sala:", shareCode.value);
-          socket.value.emit("leave-room", {
-            roomId: shareCode.value
-          });
+
         }
         socket.value.disconnect();
       }
     });
 
     const generateShareCode = () => {
-      // Generar un código aleatorio de 6 caracteres alfanuméricos
       const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
       shareCode.value = randomCode;
 
-      // Crear la room en el servidor
       socket.value.emit("create-room", {
         roomId: randomCode,
         projectId: idProyectoActualStore.id,
@@ -532,11 +493,6 @@ export default {
       isCollaborating.value = true;
       showShareModal.value = true;
 
-      // Solicitar explícitamente el conteo de usuarios con un pequeño retraso
-      // para asegurarnos de que la sala se creó correctamente
-      setTimeout(() => {
-        socket.value.emit("get-room-users", { roomId: randomCode });
-      }, 500);
     };
 
     const closeShareModal = () => {
@@ -560,23 +516,19 @@ export default {
 
       isCollaborating.value = true;
 
-      // Solicitar explícitamente el conteo de usuarios tras unirse
-      // con un pequeño retraso para dar tiempo al servidor a procesar la unión
-      setTimeout(() => {
-        socket.value.emit("get-room-users", { roomId: code });
-      }, 500);
+    };
+
+    const leaveCollaborationSession = () => {
+      if (socket.value) {
+        socket.value.disconnect();
+        socket.value = null;
+      }
       
-      // Agregar un timeout para detectar si la unión falla
-      const joinTimeout = setTimeout(() => {
-        if (activeUsers.value <= 1) {
-          console.warn("No se pudo unir a la sesión de colaboración o no hay otros usuarios presentes");
-        }
-      }, 5000);
+      isCollaborating.value = false;
+      shareCode.value = "";
+      activeUsers.value = 0;
       
-      // Limpiar el timeout cuando recibimos información de usuarios en la sala
-      socket.value.once("room-users", () => {
-        clearTimeout(joinTimeout);
-      });
+      initSocketConnection();
     };
 
     const guardarProyecto2 = () => {
@@ -698,20 +650,6 @@ export default {
       document.removeEventListener('mouseup', stopResize);
     };
 
-    // Función para desconectar la sesión de colaboración
-    const leaveCollaborationSession = () => {
-      if (socket.value) {
-        socket.value.disconnect();
-        socket.value = null;
-      }
-      
-      isCollaborating.value = false;
-      shareCode.value = "";
-      activeUsers.value = 0;
-      
-      // Reiniciar la conexión para uso no colaborativo
-      initSocketConnection();
-    };
 
     return {
       title,
