@@ -153,4 +153,31 @@ export default {
 .back-button:hover {
   background-color: #2c3e50;
 }
+@media (max-width: 450px) {
+  .level-container {
+  position: relative;
+  height: 100vh;
+  width: 190%;
+  display: flex;
+  flex-direction: column;
+  margin-left: -90%;
+  align-items: center;
+  justify-content: center;
+  background-image: url('/fondo.png');
+  background-size: cover;
+  background-position: center;  
+}
+
+.level-button-container:nth-child(1) { top: 15%; left: 20%; }
+.level-button-container:nth-child(2) { top: 23.3%; left: 60%; }
+.level-button-container:nth-child(3) { top: 31.6%; left: 20%; }
+.level-button-container:nth-child(4) { top: 39.9%; left: 60%; }
+.level-button-container:nth-child(5) { top: 48.2%; left: 20%; }
+.level-button-container:nth-child(6) { top: 56.5%; left: 60%; }
+.level-button-container:nth-child(7) { top: 64.8%; left: 20%; }
+.level-button-container:nth-child(8) { top: 73.1%; left: 60%; }
+.level-button-container:nth-child(9) { top: 81.4%; left: 20%; }
+.level-button-container:nth-child(10) { top: 89.7%; left: 60%; }
+
+}
 </style>

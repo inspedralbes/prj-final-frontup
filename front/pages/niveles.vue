@@ -154,7 +154,7 @@ button:hover {
     flex-direction: column;
     align-items: center;
     gap: 30px;
-    width: 100%;
+    width: 90%;
   }
 
   .boton-container {
