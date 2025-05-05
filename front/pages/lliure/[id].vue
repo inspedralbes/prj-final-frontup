@@ -88,23 +88,9 @@
           ai: msg.type === 'ai',
           loading: msg.type === 'loading'
         }">
-          <!-- Indicador de carga -->
           <div v-if="msg.type === 'loading'" class="loading-indicator">
             <div class="dot-flashing"></div>
           </div>
-
-          <!-- Respuestas de la IA con bloque de código -->
-          <template v-else-if="msg.type === 'ai'">
-            <div v-if="hasCodeBlock(msg.content)" class="ai-code-block">
-              <pre><code>{{ extractCode(msg.content) }}</code></pre>
-              <button class="copy-code-button" @click="copyCode(extractCode(msg.content))">
-                Copiar código
-              </button>
-            </div>
-            <p v-else>{{ msg.content }}</p>
-          </template>
-
-          <!-- Mensajes del usuario -->
           <p v-else>{{ msg.content }}</p>
         </div>
       </div>
@@ -112,7 +98,7 @@
         <input type="text" v-model="newMessage" placeholder="Escribe tu mensaje..." class="chat-input"
           @keyup.enter="sendMessage" :disabled="state.loading" />
         <button class="send-button" @click="sendMessage" :disabled="state.loading">
-          {{ state.loading ? 'Enviando...' : 'Enviar' }}
+          {{ state.loading ? 'Enviant...' : 'Enviar' }}
         </button>
       </div>
     </div>
@@ -212,6 +198,7 @@ export default {
     const isCollaborating = ref(false);
     const activeUsers = ref(1);
 
+
     // Flag para controlar las actualizaciones externas
     const isApplyingExternalChanges = ref({
       html: false,
@@ -272,6 +259,7 @@ export default {
     const setLayout = (dir) => {
       layoutType.value = dir
     }
+
 
     onMounted(async () => {
       lliureStore.toggleLliure();
@@ -354,9 +342,11 @@ export default {
         // Ignorar cambios que vienen de actualizaciones remotas
         if (isApplyingExternalChanges.value.html) return;
 
+
         const newValue = instance.getValue();
         html.value = newValue;
         markDirty();
+
 
         if (isCollaborating.value) {
           socket.value.emit("html-change", {
@@ -366,13 +356,16 @@ export default {
         }
       });
 
+
       cssEditorInstance.on("change", (instance) => {
         // Ignorar cambios que vienen de actualizaciones remotas
         if (isApplyingExternalChanges.value.css) return;
 
+
         const newValue = instance.getValue();
         css.value = newValue;
         markDirty();
+
 
         if (isCollaborating.value) {
           socket.value.emit("css-change", {
@@ -382,13 +375,16 @@ export default {
         }
       });
 
+
       jsEditorInstance.on("change", (instance) => {
         // Ignorar cambios que vienen de actualizaciones remotas
         if (isApplyingExternalChanges.value.js) return;
 
+
         const newValue = instance.getValue();
         js.value = newValue;
         markDirty();
+
 
         if (isCollaborating.value) {
           socket.value.emit("js-change", {
@@ -399,12 +395,21 @@ export default {
       });
     });
 
+
     const initSocketConnection = () => {
       socket.value = io("http://localhost:5000");
+
 
       socket.value.on("connect", () => {
         console.log("Conectado al servidor de socket");
       });
+
+
+      socket.value.on("active-users", (count) => {
+        activeUsers.value = count;
+      });
+
+
 
       socket.value.on("html-change", (newValue) => {
         if (newValue !== html.value) {
@@ -421,6 +426,7 @@ export default {
         }
       });
 
+
       socket.value.on("css-change", (newValue) => {
         if (newValue !== css.value) {
           try {
@@ -434,6 +440,7 @@ export default {
           }
         }
       });
+
 
       socket.value.on("js-change", (newValue) => {
         if (newValue !== js.value) {
@@ -449,6 +456,7 @@ export default {
         }
       });
 
+
       socket.value.on("initial-state", ({ html: htmlCode, css: cssCode, js: jsCode }) => {
         try {
           isApplyingExternalChanges.value = {
@@ -457,9 +465,11 @@ export default {
             js: true
           };
 
+
           html.value = htmlCode;
           css.value = cssCode;
           js.value = jsCode;
+
 
           htmlEditorInstance.setValue(htmlCode);
           cssEditorInstance.setValue(cssCode);
@@ -475,31 +485,12 @@ export default {
         }
       });
 
-      socket.value.on("user-joined", () => {
-        activeUsers.value++;
-      });
-
-      socket.value.on("user-left", () => {
-        activeUsers.value = Math.max(1, activeUsers.value - 1);
-      });
-
-      socket.value.on("room-users", ({ count }) => {
-        activeUsers.value = count;
-      });
-
-      // Error handling
-      socket.value.on("connect_error", (error) => {
-        console.error("Error de conexión:", error);
-      });
-
-      socket.value.on("error", ({ message }) => {
-        console.error("Error de socket:", message);
-      });
     };
 
     onUnmounted(() => {
       lliureStore.toggleLliure();
       idProyectoActualStore.vaciarId();
+
 
       if (socket.value) {
         socket.value.disconnect();
@@ -512,6 +503,7 @@ export default {
       shareCode.value = randomCode;
 
       // Crear la room en el servidor
+
       socket.value.emit("create-room", {
         roomId: randomCode,
         projectId: idProyectoActualStore.id,
@@ -521,6 +513,7 @@ export default {
           js: js.value
         }
       });
+
 
       isCollaborating.value = true;
       showShareModal.value = true;
@@ -538,6 +531,7 @@ export default {
     const joinCollaborationSession = (code) => {
       if (!code) return;
 
+      console.log("Intentant unir-se a la room:", code); // DEBUG
       shareCode.value = code;
 
       socket.value.emit("join-room", {
@@ -755,9 +749,6 @@ export default {
       activeUsers,
       outputContainer,
       startResize,
-      hasCodeBlock,
-      extractCode,
-      copyCode,
       output: computed(() => {
         let jsContent = js.value;
         let scriptContent = `
@@ -837,7 +828,6 @@ export default {
   font-size: 14px;
   transition: background-color 0.3s ease;
 }
-
 .button-position {
   background-color: #2e2e2e;
   border: 1px solid #444;
@@ -848,6 +838,7 @@ export default {
   font-size: 14px;
   transition: background-color 0.3s ease;
 }
+
 
 .button-position svg {
   width: 20px;
@@ -1248,7 +1239,7 @@ export default {
   overflow-y: auto;
 }
 
-.layout-left .output-container,
+.layout-left  .output-container,
 .layout-right .output-container {
   flex: 1;
 }
