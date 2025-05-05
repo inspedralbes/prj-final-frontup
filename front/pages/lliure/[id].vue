@@ -23,30 +23,30 @@
 
     <!-- Botones de layout -->
     <div class="layout-buttons">
-  <!-- Sidebar izquierda -->
-  <button class="button-position" @click="setLayout('left')" aria-label="Sidebar izquierda">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <rect x="3" y="3" width="6" height="18"/>
-      <rect x="11" y="3" width="10" height="18" opacity="0.3"/>
-    </svg>
-  </button>
+      <!-- Sidebar izquierda -->
+      <button class="button-position" @click="setLayout('left')" aria-label="Sidebar izquierda">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="3" y="3" width="6" height="18" />
+          <rect x="11" y="3" width="10" height="18" opacity="0.3" />
+        </svg>
+      </button>
 
-  <!-- Sidebar derecha -->
-  <button class="button-position" @click="setLayout('right')" aria-label="Sidebar derecha">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <rect x="15" y="3" width="6" height="18"/>
-      <rect x="3"  y="3" width="10" height="18" opacity="0.3"/>
-    </svg>
-  </button>
+      <!-- Sidebar derecha -->
+      <button class="button-position" @click="setLayout('right')" aria-label="Sidebar derecha">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="15" y="3" width="6" height="18" />
+          <rect x="3" y="3" width="10" height="18" opacity="0.3" />
+        </svg>
+      </button>
 
-  <!-- Layout normal (editors arriba, salida abajo) -->
-  <button class="button-position" @click="setLayout('normal')" aria-label="Layout normal">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <rect x="3"  y="3"  width="18" height="6"/>
-      <rect x="3"  y="11" width="18" height="10" opacity="0.3"/>
-    </svg>
-  </button>
-</div>
+      <!-- Layout normal (editors arriba, salida abajo) -->
+      <button class="button-position" @click="setLayout('normal')" aria-label="Layout normal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="3" y="3" width="18" height="6" />
+          <rect x="3" y="11" width="18" height="10" opacity="0.3" />
+        </svg>
+      </button>
+    </div>
 
     <!-- Modal para compartir código de colaboración -->
     <div v-if="showShareModal" class="modal-overlay" @click="closeShareModal">
@@ -56,7 +56,8 @@
           <p class="share-code">{{ shareCode }}</p>
           <button class="modal-button copy-button" @click="copyShareCode">Copiar</button>
         </div>
-        <p class="share-instructions">Comparteix aquest codi amb altres usuaris perquè puguin unir-se i editar aquest projecte en temps real.</p>
+        <p class="share-instructions">Comparteix aquest codi amb altres usuaris perquè puguin unir-se i editar aquest
+          projecte en temps real.</p>
         <div class="modal-actions">
           <button type="button" class="modal-button" @click="closeShareModal">Tancar</button>
         </div>
@@ -87,9 +88,23 @@
           ai: msg.type === 'ai',
           loading: msg.type === 'loading'
         }">
+          <!-- Indicador de carga -->
           <div v-if="msg.type === 'loading'" class="loading-indicator">
             <div class="dot-flashing"></div>
           </div>
+
+          <!-- Respuestas de la IA con bloque de código -->
+          <template v-else-if="msg.type === 'ai'">
+            <div v-if="hasCodeBlock(msg.content)" class="ai-code-block">
+              <pre><code>{{ extractCode(msg.content) }}</code></pre>
+              <button class="copy-code-button" @click="copyCode(extractCode(msg.content))">
+                Copiar código
+              </button>
+            </div>
+            <p v-else>{{ msg.content }}</p>
+          </template>
+
+          <!-- Mensajes del usuario -->
           <p v-else>{{ msg.content }}</p>
         </div>
       </div>
@@ -97,7 +112,7 @@
         <input type="text" v-model="newMessage" placeholder="Escribe tu mensaje..." class="chat-input"
           @keyup.enter="sendMessage" :disabled="state.loading" />
         <button class="send-button" @click="sendMessage" :disabled="state.loading">
-          {{ state.loading ? 'Enviant...' : 'Enviar' }}
+          {{ state.loading ? 'Enviando...' : 'Enviar' }}
         </button>
       </div>
     </div>
@@ -196,7 +211,7 @@ export default {
     const socket = ref(null);
     const isCollaborating = ref(false);
     const activeUsers = ref(1);
-    
+
     // Flag para controlar las actualizaciones externas
     const isApplyingExternalChanges = ref({
       html: false,
@@ -257,7 +272,7 @@ export default {
     const setLayout = (dir) => {
       layoutType.value = dir
     }
-    
+
     onMounted(async () => {
       lliureStore.toggleLliure();
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
@@ -338,11 +353,11 @@ export default {
       htmlEditorInstance.on("change", (instance) => {
         // Ignorar cambios que vienen de actualizaciones remotas
         if (isApplyingExternalChanges.value.html) return;
-        
+
         const newValue = instance.getValue();
         html.value = newValue;
         markDirty();
-        
+
         if (isCollaborating.value) {
           socket.value.emit("html-change", {
             code: newValue,
@@ -350,15 +365,15 @@ export default {
           });
         }
       });
-      
+
       cssEditorInstance.on("change", (instance) => {
         // Ignorar cambios que vienen de actualizaciones remotas
         if (isApplyingExternalChanges.value.css) return;
-        
+
         const newValue = instance.getValue();
         css.value = newValue;
         markDirty();
-        
+
         if (isCollaborating.value) {
           socket.value.emit("css-change", {
             code: newValue,
@@ -366,15 +381,15 @@ export default {
           });
         }
       });
-      
+
       jsEditorInstance.on("change", (instance) => {
         // Ignorar cambios que vienen de actualizaciones remotas
         if (isApplyingExternalChanges.value.js) return;
-        
+
         const newValue = instance.getValue();
         js.value = newValue;
         markDirty();
-        
+
         if (isCollaborating.value) {
           socket.value.emit("js-change", {
             code: newValue,
@@ -383,14 +398,14 @@ export default {
         }
       });
     });
-    
+
     const initSocketConnection = () => {
       socket.value = io("http://localhost:5000");
-      
+
       socket.value.on("connect", () => {
         console.log("Conectado al servidor de socket");
       });
-      
+
       socket.value.on("html-change", (newValue) => {
         if (newValue !== html.value) {
           try {
@@ -405,7 +420,7 @@ export default {
           }
         }
       });
-      
+
       socket.value.on("css-change", (newValue) => {
         if (newValue !== css.value) {
           try {
@@ -419,7 +434,7 @@ export default {
           }
         }
       });
-      
+
       socket.value.on("js-change", (newValue) => {
         if (newValue !== js.value) {
           try {
@@ -433,7 +448,7 @@ export default {
           }
         }
       });
-      
+
       socket.value.on("initial-state", ({ html: htmlCode, css: cssCode, js: jsCode }) => {
         try {
           isApplyingExternalChanges.value = {
@@ -441,11 +456,11 @@ export default {
             css: true,
             js: true
           };
-          
+
           html.value = htmlCode;
           css.value = cssCode;
           js.value = jsCode;
-          
+
           htmlEditorInstance.setValue(htmlCode);
           cssEditorInstance.setValue(cssCode);
           jsEditorInstance.setValue(jsCode);
@@ -459,24 +474,24 @@ export default {
           }, 0);
         }
       });
-      
+
       socket.value.on("user-joined", () => {
         activeUsers.value++;
       });
-      
+
       socket.value.on("user-left", () => {
         activeUsers.value = Math.max(1, activeUsers.value - 1);
       });
-      
+
       socket.value.on("room-users", ({ count }) => {
         activeUsers.value = count;
       });
-      
+
       // Error handling
       socket.value.on("connect_error", (error) => {
         console.error("Error de conexión:", error);
       });
-      
+
       socket.value.on("error", ({ message }) => {
         console.error("Error de socket:", message);
       });
@@ -485,7 +500,7 @@ export default {
     onUnmounted(() => {
       lliureStore.toggleLliure();
       idProyectoActualStore.vaciarId();
-      
+
       if (socket.value) {
         socket.value.disconnect();
       }
@@ -495,7 +510,7 @@ export default {
       // Generar un código aleatorio de 6 caracteres alfanuméricos
       const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
       shareCode.value = randomCode;
-      
+
       // Crear la room en el servidor
       socket.value.emit("create-room", {
         roomId: randomCode,
@@ -506,7 +521,7 @@ export default {
           js: js.value
         }
       });
-      
+
       isCollaborating.value = true;
       showShareModal.value = true;
     };
@@ -522,23 +537,23 @@ export default {
 
     const joinCollaborationSession = (code) => {
       if (!code) return;
-      
+
       shareCode.value = code;
-      
+
       socket.value.emit("join-room", {
         roomId: code,
         projectId: idProyectoActualStore.id
       });
-      
+
       isCollaborating.value = true;
-      
+
       // Agregar un timeout para detectar si la unión falla
       const joinTimeout = setTimeout(() => {
         if (activeUsers.value <= 1) {
           console.warn("No se pudo unir a la sesión de colaboración o no hay otros usuarios presentes");
         }
       }, 5000);
-      
+
       // Limpiar el timeout cuando recibimos información de usuarios en la sala
       socket.value.once("room-users", () => {
         clearTimeout(joinTimeout);
@@ -667,13 +682,32 @@ export default {
         socket.value.disconnect();
         socket.value = null;
       }
-      
+
       isCollaborating.value = false;
       shareCode.value = "";
       activeUsers.value = 0;
-      
+
       // Reiniciar la conexión para uso no colaborativo
       initSocketConnection();
+    };
+    const hasCodeBlock = (text) => /```[\s\S]*?```/.test(text);
+
+    // Extrae sólo el contenido del bloque de código (sin los backticks)
+    const extractCode = (text) => {
+      const match = text.match(/```(?:\w*\n)?([\s\S]*?)```/);
+      return match ? match[1].trim() : '';
+    };
+
+    // Copia el texto dado al portapapeles
+    const copyCode = (code) => {
+      navigator.clipboard.writeText(code)
+        .then(() => {
+          // Aquí puedes usar un toast o un alert sencillo
+          alert('Código copiado al portapapeles');
+        })
+        .catch(err => {
+          console.error('Error copiando código:', err);
+        });
     };
 
     return {
@@ -721,6 +755,9 @@ export default {
       activeUsers,
       outputContainer,
       startResize,
+      hasCodeBlock,
+      extractCode,
+      copyCode,
       output: computed(() => {
         let jsContent = js.value;
         let scriptContent = `
@@ -800,6 +837,7 @@ export default {
   font-size: 14px;
   transition: background-color 0.3s ease;
 }
+
 .button-position {
   background-color: #2e2e2e;
   border: 1px solid #444;
@@ -810,6 +848,7 @@ export default {
   font-size: 14px;
   transition: background-color 0.3s ease;
 }
+
 .button-position svg {
   width: 20px;
   height: 20px;
@@ -818,8 +857,10 @@ export default {
 .layout-buttons {
   display: flex;
   gap: 12px;
-  align-self: flex-end;      /* sitúa el bloque a la derecha */
-  margin: 20px 20px 0 0;     /* separaciones: top, right, bottom, left */
+  align-self: flex-end;
+  /* sitúa el bloque a la derecha */
+  margin: 20px 20px 0 0;
+  /* separaciones: top, right, bottom, left */
 }
 
 .header-button:hover {
@@ -1177,35 +1218,60 @@ export default {
   border-radius: 6px;
   font-size: 14px;
 }
+
 .layout {
   display: flex;
   width: 100%;
   height: 100%;
   transition: all 0.3s ease;
 }
+
 .layout-normal {
   flex-direction: column;
 }
+
 .layout-left {
   flex-direction: row;
 }
+
 .layout-right {
   flex-direction: row-reverse;
 }
 
-.layout-left  .editor-container,
+.layout-left .editor-container,
 .layout-right .editor-container {
-  display: flex;           
-  flex-direction: column; 
-  width: 45vw;             
-  max-width: 50vw;         
+  display: flex;
+  flex-direction: column;
+  width: 45vw;
+  max-width: 50vw;
   max-height: 90vh;
-  overflow-y: auto;        
+  overflow-y: auto;
 }
 
-.layout-left  .output-container,
+.layout-left .output-container,
 .layout-right .output-container {
   flex: 1;
 }
 
+.ai-code-block {
+  background: #2d2d2d;
+  padding: 10px;
+  border-radius: 6px;
+  position: relative;
+}
+.copy-code-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #3a3a3a;
+  border: none;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.copy-code-button:hover {
+  background: #555;
+}
 </style>
