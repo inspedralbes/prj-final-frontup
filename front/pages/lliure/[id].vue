@@ -16,10 +16,11 @@
     </header>
 
     <!-- Indicador de colaboración activa -->
-    <div v-if="isCollaborating" class="collaboration-active">
-      <span class="collaboration-indicator"></span>
-      <span>Collaboración activa: {{ activeUsers }} usuarios</span>
+    <!-- Pots afegir dins del teu <div class="collaboration-active"> -->
+    <div v-if="isCollaborating">
+      Usuaris actius: {{ activeUsers }}
     </div>
+
 
     <!-- Botones de layout -->
     <div class="layout-buttons">
@@ -197,7 +198,7 @@ export default {
     const socket = ref(null);
     const isCollaborating = ref(false);
     const activeUsers = ref(1);
-    
+
     // Flag para controlar las actualizaciones externas
     const isApplyingExternalChanges = ref({
       html: false,
@@ -258,7 +259,7 @@ export default {
     const setLayout = (dir) => {
       layoutType.value = dir
     }
-    
+
     onMounted(async () => {
       lliureStore.toggleLliure();
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
@@ -339,7 +340,7 @@ export default {
       htmlEditorInstance.on("change", (instance) => {
         // Ignorar cambios que vienen de actualizaciones remotas
         if (isApplyingExternalChanges.value.html) return;
-        
+
         const newValue = instance.getValue();
         html.value = newValue;
         markDirty();
@@ -355,7 +356,7 @@ export default {
       cssEditorInstance.on("change", (instance) => {
         // Ignorar cambios que vienen de actualizaciones remotas
         if (isApplyingExternalChanges.value.css) return;
-        
+
         const newValue = instance.getValue();
         css.value = newValue;
         markDirty();
@@ -371,7 +372,7 @@ export default {
       jsEditorInstance.on("change", (instance) => {
         // Ignorar cambios que vienen de actualizaciones remotas
         if (isApplyingExternalChanges.value.js) return;
-        
+
         const newValue = instance.getValue();
         js.value = newValue;
         markDirty();
@@ -384,13 +385,19 @@ export default {
         }
       });
     });
-    
+
     const initSocketConnection = () => {
       socket.value = io("http://localhost:5000");
 
       socket.value.on("connect", () => {
-        console.log("Conectado al servidor de socket");
+        console.log("Conectat al servidor amb ID:", socket.value.id);
       });
+
+
+      socket.value.on("active-users", (count) => {
+        activeUsers.value = count;
+      });
+
 
       socket.value.on("html-change", (newValue) => {
         if (newValue !== html.value) {
@@ -442,11 +449,11 @@ export default {
             css: true,
             js: true
           };
-          
+
           html.value = htmlCode;
           css.value = cssCode;
           js.value = jsCode;
-          
+
           htmlEditorInstance.setValue(htmlCode);
           cssEditorInstance.setValue(cssCode);
           jsEditorInstance.setValue(jsCode);
@@ -460,7 +467,7 @@ export default {
           }, 0);
         }
       });
-      
+
     };
 
     onUnmounted(() => {
@@ -506,7 +513,8 @@ export default {
 
     const joinCollaborationSession = (code) => {
       if (!code) return;
-      
+
+      console.log("Intentant unir-se a la room:", code); // DEBUG
       shareCode.value = code;
 
       socket.value.emit("join-room", {
@@ -515,19 +523,19 @@ export default {
       });
 
       isCollaborating.value = true;
-
     };
+
 
     const leaveCollaborationSession = () => {
       if (socket.value) {
         socket.value.disconnect();
         socket.value = null;
       }
-      
+
       isCollaborating.value = false;
       shareCode.value = "";
       activeUsers.value = 0;
-      
+
       initSocketConnection();
     };
 

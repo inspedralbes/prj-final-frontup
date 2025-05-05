@@ -53,6 +53,18 @@ app.get('/', (req, res) => {
     res.send('Socket.IO Server para FrontUp Collaboration');
 });
 
+app.get('/debug-rooms', (req, res) => {
+    const data = {};
+    rooms.forEach((value, key) => {
+        data[key] = {
+            projectId: value.projectId,
+            users: value.users
+        };
+    });
+    res.json(data);
+});
+
+
 io.on('connection', (socket) => {
     console.log(`Usuario conectado: ${socket.id}`);
 
@@ -71,26 +83,61 @@ io.on('connection', (socket) => {
         socket.join(roomId);
         socket.emit('room-created', { roomId });
         console.log(`Room ${roomId} creada amb èxit`);
+        io.to(roomId).emit('active-users', 1);
+
     });
 
-    // Unir-se a una room existent
     socket.on('join-room', ({ roomId, projectId }) => {
         const room = rooms.get(roomId);
         if (!room) {
             socket.emit('error', { message: 'La sala no existeix' });
             return;
         }
-        room.users.push(socket.id);
+    
+        // Evitar duplicats
+        if (!room.users.includes(socket.id)) {
+            room.users.push(socket.id);
+        }
+    
         socket.join(roomId);
-
+    
+        console.log(`[JOIN] Usuari ${socket.id} afegit a ${roomId}`);
+        console.log(`[JOIN] Usuaris a ${roomId}:`, room.users);
+    
         socket.emit('initial-state', {
             html: room.html,
             css: room.css,
             js: room.js
         });
-
+    
         socket.emit('joinedRoom', { projectId });
+    
+        // Recompte d'usuaris
+        io.to(roomId).emit('active-users', room.users.length);
     });
+    
+
+    socket.on('disconnect', () => {
+        console.log(`Usuari desconnectat: ${socket.id}`);
+        for (const [roomId, room] of rooms.entries()) {
+            const index = room.users.indexOf(socket.id);
+            if (index !== -1) {
+                room.users.splice(index, 1);
+                console.log(`Usuari ${socket.id} eliminat de la room ${roomId}`);
+                console.log(`Queden ${room.users.length} usuaris`);
+
+                io.to(roomId).emit('active-users', room.users.length);
+
+                if (room.users.length === 0) {
+                    rooms.delete(roomId);
+                    console.log(`Room ${roomId} eliminada per estar buida`);
+                }
+                break;
+            }
+        }
+    });
+
+
 
     // Manejar cambios en HTML
     socket.on('html-change', ({ code, roomId }) => {
@@ -133,9 +180,8 @@ io.on('connection', (socket) => {
         }
     });
 
-
-    
 });
+
 
 const PORT = 5000;
 server.listen(PORT, () => console.log("Servidor corriendo en http://localhost:" + PORT));
