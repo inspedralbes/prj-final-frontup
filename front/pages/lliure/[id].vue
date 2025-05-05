@@ -531,7 +531,7 @@ export default {
     const joinCollaborationSession = (code) => {
       if (!code) return;
 
-      console.log("Intentant unir-se a la room:", code); // DEBUG
+      console.log("Intentant unir-se a la room:", code);
       shareCode.value = code;
 
       socket.value.emit("join-room", {
@@ -540,18 +540,6 @@ export default {
       });
 
       isCollaborating.value = true;
-
-      // Agregar un timeout para detectar si la unión falla
-      const joinTimeout = setTimeout(() => {
-        if (activeUsers.value <= 1) {
-          console.warn("No se pudo unir a la sesión de colaboración o no hay otros usuarios presentes");
-        }
-      }, 5000);
-
-      // Limpiar el timeout cuando recibimos información de usuarios en la sala
-      socket.value.once("room-users", () => {
-        clearTimeout(joinTimeout);
-      });
     };
 
     const guardarProyecto2 = () => {
