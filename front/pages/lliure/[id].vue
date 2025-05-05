@@ -681,7 +681,6 @@ export default {
       shareCode.value = "";
       activeUsers.value = 0;
 
-      // Reiniciar la conexión para uso no colaborativo
       initSocketConnection();
     };
     const hasCodeBlock = (text) => /```[\s\S]*?```/.test(text);
@@ -828,6 +827,7 @@ export default {
   font-size: 14px;
   transition: background-color 0.3s ease;
 }
+
 .button-position {
   background-color: #2e2e2e;
   border: 1px solid #444;
@@ -1239,7 +1239,7 @@ export default {
   overflow-y: auto;
 }
 
-.layout-left  .output-container,
+.layout-left .output-container,
 .layout-right .output-container {
   flex: 1;
 }
@@ -1250,6 +1250,7 @@ export default {
   border-radius: 6px;
   position: relative;
 }
+
 .copy-code-button {
   position: absolute;
   top: 8px;
@@ -1262,6 +1263,7 @@ export default {
   cursor: pointer;
   font-size: 12px;
 }
+
 .copy-code-button:hover {
   background: #555;
 }
