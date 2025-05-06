@@ -460,7 +460,7 @@ const register = async () => {
 </script>
 <style scoped, lang="scss">
 :root {
-  --background-image: url(deserd.png);
+  --background-image: url(/deserd.png);
   --primary-color: #f2eeeb;
   --secondary-color: #5353ff;
   --title-color: black;
