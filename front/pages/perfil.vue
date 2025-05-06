@@ -1,5 +1,8 @@
 <template>
   <div class="profile-container">
+    <AlertComponent v-if="alertVisible" :success="alertSuccess" :text="alertText" :duration="2000"
+      @close="alertVisible = false" />
+      
     <div class="profile-card">
       <div class="profile-card-bg"></div>
       <div class="profile-header">
@@ -70,12 +73,17 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAppStore } from '../stores/app';
+import AlertComponent from '../components/AlertComponent';
 
 const user = ref(null);
 const newAvatar = ref('');
-const loading = ref(true);  // Esta variable controla el estado de carga
+const loading = ref(true);
 const router = useRouter();
 const appStore = useAppStore();
+
+const alertVisible = ref(false);
+const alertSuccess = ref(false);
+const alertText = ref('');
 
 onMounted(() => {
   if (!appStore.isLoggedIn) {
@@ -85,9 +93,14 @@ onMounted(() => {
   }
 });
 
+const showAlert = (text, success) => {
+  alertText.value = text;
+  alertSuccess.value = success;
+  alertVisible.value = true;
+};
+
 const fetchUserData = async (token) => {
   try {
-    // Simula una carga de 2 segundos
     setTimeout(async () => {
       const response = await fetch('http://127.0.0.1:8000/api/user', {
         method: 'GET',
@@ -107,12 +120,12 @@ const fetchUserData = async (token) => {
       } else {
         console.error('No se pudo obtener los detalles del usuario');
       }
-      loading.value = false;  // Detiene el gif después de obtener los datos
-    }, 2000); // 2 segundos de espera
+      loading.value = false;  
+    }, 2000); 
 
   } catch (error) {
     console.error('Error al obtener los datos del usuario:', error);
-    loading.value = false;  // Detiene el gif si ocurre un error
+    loading.value = false;
   }
 };
 
@@ -137,20 +150,26 @@ const updateAvatar = async () => {
       const data = await response.json();
       user.value = data.user;
       newAvatar.value = '';
+      showAlert("Avatar actualitzat correctament", true);
     } else {
       console.error('Error al actualizar el avatar');
+      showAlert("Error al actualitzar l'avatar", false);
     }
   } catch (error) {
     console.error('Error al enviar la solicitud:', error);
+    showAlert("Error al actualitzar l'avatar", false);
   }
 };
 
 const logout = () => {
-  appStore.logout();
-  router.push('/login');
+  showAlert("Sessió tancada correctament", true);
+  
+  setTimeout(() => {
+    appStore.logout();
+    router.push('/login');
+  }, 1000);
 };
 </script>
-
 <style scoped>
 .profile-container {
   height: 100%;

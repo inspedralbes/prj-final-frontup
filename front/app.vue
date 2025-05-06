@@ -97,14 +97,9 @@
         </div>
       </div>
     </div>
-    
-    <AlertComponent 
-      v-if="alertVisible" 
-      :success="false" 
-      :text="'Has d\'iniciar sessió per crear un projecte nou.'"
-      :duration="3000"
-      @close="alertVisible = false"
-    />
+
+    <AlertComponent v-if="alertVisible" :success="false" :text="'Has d\'iniciar sessió per crear un projecte nou.'"
+      :duration="3000" @close="alertVisible = false" />
   </div>
   <NuxtPage />
   <footer>
@@ -192,7 +187,7 @@ const navigateToLliure = async () => {
       });
       console.log("lo que devuelve")
       console.log(projecte.result.id)
-      
+
       let id = projecte.result.id;
       idProyectoActualStore.actalizarId(id);
       localStorage.setItem("idProyectoActual", id);
@@ -398,8 +393,13 @@ footer {
 }
 
 @keyframes fadeInOverlay {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .modal {
@@ -415,8 +415,15 @@ footer {
 }
 
 @keyframes popIn {
-  from { transform: scale(0.95); opacity: 0; }
-  to   { transform: scale(1);    opacity: 1; }
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .modal h3 {
@@ -470,6 +477,7 @@ footer {
   background: linear-gradient(90deg, #5e81ac, #81a1c1);
   color: #fff;
 }
+
 .modal-actions button:not(.cancel):hover {
   filter: brightness(1.1);
   transform: translateY(-2px);
@@ -479,6 +487,7 @@ footer {
   background: linear-gradient(90deg, #bf616a, #d08770);
   color: #eceff4;
 }
+
 .modal-actions .cancel:hover {
   filter: brightness(1.1);
   transform: translateY(-2px);
