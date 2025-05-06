@@ -90,7 +90,7 @@ export default {
         }
 
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("No hay token guardado");
+        if (!token) throw new Error("No hi ha token guardat");
 
         const response = await fetch(url, {
           headers: {

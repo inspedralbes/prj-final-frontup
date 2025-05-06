@@ -38,7 +38,7 @@ export default {
           },
         });
 
-        if (!response.ok) throw new Error("Error al obtener el nivel del usuario");
+        if (!response.ok) throw new Error("Error al obtenir el nivell de l\'usuari");
 
         const data = await response.json();
         this.userLevel = data.user.nivel;
@@ -47,7 +47,7 @@ export default {
           locked: level.id > this.userLevel, 
         }));
       } catch (error) {
-        console.error("Error al cargar el nivel del usuario:", error);
+        console.error("Error en carregar el nivell de l\'usuari:", error);
       }
     },
     ir_nivel(levelId) {

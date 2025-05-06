@@ -69,7 +69,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAppStore } from '../stores/app';
+import { useAppStore } from '@/stores/app';
 
 const user = ref(null);
 const newAvatar = ref('');
@@ -105,13 +105,13 @@ const fetchUserData = async (token) => {
           console.error('No es va trobar informació d\'usuari');
         }
       } else {
-        console.error('No se pudo obtener los detalles del usuario');
+        console.error('No es va poder obtenir els detalls de l\'usuari');
       }
       loading.value = false;  // Detiene el gif después de obtener los datos
     }, 2000); // 2 segundos de espera
 
   } catch (error) {
-    console.error('Error al obtener los datos del usuario:', error);
+    console.error('Error en obtenir les dades de l\'usuari:', error);
     loading.value = false;  // Detiene el gif si ocurre un error
   }
 };
@@ -138,7 +138,7 @@ const updateAvatar = async () => {
       user.value = data.user;
       newAvatar.value = '';
     } else {
-      console.error('Error al actualizar el avatar');
+      console.error('Error al actualitzar l\'avatar');
     }
   } catch (error) {
     console.error('Error al enviar la solicitud:', error);

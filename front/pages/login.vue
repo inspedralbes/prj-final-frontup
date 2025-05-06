@@ -285,19 +285,19 @@ const validateEmail = () => {
   if (!formData.email) {
     errors.email = ""; // Si está vacío, no hay error
   } else {
-    errors.email = emailRegex.test(formData.email) ? "" : "Correo inválido";
+    errors.email = emailRegex.test(formData.email) ? "" : "Correu invalid";
   }
 };
 
 const validatename = () => {
-  errors.name = formData.name ? "" : "El nombre de usuario es obligatorio";
+  errors.name = formData.name ? "" : "El nom d\'usuari es obligatori";
 };
 
 const validatePassword = () => {
   if (!formData.password) {
     errors.password = ""; // Si está vacío, no hay error
   } else if (formData.password !== formData.password) {
-    errors.password = formData.password ? "" : "La contraseña es obligatoria";
+    errors.password = formData.password ? "" : "La contrasenya es obligatoria";
   } else {
     errors.password = null; // No hay error si coinciden
   }
@@ -313,8 +313,8 @@ const validatePasswordRepeat = () => {
 
   // Si no coinciden, se marca error en ambos.
   if (formData.password !== formData.passwordRepeat) {
-    errors.password = "Las contraseñas no coinciden";
-    errors.passwordRepeat = "Las contraseñas no coinciden";
+    errors.password = "Les contrasenyes no coincideixen";
+    errors.passwordRepeat = "Les contrasenyes no coincideixen";
   } else {
     // Si coinciden, se eliminan los errores.
     errors.password = null;
@@ -380,7 +380,7 @@ const login = async () => {
       errorMessage.value = data.message || "Credenciales inválidas";
     }
   } catch (err) {
-    errorMessage.value = "Error de red. No se pudo conectar al servidor.";
+    errorMessage.value = "Error de xarxa. No es va poder connectar al servidor.";
   }
 };
 
@@ -446,14 +446,14 @@ const register = async () => {
           router.push("/");
         } else {
           errorMessage.value =
-            loginData.message || "Error al iniciar sesión automáticamente";
+            loginData.message || "Error en iniciar sessió automàticament";
         }
       } else {
-        errorMessage.value = data.message || "Error al crear la cuenta";
+        errorMessage.value = data.message || "Error en crear el compte";
       }
     } catch (error) {
-      console.error("Error durante el registro:", error);
-      errorMessage.value = "Error de red. No se pudo conectar al servidor.";
+      console.error("Error durant el registre:", error);
+      errorMessage.value = "Error de xarxa. No es va poder connectar al servidor.";
     }
   }
 };

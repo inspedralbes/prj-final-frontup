@@ -54,11 +54,8 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-    console.log(`Usuario conectado: ${socket.id}`);
-
     // Crear una nova room
     socket.on('create-room', ({ roomId, projectId, initialData }) => {
-        console.log(`Creando room: ${roomId} para proyecto: ${projectId}`);
         rooms.set(roomId, {
             projectId,
             html: initialData.html || '',

@@ -182,8 +182,6 @@ const navigateToLliure = async () => {
         css_code: "",
         js_code: "",
       });
-      console.log("lo que devuelve")
-      console.log(projecte.result.id)
     } catch (error) {
       console.error(error);
     }
