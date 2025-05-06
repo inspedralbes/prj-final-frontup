@@ -1,4 +1,11 @@
 <template>
+  <AlertComponent 
+    v-if="alertVisible" 
+    :success="alertSuccess" 
+    :text="alertText"
+    :duration="3000"
+    @close="alertVisible = false"
+  />
   <div class="todo">
     <header class="header" v-show="!isExpanded">
       <button class="header-button" @click="goBack">Atrás</button>
@@ -14,16 +21,12 @@
         </select>
       </div>
     </header>
-
-    <!-- Indicador de colaboración activa -->
     <div v-if="isCollaborating" class="collaboration-active">
       <span class="collaboration-indicator"></span>
       <span>Collaboración activa: {{ activeUsers }} usuarios</span>
     </div>
 
-    <!-- Botones de layout -->
     <div class="layout-buttons">
-  <!-- Sidebar izquierda -->
   <button class="button-position" @click="setLayout('left')" aria-label="Sidebar izquierda">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
       <rect x="3" y="3" width="6" height="18"/>
@@ -48,7 +51,6 @@
   </button>
 </div>
 
-    <!-- Modal para compartir código de colaboración -->
     <div v-if="showShareModal" class="modal-overlay" @click="closeShareModal">
       <div class="modal-content" @click.stop>
         <h2>Codi de col·laboració</h2>
@@ -63,7 +65,6 @@
       </div>
     </div>
 
-    <!-- Modal para guardar antes de salir -->
     <div v-if="guardarParaSalir" class="modal-overlay" @click="closeGuardarParaSalir">
       <div class="modal-content" @click.stop>
         <h2>Vols guardar aquest projecte?</h2>
@@ -76,7 +77,6 @@
       </div>
     </div>
 
-    <!-- Chat IA flotante -->
     <div v-if="isChatVisible" class="chat-container"
       :style="{ transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)` }" @mousedown="startDrag">
       <button class="close-chat-button" @click="toggleChat">✖</button>
@@ -133,11 +133,12 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, onMounted, computed, onUnmounted, nextTick, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import CodeMirror from "codemirror";
 import { useLliureStore } from "~/stores/app";
+import AlertComponent from '../../components/AlertComponent.vue';
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
 import { io } from "socket.io-client";
@@ -157,8 +158,6 @@ import "codemirror/addon/edit/closebrackets";
 import useCommunicationManager from "@/stores/comunicationManager";
 import { useAppStore, useIdProyectoActualStore } from "@/stores/app";
 
-export default {
-  setup() {
     const appStore = useAppStore();
     const idProyectoActualStore = useIdProyectoActualStore();
     const router = useRouter();
@@ -171,6 +170,11 @@ export default {
       useProyectoStore,
     } = useCommunicationManager();
     const lliureStore = useLliureStore();
+
+    // Variables para las alertas mejoradas
+    const alertVisible = ref(false);
+    const alertSuccess = ref(false);
+    const alertText = ref('');
 
     const isDragging = ref(false);
     const chatPosition = ref({ x: 20, y: 20 });
@@ -190,14 +194,12 @@ export default {
     const isPrivate = ref(0);
     const layoutType = ref('normal');
 
-    // Nuevas variables para la colaboración en tiempo real
     const showShareModal = ref(false);
     const shareCode = ref("");
     const socket = ref(null);
     const isCollaborating = ref(false);
     const activeUsers = ref(1);
     
-    // Flag para controlar las actualizaciones externas
     const isApplyingExternalChanges = ref({
       html: false,
       css: false,
@@ -209,6 +211,12 @@ export default {
     const jsEditor = ref(null);
 
     let htmlEditorInstance, cssEditorInstance, jsEditorInstance;
+
+    const showAlert = (message, isSuccess = false) => {
+      alertText.value = message;
+      alertSuccess.value = isSuccess;
+      alertVisible.value = true;
+    };
 
     const startDrag = (event) => {
       isDragging.value = true;
@@ -324,19 +332,14 @@ export default {
         console.error("No se encontró un ID de proyecto válido en la ruta.");
       }
 
-      // Inicializar conexión de socket
       initSocketConnection();
 
-      // Verificar si hay un código de colaboración en la URL
       const collabCode = route.query.code;
       if (collabCode) {
         joinCollaborationSession(collabCode);
       }
 
-      // Modificar los event listeners para incluir la emisión de cambios por socket
-      // y prevenir loops de actualización
       htmlEditorInstance.on("change", (instance) => {
-        // Ignorar cambios que vienen de actualizaciones remotas
         if (isApplyingExternalChanges.value.html) return;
         
         const newValue = instance.getValue();
@@ -352,7 +355,6 @@ export default {
       });
       
       cssEditorInstance.on("change", (instance) => {
-        // Ignorar cambios que vienen de actualizaciones remotas
         if (isApplyingExternalChanges.value.css) return;
         
         const newValue = instance.getValue();
@@ -368,7 +370,6 @@ export default {
       });
       
       jsEditorInstance.on("change", (instance) => {
-        // Ignorar cambios que vienen de actualizaciones remotas
         if (isApplyingExternalChanges.value.js) return;
         
         const newValue = instance.getValue();
@@ -398,7 +399,6 @@ export default {
             html.value = newValue;
             htmlEditorInstance.setValue(newValue);
           } finally {
-            // Usar setTimeout para asegurar que se ejecuta después de los eventos internos de CodeMirror
             setTimeout(() => {
               isApplyingExternalChanges.value.html = false;
             }, 0);
@@ -472,7 +472,6 @@ export default {
         activeUsers.value = count;
       });
       
-      // Error handling
       socket.value.on("connect_error", (error) => {
         console.error("Error de conexión:", error);
       });
@@ -492,11 +491,9 @@ export default {
     });
 
     const generateShareCode = () => {
-      // Generar un código aleatorio de 6 caracteres alfanuméricos
       const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
       shareCode.value = randomCode;
       
-      // Crear la room en el servidor
       socket.value.emit("create-room", {
         roomId: randomCode,
         projectId: idProyectoActualStore.id,
@@ -517,7 +514,10 @@ export default {
 
     const copyShareCode = () => {
       navigator.clipboard.writeText(shareCode.value);
-      alert("Codi copiat al portapapers");
+      // Reemplazar el alert nativo con nuestra alerta personalizada
+      showAlert("Codi copiat correctament al portapapers", true);
+      // Cerrar el modal después de copiar
+      closeShareModal();
     };
 
     const joinCollaborationSession = (code) => {
@@ -532,23 +532,31 @@ export default {
       
       isCollaborating.value = true;
       
-      // Agregar un timeout para detectar si la unión falla
       const joinTimeout = setTimeout(() => {
         if (activeUsers.value <= 1) {
           console.warn("No se pudo unir a la sesión de colaboración o no hay otros usuarios presentes");
         }
       }, 5000);
       
-      // Limpiar el timeout cuando recibimos información de usuarios en la sala
       socket.value.once("room-users", () => {
         clearTimeout(joinTimeout);
       });
     };
 
     const guardarProyecto2 = () => {
+      const prevGuardarParaSalir = guardarParaSalir.value;
+      
       guardarProyecto();
-      guardarParaSalir.value = false;
-      router.push("/");
+      
+      setTimeout(() => {
+        if (prevGuardarParaSalir) {
+          guardarParaSalir.value = false;
+          // Solo navegar a home si el guardado fue exitoso (no hay alerta de error visible)
+          if (!alertVisible.value || alertSuccess.value) {
+            router.push("/");
+          }
+        }
+      }, 500);
     };
 
     const toggleChat = () => {
@@ -609,7 +617,14 @@ export default {
 
     const savePrivacy = async () => {
       markDirty();
-      await guardarProyecto();
+      
+      try {
+        await guardarProyecto();
+        if (!alertVisible.value) {
+        }
+      } catch (error) {
+        showAlert(`Error al canviar la privacitat del projecte`, false);
+      }
     };
 
     const guardarProyecto = async () => {
@@ -617,6 +632,13 @@ export default {
 
       if (!idProyectoActualStore.id) {
         console.error("ID del proyecto es null o no se encuentra.");
+        showAlert("Error: No s'ha trobat l'ID del projecte", false);
+        return;
+      }
+
+      // Verificar si el usuario está autenticado
+      if (!localStorage.getItem('loginInfo')) {
+        showAlert("Has d'iniciar sessió per guardar aquest projecte", false);
         return;
       }
 
@@ -632,15 +654,19 @@ export default {
           },
           idProyectoActualStore.id
         );
-        if (response.success == false) {
+        
+        if (response.success === false) {
+          showAlert("Cal ser el propietari del projecte per poder-lo guardar", false);
           console.log(response.message);
+        } else {
+          showAlert("Projecte guardat correctament", true);
         }
       } catch (error) {
         console.error("Error al guardar el proyecto:", error);
+        showAlert("Error al guardar el projecte", false);
       }
     };
 
-    // Agregar escuchadores para eventos de resize (para el editor y output)
     let isResizing = false;
     const outputContainer = ref(null);
     const startResize = (event) => {
@@ -661,7 +687,6 @@ export default {
       document.removeEventListener('mouseup', stopResize);
     };
 
-    // Función para desconectar la sesión de colaboración
     const leaveCollaborationSession = () => {
       if (socket.value) {
         socket.value.disconnect();
@@ -672,75 +697,27 @@ export default {
       shareCode.value = "";
       activeUsers.value = 0;
       
-      // Reiniciar la conexión para uso no colaborativo
       initSocketConnection();
+      showAlert("Has sortit de la sessió de col·laboració", true);
     };
 
-    return {
-      title,
-      html,
-      css,
-      js,
-      htmlEditor,
-      cssEditor,
-      jsEditor,
-      isEditing,
-      isExpanded,
-      isChatVisible,
-      newMessage,
-      messages,
-      messagesContainer,
-      state,
-      guardarParaSalir,
-      guardarProyecto2,
-      volverHome,
-      toggleChat,
-      sendMessage,
-      toggleExpand,
-      goBack,
-      closeGuardarParaSalir,
-      guardarProyecto,
-      isDragging,
-      chatPosition,
-      startDrag,
-      onDrag,
-      stopDrag,
-      markDirty,
-      isPrivate,
-      savePrivacy,
-      layoutType,
-      setLayout,
-      showShareModal,
-      shareCode,
-      generateShareCode,
-      closeShareModal,
-      copyShareCode,
-      joinCollaborationSession,
-      leaveCollaborationSession,
-      isCollaborating,
-      activeUsers,
-      outputContainer,
-      startResize,
-      output: computed(() => {
-        let jsContent = js.value;
-        let scriptContent = `
-          try {
-            ${jsContent}
-          } catch (e) {
-            console.error('Error in JavaScript:', e);
-          }
-        `;
-        return `
-          <html>
-            <head><style>${css.value}</style></head>
-            <body>${html.value}
-              <script>${scriptContent}<\/script>
-            </body>
-          </html>`;
-      }),
-    };
-  },
-};
+    const output = computed(() => {
+      let jsContent = js.value;
+      let scriptContent = `
+        try {
+          ${jsContent}
+        } catch (e) {
+          console.error('Error in JavaScript:', e);
+        }
+      `;
+      return `
+        <html>
+          <head><style>${css.value}</style></head>
+          <body>${html.value}
+            <script>${scriptContent}<\/script>
+          </body>
+        </html>`;
+    });
 </script>
 
 <style scoped>
@@ -818,8 +795,8 @@ export default {
 .layout-buttons {
   display: flex;
   gap: 12px;
-  align-self: flex-end;      /* sitúa el bloque a la derecha */
-  margin: 20px 20px 0 0;     /* separaciones: top, right, bottom, left */
+  align-self: flex-end;
+  margin: 20px 20px 0 0;
 }
 
 .header-button:hover {
