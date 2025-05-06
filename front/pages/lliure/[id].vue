@@ -3,7 +3,7 @@
     @close="alertVisible = false" />
   <div class="todo">
     <header class="header" v-show="!isExpanded">
-      <button class="header-button" @click="goBack">Atrás</button>
+      <button class="header-button" @click="leaveCollaborationSession(); goBack()">Enrere</button>
       <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
         :readonly="!isEditing" />
       <div class="header-actions">
@@ -328,19 +328,26 @@ onMounted(async () => {
     console.error("No se encontró un ID de proyecto válido en la ruta.");
   }
 
+  // Inicializar conexión de socket
   initSocketConnection();
 
+  // Verificar si hay un código de colaboración en la URL
   const collabCode = route.query.code;
   if (collabCode) {
     joinCollaborationSession(collabCode);
   }
 
+  // Modificar los event listeners para incluir la emisión de cambios por socket
+  // y prevenir loops de actualización
   htmlEditorInstance.on("change", (instance) => {
+    // Ignorar cambios que vienen de actualizaciones remotas
     if (isApplyingExternalChanges.value.html) return;
+
 
     const newValue = instance.getValue();
     html.value = newValue;
     markDirty();
+
 
     if (isCollaborating.value) {
       socket.value.emit("html-change", {
@@ -350,12 +357,16 @@ onMounted(async () => {
     }
   });
 
+
   cssEditorInstance.on("change", (instance) => {
+    // Ignorar cambios que vienen de actualizaciones remotas
     if (isApplyingExternalChanges.value.css) return;
+
 
     const newValue = instance.getValue();
     css.value = newValue;
     markDirty();
+
 
     if (isCollaborating.value) {
       socket.value.emit("css-change", {
@@ -365,12 +376,16 @@ onMounted(async () => {
     }
   });
 
+
   jsEditorInstance.on("change", (instance) => {
+    // Ignorar cambios que vienen de actualizaciones remotas
     if (isApplyingExternalChanges.value.js) return;
+
 
     const newValue = instance.getValue();
     js.value = newValue;
     markDirty();
+
 
     if (isCollaborating.value) {
       socket.value.emit("js-change", {
@@ -381,11 +396,18 @@ onMounted(async () => {
   });
 });
 
+
 const initSocketConnection = () => {
   socket.value = io("http://localhost:5000");
 
+
   socket.value.on("connect", () => {
     console.log("Conectado al servidor de socket");
+  });
+
+
+  socket.value.on("active-users", (count) => {
+    activeUsers.value = count;
   });
 
   socket.value.on("html-change", (newValue) => {
@@ -395,12 +417,14 @@ const initSocketConnection = () => {
         html.value = newValue;
         htmlEditorInstance.setValue(newValue);
       } finally {
+        // Usar setTimeout para asegurar que se ejecuta después de los eventos internos de CodeMirror
         setTimeout(() => {
           isApplyingExternalChanges.value.html = false;
         }, 0);
       }
     }
   });
+
 
   socket.value.on("css-change", (newValue) => {
     if (newValue !== css.value) {
@@ -416,6 +440,7 @@ const initSocketConnection = () => {
     }
   });
 
+
   socket.value.on("js-change", (newValue) => {
     if (newValue !== js.value) {
       try {
@@ -430,6 +455,7 @@ const initSocketConnection = () => {
     }
   });
 
+
   socket.value.on("initial-state", ({ html: htmlCode, css: cssCode, js: jsCode }) => {
     try {
       isApplyingExternalChanges.value = {
@@ -438,9 +464,11 @@ const initSocketConnection = () => {
         js: true
       };
 
+
       html.value = htmlCode;
       css.value = cssCode;
       js.value = jsCode;
+
 
       htmlEditorInstance.setValue(htmlCode);
       cssEditorInstance.setValue(cssCode);
@@ -456,25 +484,6 @@ const initSocketConnection = () => {
     }
   });
 
-  socket.value.on("user-joined", () => {
-    activeUsers.value++;
-  });
-
-  socket.value.on("user-left", () => {
-    activeUsers.value = Math.max(1, activeUsers.value - 1);
-  });
-
-  socket.value.on("room-users", ({ count }) => {
-    activeUsers.value = count;
-  });
-
-  socket.value.on("connect_error", (error) => {
-    console.error("Error de conexión:", error);
-  });
-
-  socket.value.on("error", ({ message }) => {
-    console.error("Error de socket:", message);
-  });
 };
 
 onUnmounted(() => {
@@ -517,6 +526,7 @@ const copyShareCode = () => {
 const joinCollaborationSession = (code) => {
   if (!code) return;
 
+  console.log("Intentant unir-se a la room:", code);
   shareCode.value = code;
 
   socket.value.emit("join-room", {
@@ -525,16 +535,6 @@ const joinCollaborationSession = (code) => {
   });
 
   isCollaborating.value = true;
-
-  const joinTimeout = setTimeout(() => {
-    if (activeUsers.value <= 1) {
-      console.warn("No se pudo unir a la sesión de colaboración o no hay otros usuarios presentes");
-    }
-  }, 5000);
-
-  socket.value.once("room-users", () => {
-    clearTimeout(joinTimeout);
-  });
 };
 
 const guardarProyecto2 = () => {
@@ -692,7 +692,6 @@ const leaveCollaborationSession = () => {
   activeUsers.value = 0;
 
   initSocketConnection();
-  showAlert("Has sortit de la sessió de col·laboració", true);
 };
 
 const output = computed(() => {
