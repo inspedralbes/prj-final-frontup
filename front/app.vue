@@ -97,6 +97,9 @@
         </div>
       </div>
     </div>
+
+    <AlertComponent v-if="alertVisible" :success="false" :text="'Has d\'iniciar sessió per crear un projecte nou.'"
+      :duration="3000" @close="alertVisible = false" />
   </div>
   <NuxtPage />
   <footer>
@@ -112,6 +115,7 @@ import useCommunicationManager from '@/stores/comunicationManager'
 import { ref, watch, onMounted, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useBuscadorStore } from '@/stores/app'
+import AlertComponent from './components/AlertComponent.vue';
 
 const showCollaborationModal = ref(false);
 const idProyectoActualStore = useIdProyectoActualStore();
@@ -126,9 +130,10 @@ const buscadorStore = useBuscadorStore()
 const comunicationManager = useCommunicationManager();
 const roomId = computed(() => route.params.id || 'default-room');
 
+const alertVisible = ref(false);
+
 onMounted(() => {
   comunicationManager.connect();
-
 });
 
 const router = useRouter()
@@ -169,11 +174,9 @@ const joinCollaboration = () => {
   });
 };
 
-
-
-
 const navigateToLliure = async () => {
-  if (appStore.loginInfo.id != null) {
+  // Verificar si existe loginInfo en localStorage
+  if (localStorage.getItem('loginInfo') !== null) {
     try {
       projecte.result = await comunicationManager.crearProyectoDB({
         nombre: "untitled",
@@ -184,15 +187,16 @@ const navigateToLliure = async () => {
       });
       console.log("lo que devuelve")
       console.log(projecte.result.id)
+
+      let id = projecte.result.id;
+      idProyectoActualStore.actalizarId(id);
+      localStorage.setItem("idProyectoActual", id);
+      router.push(`/lliure/${id}`);
     } catch (error) {
       console.error(error);
     }
-    let id = projecte.result.id;
-    idProyectoActualStore.actalizarId(id);
-    localStorage.setItem("idProyectoActual", id);
-    router.push(`/lliure/${id}`);
   } else {
-    showAlert(`Registra't per crear un projecte`)
+    alertVisible.value = true;
   }
 }
 
@@ -232,7 +236,6 @@ watch(route, () => {
     }
   }
 });
-
 </script>
 
 
@@ -390,8 +393,13 @@ footer {
 }
 
 @keyframes fadeInOverlay {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .modal {
@@ -407,8 +415,15 @@ footer {
 }
 
 @keyframes popIn {
-  from { transform: scale(0.95); opacity: 0; }
-  to   { transform: scale(1);    opacity: 1; }
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .modal h3 {
@@ -462,6 +477,7 @@ footer {
   background: linear-gradient(90deg, #5e81ac, #81a1c1);
   color: #fff;
 }
+
 .modal-actions button:not(.cancel):hover {
   filter: brightness(1.1);
   transform: translateY(-2px);
@@ -471,10 +487,9 @@ footer {
   background: linear-gradient(90deg, #bf616a, #d08770);
   color: #eceff4;
 }
+
 .modal-actions .cancel:hover {
   filter: brightness(1.1);
   transform: translateY(-2px);
 }
-
-
 </style>

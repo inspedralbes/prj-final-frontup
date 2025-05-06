@@ -1,8 +1,6 @@
-<!-- index.vue -->
 <template>
   <div class="todo">
     <div class="main-container">
-      <!-- Contenido de la Home -->
       <div class="body-content">
         <h2>El lloc ideal per crear, provar i explorar codi web.</h2>
         <br><br>
@@ -25,7 +23,6 @@
         </div>
       </div>
       <br><br><br>
-      <!-- Card Container -->
       <div class="card-container">
         <div class="card">
           <div class="card-content">
@@ -81,12 +78,12 @@ export default {
         wordList.style.transform = `translateY(-${wordHeight}%)`;
 
         setTimeout(() => {
-          wordList.appendChild(words[0]); // Mueve la primera palabra al final
+          wordList.appendChild(words[0]); 
           wordList.style.transition = 'none';
           wordList.style.transform = 'translateY(0)';
 
-          words.push(words.shift()); // Reorganiza el array en memoria
-        }, 1000); // Tiempo suficiente para completar la animación
+          words.push(words.shift());
+        }, 1000); 
       };
 
       setInterval(moveWords, 2000);
