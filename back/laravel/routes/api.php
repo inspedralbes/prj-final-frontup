@@ -5,9 +5,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenticatorController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\LikesController;
 use App\Http\Controllers\NivellUsuariController;
+use App\Http\Controllers\NivelController;         
+use App\Http\Controllers\NivelCssController;      
+use App\Http\Controllers\NivelJsController; 
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [UserController::class, 'getUser']);
@@ -31,6 +33,30 @@ Route::middleware('auth:sanctum')->group(function () {
     ]);
     Route::get('/nivelUsuari/{id}', [NivellUsuariController::class, 'show']);
 });
+//Niveles
+Route::prefix('niveles')->group(function () {
+    // HTML
+    Route::prefix('html')->group(function () {
+        Route::get('/pregunta/{id}', [NivelController::class, 'getPregunta']);
+        Route::post('/verificar/{id}', [NivelController::class, 'verificarRespuesta']);
+        Route::post('/actualizar', [NivelController::class, 'actualizarNivel']);
+    });
+
+    // CSS
+    Route::prefix('css')->group(function () {
+        Route::get('/pregunta/{id}', [NivelCssController::class, 'getPregunta']);
+        Route::post('/verificar/{id}', [NivelCssController::class, 'verificarRespuesta']);
+        Route::post('/actualizar', [NivelCssController::class, 'actualizarNivel']);
+    });
+
+    // JavaScript
+    Route::prefix('js')->group(function () {
+        Route::get('/pregunta/{id}', [NivelJsController::class, 'getPregunta']);
+        Route::post('/verificar/{id}', [NivelJsController::class, 'verificarRespuesta']);
+        Route::post('/actualizar', [NivelJsController::class, 'actualizarNivel']);
+    });
+});
+
 //contador de likes para un proyecto
 Route::get('/likes/count/{projectId}', [LikesController::class, 'likeCount']);
 //indexa proyectos de todos los usuarios
@@ -45,7 +71,3 @@ Route::get('/projects/{id}/preview', [ProjectController::class, 'preview'])->nam
 Route::post('/register', [AuthenticatorController::class, 'register']);
 
 Route::post('/login', [AuthenticatorController::class, 'authenticate']);    
-
-Route::get('/preguntas/{language}/{id}', [PreguntaController::class, 'getPreguntas']);
-
-Route::post('/actualizar-nivel', [PreguntaController::class, 'actualizarNivel']);
