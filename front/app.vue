@@ -630,19 +630,7 @@ footer {
     left: 23px;
     z-index: 1001;
   }
-  .top-navbar {
-  width: 100%;
-  height: 60px; 
-  background-color: rgb(29, 32, 39);
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  box-sizing: border-box;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1002; 
-}
+  
 
   .navbar {
     display: block;

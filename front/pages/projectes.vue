@@ -288,6 +288,12 @@ export default {
     color: #ccc;
     text-align: left;
   }
+  .projects-list {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 30px;
+  padding: 10px;
+}
 }
 
 

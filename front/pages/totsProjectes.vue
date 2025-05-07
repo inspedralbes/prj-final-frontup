@@ -209,7 +209,7 @@ h1 {
 }
 @media (max-width: 450px) {
   .container {
-  display: flex;
+    display: flex;
   flex-direction: column;
   min-height: 80vh;
   max-width: 170%;
@@ -220,7 +220,8 @@ h1 {
   background-color: #252323;
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-}
+  }
+
 .header {
     display: flex;
     flex-direction: column;
@@ -252,5 +253,12 @@ h1 {
     color: #ccc;
     text-align: left;
   }
+  .projects-list {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr); 
+  gap: 30px;
+  padding: 10px;
+  margin-top: 20px;
+}
 }
 </style>

@@ -1,19 +1,23 @@
 <template>
   <div class="todo">
     <header class="header" v-show="!isExpanded">
-      <button class="header-button" @click="goBack">Atrás</button>
-      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
-        :readonly="!isEditing" />
-      <div class="header-actions">
-        <button class="header-button" @click="generateShareCode">Compartir</button>
-        <button class="header-button" @click="toggleChat">Xat IA</button>
-        <button class="header-button" @click="guardarProyecto">Guardar</button>
-        <select v-model="isPrivate" @change="savePrivacy" class="header-select">
-          <option :value="0">Público</option>
-          <option :value="1">Privado</option>
-        </select>
-      </div>
-    </header>
+  <div class="header-row">
+    <button class="header-button" @click="goBack">Atrás</button>
+    <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
+      :readonly="!isEditing" />
+    <button class="header-button" @click="generateShareCode">Compartir</button>
+  </div>
+
+  <div class="header-row">
+    <button class="header-button" @click="toggleChat">Xat IA</button>
+    <button class="header-button" @click="guardarProyecto">Guardar</button>
+    <select v-model="isPrivate" @change="savePrivacy" class="header-select">
+      <option :value="0">Público</option>
+      <option :value="1">Privado</option>
+    </select>
+  </div>
+</header>
+
 
     <!-- Indicador de colaboración activa -->
     <div v-if="isCollaborating" class="collaboration-active">
@@ -1114,5 +1118,49 @@ export default {
 .layout-right .output-container {
   flex: 1;
 }
+
+.button-position{
+  display: none;     
+}
+    
+@media (max-width: 450px) {
+  .todo {
+  display: flex;
+  flex-direction: column;
+  background-color: #1e1e1e;
+  font-family: 'Arial', sans-serif;
+  color: #ffffff;
+  margin-left: -110px;
+  margin-left: -110px;
+  margin-left: -90%;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100px;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-title {
+  font-size: 18px;
+  color: #ffffff;
+  background-color: transparent;
+  border: 2px solid transparent;
+  padding: 10px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  text-align: center;
+  min-width: 180px;
+}
+
+
+  }
 
 </style>

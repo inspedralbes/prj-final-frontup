@@ -214,7 +214,7 @@ h1 {
     background-color: #777;
 }
 @media (max-width: 450px) {
-  .container {
+.container {
   display: flex;
   flex-direction: column;
   min-height: 80vh;
@@ -258,5 +258,11 @@ h1 {
     color: #ccc;
     text-align: left;
   }
+  .projects-list {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 30px;
+  padding: 10px;
+}
 }
 </style>
