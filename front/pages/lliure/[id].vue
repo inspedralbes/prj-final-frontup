@@ -16,10 +16,17 @@
         </select>
       </div>
     </header>
-    <div v-if="isCollaborating" class="collaboration-active">
-      <span class="collaboration-indicator"></span>
-      <span>Collaboración activa: {{ activeUsers }} usuarios</span>
+    <div class="users-container">
+      <div v-for="(user, index) in activeUsersList" :key="index" class="user-card">
+        <img :src="user.avatar" alt="avatar" class="avatar-img" />
+        <div class="user-info">
+          <div class="user-name">{{ user.name }}</div>
+        </div>
+      </div>
     </div>
+
+
+
 
     <div class="layout-buttons">
       <button class="button-position" @click="setLayout('left')" aria-label="Sidebar izquierda">
@@ -195,6 +202,7 @@ const shareCode = ref("");
 const socket = ref(null);
 const isCollaborating = ref(false);
 const activeUsers = ref(1);
+const activeUsersList = ref([]);
 
 const isApplyingExternalChanges = ref({
   html: false,
@@ -405,10 +413,10 @@ const initSocketConnection = () => {
     console.log("Conectado al servidor de socket");
   });
 
-
-  socket.value.on("active-users", (count) => {
-    activeUsers.value = count;
+  socket.value.on("active-users", (users) => {
+    activeUsersList.value = users;
   });
+
 
   socket.value.on("html-change", (newValue) => {
     if (newValue !== html.value) {
@@ -498,16 +506,19 @@ onUnmounted(() => {
 const generateShareCode = () => {
   const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
   shareCode.value = randomCode;
-
   socket.value.emit("create-room", {
     roomId: randomCode,
     projectId: idProyectoActualStore.id,
+    userName: appStore.loginInfo.name,
+    avatar: appStore.loginInfo.avatar,
     initialData: {
       html: html.value,
       css: css.value,
       js: js.value
     }
   });
+
+
 
   isCollaborating.value = true;
   showShareModal.value = true;
@@ -531,8 +542,11 @@ const joinCollaborationSession = (code) => {
 
   socket.value.emit("join-room", {
     roomId: code,
-    projectId: idProyectoActualStore.id
+    projectId: idProyectoActualStore.id,
+    userName: appStore.loginInfo.name,
+    avatar: appStore.loginInfo.avatar
   });
+
 
   isCollaborating.value = true;
 };
@@ -714,6 +728,18 @@ const output = computed(() => {
 </script>
 
 <style scoped>
+.user-info {
+  margin-left: 25px;
+}
+
+.avatar-img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 9999px;
+}
+
+
 .todo {
   display: flex;
   flex-direction: column;

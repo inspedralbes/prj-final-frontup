@@ -69,53 +69,55 @@ io.on('connection', (socket) => {
     console.log(`Usuario conectado: ${socket.id}`);
 
     // Crear una nova room
-    socket.on('create-room', ({ roomId, projectId, initialData }) => {
+    socket.on('create-room', ({ roomId, projectId, initialData, userName, avatar }) => {
         console.log(`Creando room: ${roomId} para proyecto: ${projectId}`);
         rooms.set(roomId, {
             projectId,
             html: initialData.html || '',
             css: initialData.css || '',
             js: initialData.js || '',
-            users: [socket.id]
+            users: [{ id: socket.id, name: userName, avatar }]
         });
         projectRooms.set(projectId, roomId);
 
         socket.join(roomId);
         socket.emit('room-created', { roomId });
-        console.log(`Room ${roomId} creada amb èxit`);
-        io.to(roomId).emit('active-users', 1);
-
+        updateActiveUsers(roomId); // 👈 actualitza la llista
     });
 
-    socket.on('join-room', ({ roomId, projectId }) => {
+
+    socket.on('join-room', ({ roomId, projectId, userName, avatar }) => {
         const room = rooms.get(roomId);
         if (!room) {
             socket.emit('error', { message: 'La sala no existeix' });
             return;
         }
-    
-        // Evitar duplicats
-        if (!room.users.includes(socket.id)) {
-            room.users.push(socket.id);
-        }
-    
+
+        room.users.push({ id: socket.id, name: userName, avatar });
         socket.join(roomId);
-    
-        console.log(`[JOIN] Usuari ${socket.id} afegit a ${roomId}`);
-        console.log(`[JOIN] Usuaris a ${roomId}:`, room.users);
-    
+
         socket.emit('initial-state', {
             html: room.html,
             css: room.css,
             js: room.js
         });
-    
+
         socket.emit('joinedRoom', { projectId });
-    
-        // Recompte d'usuaris
-        io.to(roomId).emit('active-users', room.users.length);
+        updateActiveUsers(roomId); // 👈
     });
-    
+
+    function updateActiveUsers(roomId) {
+        const room = rooms.get(roomId);
+        if (!room) return;
+
+        const usersInfo = room.users.map(user => ({
+            name: user.name,
+            avatar: user.avatar || ''
+        }));
+
+        io.to(roomId).emit('active-users', usersInfo);
+    }
+
 
     socket.on('disconnect', () => {
         console.log(`Usuari desconnectat: ${socket.id}`);
@@ -126,7 +128,7 @@ io.on('connection', (socket) => {
                 console.log(`Usuari ${socket.id} eliminat de la room ${roomId}`);
                 console.log(`Queden ${room.users.length} usuaris`);
 
-                io.to(roomId).emit('active-users', room.users.length);
+                updateActiveUsers(roomId);
 
                 if (room.users.length === 0) {
                     rooms.delete(roomId);
