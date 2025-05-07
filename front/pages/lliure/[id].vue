@@ -1,5 +1,5 @@
 <template>
-  <AlertComponent v-if="alertVisible" :success="alertSuccess" :text="alertText" :duration="2000"
+  <AlertComponent v-if="alertVisible" :success="alertSuccess" :text="alertText" :duration="1500"
     @close="alertVisible = false" />
   <div class="todo">
     <header class="header" v-show="!isExpanded">
@@ -92,17 +92,29 @@
           <div v-if="msg.type === 'loading'" class="loading-indicator">
             <div class="dot-flashing"></div>
           </div>
-          <p v-else>{{ msg.content }}</p>
+          <p v-else-if="msg.type === 'user'">{{ msg.content }}</p>
+          <div v-else-if="msg.type === 'ai'">
+            <template v-if="msg.content.includes('```')">
+              <div class="code-block">
+                <pre><code>{{ extractCode(msg.content) }}</code></pre>
+                <button class="btn-copy" @click="copyCode(extractCode(msg.content))">
+                  Copiar
+                </button>
+              </div>
+            </template>
+            <p v-else>{{ msg.content }}</p>
+          </div>
         </div>
       </div>
       <div class="input-container">
         <input type="text" v-model="newMessage" placeholder="Escribe tu mensaje..." class="chat-input"
           @keyup.enter="sendMessage" :disabled="state.loading" />
         <button class="send-button" @click="sendMessage" :disabled="state.loading">
-          {{ state.loading ? 'Enviant...' : 'Enviar' }}
+          {{ state.loading ? 'Enviando...' : 'Enviar' }}
         </button>
       </div>
     </div>
+
 
     <!-- Layout dinámico -->
     <div :class="['layout', 'layout-' + layoutType]">
@@ -140,7 +152,7 @@ import { ref, onMounted, computed, onUnmounted, nextTick, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import CodeMirror from "codemirror";
 import { useLliureStore } from "~/stores/app";
-import AlertComponent from '../../components/AlertComponent.vue';
+import AlertComponent from '@/components/AlertComponent.vue';
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
 import { io } from "socket.io-client";
@@ -173,7 +185,7 @@ const {
 } = useCommunicationManager();
 const lliureStore = useLliureStore();
 
-// Variables para las alertas mejoradas
+// Variables para las alertas mejoradas 
 const alertVisible = ref(false);
 const alertSuccess = ref(false);
 const alertText = ref('');
@@ -268,6 +280,26 @@ const closeGuardarParaSalir = () => {
 const setLayout = (dir) => {
   layoutType.value = dir
 }
+
+/**
+ * Extrae el contenido entre triple backticks.
+ */
+const extractCode = (text) => {
+  const match = text.match(/```(?:[\w-]+\n)?([\s\S]*?)```/);
+  return match ? match[1].trim() : text;
+};
+
+/**
+ * Copia al portapapeles y muestra alerta.
+ */
+const copyCode = async (code) => {
+  try {
+    await navigator.clipboard.writeText(code);
+    showAlert("Código copiado al portapapeles", true);
+  } catch {
+    showAlert("Error al copiar el código", false);
+  }
+};
 
 onMounted(async () => {
   lliureStore.toggleLliure();
@@ -1239,5 +1271,32 @@ const output = computed(() => {
 .layout-left .output-container,
 .layout-right .output-container {
   flex: 1;
+}
+
+.code-block {
+  position: relative;
+  background: #2d2d2d;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+.code-block pre {
+  margin: 0;
+  overflow-x: auto;
+}
+.btn-copy {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+.btn-copy:hover {
+  background: #45a049;
 }
 </style>
