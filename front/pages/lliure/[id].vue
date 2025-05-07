@@ -179,7 +179,7 @@ const {
 } = useCommunicationManager();
 const lliureStore = useLliureStore();
 
-// Variables para las alertas mejoradas
+// Variables para las alertas mejoradas 
 const alertVisible = ref(false);
 const alertSuccess = ref(false);
 const alertText = ref('');
