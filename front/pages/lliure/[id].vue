@@ -18,6 +18,7 @@
   </div>
 </header>
 
+    
 
     <!-- Indicador de colaboración activa -->
     <div v-if="isCollaborating" class="collaboration-active">
@@ -108,17 +109,26 @@
 
     <!-- Layout dinámico -->
     <div :class="['layout', 'layout-' + layoutType]">
+
+         <!-- Tabs solo para móvil -->
+      <div class="editor-tabs" v-if="isMobile">
+        <button :class="{ active: activeTab === 'html' }" @click="activeTab = 'html'">html</button>
+        <button :class="{ active: activeTab === 'css' }" @click="activeTab = 'css'">css</button>
+        <button :class="{ active: activeTab === 'js' }" @click="activeTab = 'js'">js</button>
+      </div>
       <!-- Contenedor principal de editores -->
       <div class="editor-container">
-        <div class="editor-box">
+        <div class="editor-box" v-show="!isMobile || activeTab === 'html'">
+
           <div class="editor-label">HTML</div>
           <div ref="htmlEditor" class="code-editor"></div>
         </div>
-        <div class="editor-box">
+        <div class="editor-box" v-show="!isMobile || activeTab === 'css'">
           <div class="editor-label">CSS</div>
           <div ref="cssEditor" class="code-editor"></div>
         </div>
-        <div class="editor-box">
+        <div class="editor-box" v-show="!isMobile || activeTab === 'js'"
+        >
           <div class="editor-label">JS</div>
           <div ref="jsEditor" class="code-editor"></div>
         </div>
@@ -587,6 +597,20 @@ export default {
       document.removeEventListener('mousemove', handleResize);
       document.removeEventListener('mouseup', stopResize);
     };
+
+
+    const isMobile = ref(false)
+    const activeTab = ref('html')
+
+    onMounted(() => {
+      const checkMobile = () => {
+        isMobile.value = window.innerWidth <= 450
+      }
+
+      checkMobile()
+      window.addEventListener('resize', checkMobile)
+    })
+
 
     return {
       title,
@@ -1119,9 +1143,7 @@ export default {
   flex: 1;
 }
 
-.button-position{
-  display: none;     
-}
+
     
 @media (max-width: 450px) {
   .todo {
@@ -1130,9 +1152,10 @@ export default {
   background-color: #1e1e1e;
   font-family: 'Arial', sans-serif;
   color: #ffffff;
-  margin-left: -110px;
-  margin-left: -110px;
   margin-left: -90%;
+}
+.button-position{
+  display: none;     
 }
 
 .header {
@@ -1158,6 +1181,33 @@ export default {
   transition: all 0.3s ease;
   text-align: center;
   min-width: 180px;
+}
+
+ .editor-container {
+    display: block;
+  } 
+
+.editor-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  color: red;
+}
+
+.editor-tabs button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #444;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.editor-tabs button.active,
+.editor-tabs button:hover {
+  background-color: #666;
 }
 
 
