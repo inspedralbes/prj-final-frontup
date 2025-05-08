@@ -25,25 +25,36 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 app.post("/pregunta", async (req, res) => {
     try {
         const { pregunta, html, css, js } = req.body;
-        let preguntaIA = 'Ets un programador frontend expert, respon a la següent pregunta tenint en compte que la persona a la qual li parles és un desenvolupador novençà, ' + pregunta;
-        if (html) preguntaIA += ' aquest es el meu html ' + html;
-        if (css) preguntaIA += ' aquest es el meu css ' + css;
-        if (js) preguntaIA += ' aquest es el meu js ' + js;
-        preguntaIA += ' Respon amb les mínimes paraules possibles encara que si fa falta pots allargar-te alguna cosa més però sense passar-te abastant tot el que està preguntant';
 
-        if (!preguntaIA) return res.status(400).send("La pregunta es requerida");
+        // 1) Context general en català
+        let prompt =
+            "Ets un programador frontend expert. Explica de forma clara a un desenvolupador novençà.\n\n" +
+            "Petició:\n" + pregunta + "\n\n";
 
-        const result = await model.generateContent(preguntaIA);
+        // 2) Afegeix el codi existent
+        if (html) prompt += "Aquest és el meu HTML:\n" + html + "\n\n";
+        if (css) prompt += "Aquest és el meu CSS:\n" + css + "\n\n";
+        if (js) prompt += "Aquest és el meu JS:\n" + js + "\n\n";
+
+        // 3) Instruccions de format en català
+        prompt += (
+            "INSTRUCCIONS DE FORMAT:\n" +
+            "- Si la petició és per **millorar** o donar suggeriments, respon **només en text**, sense blocs de codi.\n" +
+            "- Si la petició és de **implementació**, primer fes una breu explicació en text i després mostra el codi llest per copiar en un bloc entre triple backticks.\n"
+        );
+
+        // 4) Crida al model
+        const result = await model.generateContent(prompt);
         const response = await result.response;
-        const text = response.text();
+        const text = await response.text();
 
-        console.log('Respuesta:', text);
         res.send(text);
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send("Error al procesar la solicitud: " + error.message);
+        console.error(error);
+        res.status(500).send("Error: " + error.message);
     }
 });
+
 
 // Crear la funcionalitat de rooms
 const rooms = new Map();
