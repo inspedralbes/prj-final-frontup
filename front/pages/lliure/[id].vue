@@ -16,41 +16,40 @@
         </select>
       </div>
     </header>
-    <div class="users-container">
-      <div v-for="(user, index) in activeUsersList" :key="index" class="user-card">
-        <img :src="user.avatar" alt="avatar" class="avatar-img" />
-        <div class="user-info">
-          <div class="user-name">{{ user.name }}</div>
+    <div class="top-bar">
+      <div v-if="activeUsersList.length > 0" class="users-container">
+        <div v-for="(user, index) in activeUsersList" :key="index" class="user-card">
+          <img :src="user.avatar" alt="avatar" class="avatar-img" />
+          <div class="user-info">
+            <div class="user-name">{{ user.name }}</div>
+          </div>
         </div>
       </div>
-    </div>
 
+      <div class="layout-buttons">
+        <button class="button-position" @click="setLayout('left')" aria-label="Sidebar izquierda">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="3" y="3" width="6" height="18" />
+            <rect x="11" y="3" width="10" height="18" opacity="0.3" />
+          </svg>
+        </button>
 
+        <!-- Sidebar derecha -->
+        <button class="button-position" @click="setLayout('right')" aria-label="Sidebar derecha">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="15" y="3" width="6" height="18" />
+            <rect x="3" y="3" width="10" height="18" opacity="0.3" />
+          </svg>
+        </button>
 
-
-    <div class="layout-buttons">
-      <button class="button-position" @click="setLayout('left')" aria-label="Sidebar izquierda">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <rect x="3" y="3" width="6" height="18" />
-          <rect x="11" y="3" width="10" height="18" opacity="0.3" />
-        </svg>
-      </button>
-
-      <!-- Sidebar derecha -->
-      <button class="button-position" @click="setLayout('right')" aria-label="Sidebar derecha">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <rect x="15" y="3" width="6" height="18" />
-          <rect x="3" y="3" width="10" height="18" opacity="0.3" />
-        </svg>
-      </button>
-
-      <!-- Layout normal (editors arriba, salida abajo) -->
-      <button class="button-position" @click="setLayout('normal')" aria-label="Layout normal">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <rect x="3" y="3" width="18" height="6" />
-          <rect x="3" y="11" width="18" height="10" opacity="0.3" />
-        </svg>
-      </button>
+        <!-- Layout normal (editors arriba, salida abajo) -->
+        <button class="button-position" @click="setLayout('normal')" aria-label="Layout normal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="3" y="3" width="18" height="6" />
+            <rect x="3" y="11" width="18" height="10" opacity="0.3" />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <div v-if="showShareModal" class="modal-overlay" @click="closeShareModal">
@@ -728,8 +727,42 @@ const output = computed(() => {
 </script>
 
 <style scoped>
-.user-info {
-  margin-left: 25px;
+
+.layout-buttons {
+  display: flex;
+  gap: 12px;
+  margin-left: auto; 
+  margin-top: 20px;
+  margin-right: 20px;
+}
+
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.users-container {
+  display: flex;
+  flex-direction: row; 
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+
+.user-card {
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  background: #222;
+  padding: 0.5rem;
+  border-radius: 8px;
+  color: white;
+  width: 80px;
 }
 
 .avatar-img {
@@ -737,6 +770,11 @@ const output = computed(() => {
   height: 50px;
   object-fit: cover;
   border-radius: 9999px;
+}
+
+.user-info {
+  margin-top: 0.5rem;
+  text-align: center;
 }
 
 
@@ -811,13 +849,6 @@ const output = computed(() => {
 .button-position svg {
   width: 20px;
   height: 20px;
-}
-
-.layout-buttons {
-  display: flex;
-  gap: 12px;
-  align-self: flex-end;
-  margin: 20px 20px 0 0;
 }
 
 .header-button:hover {
