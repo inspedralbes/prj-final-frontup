@@ -104,113 +104,111 @@ export default {
 
 <style scoped>
 .container {
-    max-width: 100%;
-    margin: auto;
-    padding: 30px;
-    padding-top: 80px;
-    text-align: center;
-    background-color: #252323;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    height: 100vh;
+  max-width: 100%;
+  margin: auto;
+  padding: 30px;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  height: 100vh;
 }
 
 h1 {
-    color: white;
-    text-align: left;
-    margin-bottom: 20px;
+  color: #f3f4f6;
+  text-align: left;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  font-weight: bold;
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 20px;
 }
 
 .search-bar {
-    width: 200vh;
-    align-self: flex-start;
+  flex-grow: 1;
+  max-width: 400px;
 }
 
-
 .filter-input {
-    width: 100%;
-    max-width: 400px;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: none;
-    outline: none;
-    background-color: #3a3a3a;
-    color: #ddd;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  outline: none;
+  background-color: #434952;
+  color: #e5e7eb;
 }
 
 .sort-container {
-    align-items: center;
-    gap: 10px;
+  align-items: center;
+  gap: 10px;
 }
 
 .sort-label {
-    font-size: 16px;
-    color: #fff;
+  font-size: 16px;
+  color: #e5e7eb;
 }
 
 .sort-select {
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: none;
-    outline: none;
-    background-color: #2c2c2c;
-    color: #fff;
-    cursor: pointer;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #555;
+  outline: none;
+  background-color: #434952;
+  color: #f3f4f6;
+  cursor: pointer;
 }
 
 .loading,
 .error {
-    font-size: 18px;
-    color: #ff4d4d;
+  font-size: 18px;
+  color: #f87171;
 }
 
 .no-projects {
-    font-size: 18px;
-    color: #ffb74d;
+  font-size: 18px;
+  color: #facc15;
 }
 
 .projects-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
 }
 
 .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    color: white;
-    bottom: 0;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  color: #e5e7eb;
+  padding-top: 20px;
 }
 
 .page-btn {
-    padding: 10px 15px;
-    background-color: #444;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: 0.2s;
+  padding: 10px 15px;
+  background-color: #444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .page-btn:disabled {
-    background-color: #666;
-    cursor: not-allowed;
+  background-color: #666;
+  cursor: not-allowed;
 }
 
 .page-btn:hover:not(:disabled) {
-    background-color: #777;
+  background-color: #525252;
 }
 </style>

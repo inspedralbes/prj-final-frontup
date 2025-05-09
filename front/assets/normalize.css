@@ -23,10 +23,7 @@ html {
 
  body {
   margin: 0;
-  background-image: linear-gradient(139deg,
-  rgba(36, 40, 50, 1) 0%,
-  rgba(36, 40, 50, 1) 50%,
-  rgba(37, 28, 40, 1) 100%);  
+  background-color: rgba(36, 40, 50, 1);  
   font-family: 'Work Sans', sans-serif;
 }
 

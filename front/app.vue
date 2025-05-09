@@ -241,12 +241,7 @@ watch(route, () => {
 
 <style>
 body {
-  background-color: rgb(29, 32, 39);
-  margin-left: 200px;
-}
-
-h2 {
-  padding: 10px;
+  margin-left: 205px;
 }
 
 .leftsection-alert {
@@ -255,7 +250,6 @@ h2 {
   top: 20px;
   right: 20px;
   padding: 4vh 4vw;
-  background: #ff4444;
   color: white;
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -287,21 +281,6 @@ h2 {
   100% {
     opacity: 0;
   }
-}
-
-.volver-btn {
-  padding: 10px 15px;
-  background-color: #444;
-  color: #fff;
-  cursor: pointer;
-  text-transform: uppercase;
-  border-radius: 4px;
-  border: none;
-  transition: background-color 0.3s ease;
-}
-
-.volver-btn:hover {
-  background-color: #555;
 }
 
 .leftsection-card {
