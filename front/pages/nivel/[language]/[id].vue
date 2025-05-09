@@ -1,15 +1,19 @@
 <template>
   <div class="todo">
     <header class="header">
-      <button class="header-button" @click="goBack">Atrás</button>
-      <h1 class="header-title">{{ title }}</h1>
-      <div class="header-actions">
-        <button class="header-button" @click="toggleChat">Xat IA</button>
-        <button class="header-button" @click="guardarProyecto">Guardar</button>
-        <button class="header-button" @click="openSettingsModal">Configuració</button>
-        <button class="header-button">💡</button>
-      </div>
-    </header>
+  <div class="header-row">
+    <button class="header-button" @click="goBack">Atrás</button>
+    <h1 class="header-title">{{ title }}</h1>
+    <button class="header-button" @click="toggleChat">Xat IA</button>
+  </div>
+
+  <div class="header-row">
+    <button class="header-button" @click="guardarProyecto">Guardar</button>
+    <button class="header-button" @click="openSettingsModal">Configuració</button>
+    <button class="header-button">💡</button>
+  </div>
+</header>
+
 
     <div class="exercise-instructions">
       <p><strong>Instruccions:</strong></p>
@@ -351,6 +355,13 @@ export default {
   background-color: #3a3a3a;
 }
 
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+
 .exercise-instructions {
   margin-top: 100px;
   background-color: #1e1e1e;
@@ -435,5 +446,107 @@ export default {
 
 .submit-button:hover {
   background-color: #45a049;
+}
+
+@media (max-width: 450px) {
+
+  .todo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: #000000;
+  font-family: 'Arial', sans-serif;
+  color: #ffffff;
+  height: 93vh;
+  box-sizing: border-box;
+  margin-left: -220px;
+}
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100px;
+  }
+
+  .header-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-title {
+    font-size: 18px;
+    color: #ffffff;
+    background-color: transparent;
+    border: 2px solid transparent;
+    padding: 10px 12px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    text-align: center;
+    min-width: 180px;
+  }
+
+  .editor-output-wrapper {
+    flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 12px;
+  box-sizing: border-box;
+  margin-left: 8%;
+  }
+
+  .submit-container {
+    order: 0;
+    display: flex;
+    justify-content: center;
+    margin-top: -280px;
+    padding: 0 170px;
+  }
+  
+
+  .editor-box {
+  order: 1;
+  max-width: 400px; /* o el ancho que desees */
+  width: 100%;
+  margin: 0 auto; /* centra horizontalmente */
+  box-sizing: border-box;
+  background-color: #2d2d2d; /* asegúrate que este sea el color que quieres */
+  border-radius: 8px; /* opcional, mejora el aspecto en móvil */
+}
+
+
+  .output-container {
+    order: 2;
+  }
+
+  .submit-button {
+    width: 100%;
+  }
+
+  .code-editor {
+    width: 100%;
+    height: 200px;
+  }
+
+  .editor-box,
+  .output-container {
+    width: 100%;
+  }
+
+  .exercise-instructions {
+  margin-top: 100px;
+  background-color: #1e1e1e;
+  color: #fff;
+  padding: 8px 40px;
+  border-radius: 6px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.3);
+  max-width: 750px;
+} 
+
+
 }
 </style>

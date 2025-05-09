@@ -3,14 +3,7 @@
     <header class="header" v-show="!isExpanded">
       <div class="header-row">
         <button class="header-button" @click="goBack">Atrás</button>
-        <input
-          type="text"
-          v-model="title"
-          class="header-title"
-          @focus="isEditing = true"
-          @blur="isEditing = false"
-          :readonly="!isEditing"
-        />
+        <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false" :readonly="!isEditing"/>
         <button class="header-button" @click="generateShareCode">
           Compartir
         </button>
