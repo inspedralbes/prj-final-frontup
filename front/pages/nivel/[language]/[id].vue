@@ -53,7 +53,6 @@ export default {
     const route = useRoute();
     const lliureStore = useLliureStore();
 
-    // Configuración inicial
     const title = computed(() => `Exercici ${id.value}`);
     const language = ref(route.params.language);
     const id = ref(parseInt(route.params.id));
@@ -66,7 +65,6 @@ export default {
       }[language.value] || 'Llenguatge desconegut';
     });
 
-    // Estado del componente
     const html = ref("");
     const css = ref("");
     const js = ref("");
@@ -76,14 +74,12 @@ export default {
     const htmlEditor = ref(null);
     let htmlEditorInstance;
 
-    // Límites de niveles por lenguaje
     const levelLimits = {
       html: { min: 1, max: 10 },
       css: { min: 1, max: 10 },
       js: { min: 1, max: 10 }
     };
 
-    // Watchers
     watch(() => route.params.language, (newLanguage) => {
       language.value = newLanguage;
       id.value = Math.max(
@@ -99,7 +95,6 @@ export default {
       clearEditors();
     });
 
-    // Métodos
     const fetchQuestion = async () => {
       try {
         loading.value = true;
@@ -167,7 +162,6 @@ export default {
             text: message,
           });
 
-          // Llamar a la función para actualizar el nivel del usuario
           await updateUserLevel();
 
           const nextId = id.value + 1;
@@ -209,14 +203,23 @@ export default {
             },
             body: JSON.stringify({
               userId: parseInt(localStorage.getItem('userId')),
-              nivel: id.value
+              nivel: id.value,
+              language: language.value
             })
           }
         );
 
         if (!response.ok) throw new Error("Error a l'actualizar el nivell");
+
+        const data = await response.json();
+        console.log("Nivel actualizado:", data);
       } catch (error) {
         console.error("Error en actualizarNivel:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: "No s'ha pogut actualitzar el nivell",
+        });
       }
     };
 
