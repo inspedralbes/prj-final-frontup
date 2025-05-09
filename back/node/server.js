@@ -104,6 +104,8 @@ io.on('connection', (socket) => {
             return;
         }
 
+        room.users = room.users.filter(u => u.id !== socket.id && u.name !== userName);
+
         room.users.push({ id: socket.id, name: userName, avatar });
         socket.join(roomId);
 
@@ -114,8 +116,9 @@ io.on('connection', (socket) => {
         });
 
         socket.emit('joinedRoom', { projectId });
-        updateActiveUsers(roomId); // 👈
+        updateActiveUsers(roomId);
     });
+
 
     function updateActiveUsers(roomId) {
         const room = rooms.get(roomId);
