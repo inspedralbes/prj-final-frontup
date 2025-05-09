@@ -123,6 +123,8 @@ export default {
   color: #b0b0b0;
   line-height: 1.6;
   max-width: 80%;
+  margin-left: 10px;
+  margin-top: 0;
 }
 
 .card-container {

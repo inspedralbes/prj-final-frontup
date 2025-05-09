@@ -148,42 +148,42 @@ export default {
   max-width: 100%;
   margin: auto;
   padding: 30px;
-  padding-top: 80px;
   text-align: center;
-  background-color: #252323;
-  border-radius: 10px;
+
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .title {
-  color: white;
+  color: #f3f4f6;
   text-align: left;
   margin-bottom: 20px;
+  font-size: 2rem;
+  font-weight: bold;
 }
 
 .header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  padding: 10px;
+  gap: 20px;
 }
 
 .search-bar {
-  width: 200vh;
-  align-self: flex-start;
+  flex-grow: 1;
+  max-width: 400px;
 }
 
 .filter-input {
   width: 100%;
-  max-width: 400px;
   padding: 10px;
   font-size: 16px;
-  border-radius: 5px;
-  border: none;
+  border-radius: 8px;
+  border: 1px solid #444;
   outline: none;
-  background-color: #3a3a3a;
-  color: #ddd;
+  background-color: #434952;
+  color: #e5e7eb;
 }
 
 .sort-container {
@@ -194,36 +194,52 @@ export default {
 
 .sort-label {
   font-size: 16px;
-  color: #fff;
+  color: #e5e7eb;
 }
 
 .sort-select {
   padding: 10px;
   font-size: 16px;
-  border-radius: 5px;
-  border: none;
+  border-radius: 8px;
+  border: 1px solid #555;
   outline: none;
-  background-color: #2c2c2c;
-  color: #fff;
+  background-color: #434952;
+  color: #f3f4f6;
   cursor: pointer;
 }
 
 .loading,
 .error {
   font-size: 18px;
-  color: #ff4d4d;
+  color: #f87171;
 }
 
 .no-projects {
   font-size: 18px;
-  color: #ffb74d;
+  color: #facc15;
 }
 
 .projects-list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 30px;
-  padding: 10px;
+  padding: 10px 0;
+}
+
+.delete-btn {
+  margin-top: 10px;
+  padding: 8px 14px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.delete-btn:hover {
+  background-color: #dc2626;
 }
 
 .pagination {
@@ -232,41 +248,27 @@ export default {
   justify-content: center;
   align-items: center;
   gap: 15px;
-  color: white;
-  padding-top: 10px;
+  color: #e5e7eb;
+  padding-top: 20px;
 }
 
 .page-btn {
   padding: 10px 15px;
-  background-color: #444;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.page-btn:disabled {
-  background-color: #666;
-  cursor: not-allowed;
-}
-
-.page-btn:hover:not(:disabled) {
-  background-color: #777;
-}
-
-.delete-btn {
-  margin-top: 10px;
-  padding: 8px 12px;
-  background-color: #ff4d4d;
-  color: white;
-  border: none;
-  border-radius: 5px;
+  background-color: #3b3b3b;
+  color: #e2e8f0;
+  border: 1px solid #555;
+  border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
-.delete-btn:hover {
-  background-color: #e60000;
+.page-btn:disabled {
+  background-color: #555;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.page-btn:hover:not(:disabled) {
+  background-color: #525252;
 }
 </style>
