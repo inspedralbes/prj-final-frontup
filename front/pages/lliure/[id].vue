@@ -1,24 +1,30 @@
 <template>
   <div class="todo">
     <header class="header" v-show="!isExpanded">
-  <div class="header-row">
-    <button class="header-button" @click="goBack">Atrás</button>
-    <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
-      :readonly="!isEditing" />
-    <button class="header-button" @click="generateShareCode">Compartir</button>
-  </div>
+      <div class="header-row">
+        <button class="header-button" @click="goBack">Atrás</button>
+        <input
+          type="text"
+          v-model="title"
+          class="header-title"
+          @focus="isEditing = true"
+          @blur="isEditing = false"
+          :readonly="!isEditing"
+        />
+        <button class="header-button" @click="generateShareCode">
+          Compartir
+        </button>
+      </div>
 
-  <div class="header-row">
-    <button class="header-button" @click="toggleChat">Xat IA</button>
-    <button class="header-button" @click="guardarProyecto">Guardar</button>
-    <select v-model="isPrivate" @change="savePrivacy" class="header-select">
-      <option :value="0">Público</option>
-      <option :value="1">Privado</option>
-    </select>
-  </div>
-</header>
-
-    
+      <div class="header-row">
+        <button class="header-button" @click="toggleChat">Xat IA</button>
+        <button class="header-button" @click="guardarProyecto">Guardar</button>
+        <select v-model="isPrivate" @change="savePrivacy" class="header-select">
+          <option :value="0">Público</option>
+          <option :value="1">Privado</option>
+        </select>
+      </div>
+    </header>
 
     <!-- Indicador de colaboración activa -->
     <div v-if="isCollaborating" class="collaboration-active">
@@ -28,30 +34,42 @@
 
     <!-- Botones de layout -->
     <div class="layout-buttons">
-  <!-- Sidebar izquierda -->
-  <button class="button-position" @click="setLayout('left')" aria-label="Sidebar izquierda">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <rect x="3" y="3" width="6" height="18"/>
-      <rect x="11" y="3" width="10" height="18" opacity="0.3"/>
-    </svg>
-  </button>
+      <!-- Sidebar izquierda -->
+      <button
+        class="button-position"
+        @click="setLayout('left')"
+        aria-label="Sidebar izquierda"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="3" y="3" width="6" height="18" />
+          <rect x="11" y="3" width="10" height="18" opacity="0.3" />
+        </svg>
+      </button>
 
-  <!-- Sidebar derecha -->
-  <button class="button-position" @click="setLayout('right')" aria-label="Sidebar derecha">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <rect x="15" y="3" width="6" height="18"/>
-      <rect x="3"  y="3" width="10" height="18" opacity="0.3"/>
-    </svg>
-  </button>
+      <!-- Sidebar derecha -->
+      <button
+        class="button-position"
+        @click="setLayout('right')"
+        aria-label="Sidebar derecha"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="15" y="3" width="6" height="18" />
+          <rect x="3" y="3" width="10" height="18" opacity="0.3" />
+        </svg>
+      </button>
 
-  <!-- Layout normal (editors arriba, salida abajo) -->
-  <button class="button-position" @click="setLayout('normal')" aria-label="Layout normal">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <rect x="3"  y="3"  width="18" height="6"/>
-      <rect x="3"  y="11" width="18" height="10" opacity="0.3"/>
-    </svg>
-  </button>
-</div>
+      <!-- Layout normal (editors arriba, salida abajo) -->
+      <button
+        class="button-position"
+        @click="setLayout('normal')"
+        aria-label="Layout normal"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="3" y="3" width="18" height="6" />
+          <rect x="3" y="11" width="18" height="10" opacity="0.3" />
+        </svg>
+      </button>
+    </div>
 
     <!-- Modal para compartir código de colaboración -->
     <div v-if="showShareModal" class="modal-overlay" @click="closeShareModal">
@@ -59,39 +77,67 @@
         <h2>Codi de col·laboració</h2>
         <div class="share-code-container">
           <p class="share-code">{{ shareCode }}</p>
-          <button class="modal-button copy-button" @click="copyShareCode">Copiar</button>
+          <button class="modal-button copy-button" @click="copyShareCode">
+            Copiar
+          </button>
         </div>
-        <p class="share-instructions">Comparteix aquest codi amb altres usuaris perquè puguin unir-se i editar aquest projecte en temps real.</p>
+        <p class="share-instructions">
+          Comparteix aquest codi amb altres usuaris perquè puguin unir-se i
+          editar aquest projecte en temps real.
+        </p>
         <div class="modal-actions">
-          <button type="button" class="modal-button" @click="closeShareModal">Tancar</button>
+          <button type="button" class="modal-button" @click="closeShareModal">
+            Tancar
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Modal para guardar antes de salir -->
-    <div v-if="guardarParaSalir" class="modal-overlay" @click="closeGuardarParaSalir">
+    <div
+      v-if="guardarParaSalir"
+      class="modal-overlay"
+      @click="closeGuardarParaSalir"
+    >
       <div class="modal-content" @click.stop>
         <h2>Vols guardar aquest projecte?</h2>
         <form @submit.prevent="guardarProyecto2">
           <div class="modal-actions">
             <button type="submit" class="modal-button">Guardar</button>
-            <button type="button" class="modal-button cancel" @click="volverHome">Cancel·lar</button>
+            <button
+              type="button"
+              class="modal-button cancel"
+              @click="volverHome"
+            >
+              Cancel·lar
+            </button>
           </div>
         </form>
       </div>
     </div>
 
     <!-- Chat IA flotante -->
-    <div v-if="isChatVisible" class="chat-container"
-      :style="{ transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)` }" @mousedown="startDrag">
+    <div
+      v-if="isChatVisible"
+      class="chat-container"
+      :style="{
+        transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)`,
+      }"
+      @mousedown="startDrag"
+    >
       <button class="close-chat-button" @click="toggleChat">✖</button>
       <h2 class="chat-title">IA FrontUp</h2>
       <div class="messages-container" ref="messagesContainer">
-        <div v-for="(msg, index) in messages" :key="index" class="message" :class="{
-          user: msg.type === 'user',
-          ai: msg.type === 'ai',
-          loading: msg.type === 'loading'
-        }">
+        <div
+          v-for="(msg, index) in messages"
+          :key="index"
+          class="message"
+          :class="{
+            user: msg.type === 'user',
+            ai: msg.type === 'ai',
+            loading: msg.type === 'loading',
+          }"
+        >
           <div v-if="msg.type === 'loading'" class="loading-indicator">
             <div class="dot-flashing"></div>
           </div>
@@ -99,27 +145,50 @@
         </div>
       </div>
       <div class="input-container">
-        <input type="text" v-model="newMessage" placeholder="Escribe tu mensaje..." class="chat-input"
-          @keyup.enter="sendMessage" :disabled="state.loading" />
-        <button class="send-button" @click="sendMessage" :disabled="state.loading">
-          {{ state.loading ? 'Enviant...' : 'Enviar' }}
+        <input
+          type="text"
+          v-model="newMessage"
+          placeholder="Escribe tu mensaje..."
+          class="chat-input"
+          @keyup.enter="sendMessage"
+          :disabled="state.loading"
+        />
+        <button
+          class="send-button"
+          @click="sendMessage"
+          :disabled="state.loading"
+        >
+          {{ state.loading ? "Enviant..." : "Enviar" }}
         </button>
       </div>
     </div>
 
     <!-- Layout dinámico -->
     <div :class="['layout', 'layout-' + layoutType]">
-
-         <!-- Tabs solo para móvil -->
+      <!-- botones solo para móvil -->
       <div class="editor-tabs" v-if="isMobile">
-        <button :class="{ active: activeTab === 'html' }" @click="activeTab = 'html'">html</button>
-        <button :class="{ active: activeTab === 'css' }" @click="activeTab = 'css'">css</button>
-        <button :class="{ active: activeTab === 'js' }" @click="activeTab = 'js'">js</button>
+        <button
+          :class="{ active: activeTab === 'html' }"
+          @click="activeTab = 'html'"
+        >
+          html
+        </button>
+        <button
+          :class="{ active: activeTab === 'css' }"
+          @click="activeTab = 'css'"
+        >
+          css
+        </button>
+        <button
+          :class="{ active: activeTab === 'js' }"
+          @click="activeTab = 'js'"
+        >
+          js
+        </button>
       </div>
       <!-- Contenedor principal de editores -->
       <div class="editor-container">
         <div class="editor-box" v-show="!isMobile || activeTab === 'html'">
-
           <div class="editor-label">HTML</div>
           <div ref="htmlEditor" class="code-editor"></div>
         </div>
@@ -127,18 +196,31 @@
           <div class="editor-label">CSS</div>
           <div ref="cssEditor" class="code-editor"></div>
         </div>
-        <div class="editor-box" v-show="!isMobile || activeTab === 'js'"
-        >
+        <div class="editor-box" v-show="!isMobile || activeTab === 'js'">
           <div class="editor-label">JS</div>
           <div ref="jsEditor" class="code-editor"></div>
         </div>
       </div>
 
       <!-- Contenedor de salida -->
-      <div class="output-container" :class="{ expanded: isExpanded }" ref="outputContainer">
+      <div
+        class="output-container"
+        :class="{ expanded: isExpanded }"
+        ref="outputContainer"
+      >
         <button class="expand-button" @click="toggleExpand">
-          <img v-if="!isExpanded" src="/assets/img/pantalla-grande.svg" alt="Maximitzar" width="30" />
-          <img v-else src="/assets/img/pantalla-pequeña.svg" alt="Minimitzar" width="30" />
+          <img
+            v-if="!isExpanded"
+            src="/assets/img/pantalla-grande.svg"
+            alt="Maximitzar"
+            width="30"
+          />
+          <img
+            v-else
+            src="/assets/img/pantalla-pequeña.svg"
+            alt="Minimitzar"
+            width="30"
+          />
         </button>
         <div class="resize-bar" @mousedown="startResize"></div>
         <iframe class="output" :srcdoc="output"></iframe>
@@ -198,11 +280,13 @@ export default {
     const isChatVisible = ref(false);
     const newMessage = ref("");
     const cambiadoSinGuardar = ref(false);
-    const messages = ref([{ type: "ai", content: "¡Hola! ¿En qué puedo ayudarte hoy?" }]);
+    const messages = ref([
+      { type: "ai", content: "¡Hola! ¿En qué puedo ayudarte hoy?" },
+    ]);
     const messagesContainer = ref(null);
     const guardarParaSalir = ref(false);
     const isPrivate = ref(0);
-    const layoutType = ref('normal');
+    const layoutType = ref("normal");
 
     // Nuevas variables para la colaboración en tiempo real
     const showShareModal = ref(false);
@@ -262,8 +346,8 @@ export default {
     };
 
     const setLayout = (dir) => {
-      layoutType.value = dir
-    }
+      layoutType.value = dir;
+    };
     onMounted(async () => {
       lliureStore.toggleLliure();
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
@@ -274,13 +358,13 @@ export default {
         autoCloseBrackets: true,
         matchTags: { bothTags: true },
         extraKeys: {
-          "Ctrl-Space": "autocomplete"
+          "Ctrl-Space": "autocomplete",
         },
       });
       htmlEditorInstance.on("inputRead", (editor, change) => {
         if (change.text[0] === "<") {
           editor.showHint({
-            completeSingle: false
+            completeSingle: false,
           });
         }
       });
@@ -306,8 +390,8 @@ export default {
         lineNumbers: true,
         autoCloseBrackets: true,
         extraKeys: {
-          "Ctrl-Space": "autocomplete"
-        }
+          "Ctrl-Space": "autocomplete",
+        },
       });
 
       const projectId = route.params.id;
@@ -344,87 +428,90 @@ export default {
         const newValue = instance.getValue();
         html.value = newValue;
         markDirty();
-        
+
         if (isCollaborating.value) {
           socket.value.emit("html-change", {
             code: newValue,
-            roomId: shareCode.value
+            roomId: shareCode.value,
           });
         }
       });
-      
+
       cssEditorInstance.on("change", (instance) => {
         const newValue = instance.getValue();
         css.value = newValue;
         markDirty();
-        
+
         if (isCollaborating.value) {
           socket.value.emit("css-change", {
             code: newValue,
-            roomId: shareCode.value
+            roomId: shareCode.value,
           });
         }
       });
-      
+
       jsEditorInstance.on("change", (instance) => {
         const newValue = instance.getValue();
         js.value = newValue;
         markDirty();
-        
+
         if (isCollaborating.value) {
           socket.value.emit("js-change", {
             code: newValue,
-            roomId: shareCode.value
+            roomId: shareCode.value,
           });
         }
       });
     });
     const initSocketConnection = () => {
       socket.value = io("http://localhost:5000");
-      
+
       socket.value.on("connect", () => {
         console.log("Conectado al servidor de socket");
       });
-      
+
       socket.value.on("html-change", (newValue) => {
         if (newValue !== html.value) {
           html.value = newValue;
           htmlEditorInstance.setValue(newValue);
         }
       });
-      
+
       socket.value.on("css-change", (newValue) => {
         if (newValue !== css.value) {
           css.value = newValue;
           cssEditorInstance.setValue(newValue);
         }
       });
-      
+
       socket.value.on("js-change", (newValue) => {
         if (newValue !== js.value) {
           js.value = newValue;
           jsEditorInstance.setValue(newValue);
         }
       });
-      
-      socket.value.on("initial-state", ({ html: htmlCode, css: cssCode, js: jsCode }) => {
-        html.value = htmlCode;
-        css.value = cssCode;
-        js.value = jsCode;
-        
-        htmlEditorInstance.setValue(htmlCode);
-        cssEditorInstance.setValue(cssCode);
-        jsEditorInstance.setValue(jsCode);
-      });
-      
+
+      socket.value.on(
+        "initial-state",
+        ({ html: htmlCode, css: cssCode, js: jsCode }) => {
+          html.value = htmlCode;
+          css.value = cssCode;
+          js.value = jsCode;
+
+          htmlEditorInstance.setValue(htmlCode);
+          cssEditorInstance.setValue(cssCode);
+          jsEditorInstance.setValue(jsCode);
+        }
+      );
+
       socket.value.on("user-joined", () => {
         activeUsers.value++;
       });
-      
+
       socket.value.on("user-left", () => {
         activeUsers.value = Math.max(1, activeUsers.value - 1);
       });
-      
+
       socket.value.on("room-users", ({ count }) => {
         activeUsers.value = count;
       });
@@ -433,7 +520,7 @@ export default {
     onUnmounted(() => {
       lliureStore.toggleLliure();
       idProyectoActualStore.vaciarId();
-      
+
       if (socket.value) {
         socket.value.disconnect();
       }
@@ -441,9 +528,12 @@ export default {
 
     const generateShareCode = () => {
       // Generar un código aleatorio de 6 caracteres alfanuméricos
-      const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const randomCode = Math.random()
+        .toString(36)
+        .substring(2, 8)
+        .toUpperCase();
       shareCode.value = randomCode;
-      
+
       // Crear la room en el servidor
       socket.value.emit("create-room", {
         roomId: randomCode,
@@ -451,10 +541,10 @@ export default {
         initialData: {
           html: html.value,
           css: css.value,
-          js: js.value
-        }
+          js: js.value,
+        },
       });
-      
+
       isCollaborating.value = true;
       showShareModal.value = true;
     };
@@ -470,12 +560,12 @@ export default {
 
     const joinCollaborationSession = (code) => {
       shareCode.value = code;
-      
+
       socket.value.emit("join-room", {
         roomId: code,
-        projectId: idProyectoActualStore.id
+        projectId: idProyectoActualStore.id,
       });
-      
+
       isCollaborating.value = true;
     };
 
@@ -499,7 +589,12 @@ export default {
       messages.value.push({ type: "loading", content: "" });
 
       try {
-        const response = await chatIA(userMessage, html.value, css.value, js.value);
+        const response = await chatIA(
+          userMessage,
+          html.value,
+          css.value,
+          js.value
+        );
         messages.value.pop();
         messages.value.push({ type: "ai", content: response });
       } catch (error) {
@@ -511,7 +606,8 @@ export default {
       } finally {
         await nextTick();
         if (messagesContainer.value) {
-          messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+          messagesContainer.value.scrollTop =
+            messagesContainer.value.scrollHeight;
         }
       }
     };
@@ -537,7 +633,10 @@ export default {
         router.push("/");
       } else {
         guardarParaSalir.value = true;
-        console.log("¿Se muestra el guardar para salir?", guardarParaSalir.value);
+        console.log(
+          "¿Se muestra el guardar para salir?",
+          guardarParaSalir.value
+        );
       }
     };
 
@@ -569,7 +668,7 @@ export default {
         if (response.success == false) {
           console.log(response.message);
         }
-        if(response.success == false) {
+        if (response.success == false) {
           console.log(response.message);
         }
       } catch (error) {
@@ -582,8 +681,8 @@ export default {
     const outputContainer = ref(null);
     const startResize = (event) => {
       isResizing = true;
-      document.addEventListener('mousemove', handleResize);
-      document.addEventListener('mouseup', stopResize);
+      document.addEventListener("mousemove", handleResize);
+      document.addEventListener("mouseup", stopResize);
     };
 
     const handleResize = (event) => {
@@ -594,22 +693,27 @@ export default {
 
     const stopResize = () => {
       isResizing = false;
-      document.removeEventListener('mousemove', handleResize);
-      document.removeEventListener('mouseup', stopResize);
+      document.removeEventListener("mousemove", handleResize);
+      document.removeEventListener("mouseup", stopResize);
     };
 
+   
 
-    const isMobile = ref(false)
-    const activeTab = ref('html')
+      const isMobile = ref(false)
+      const activeTab = ref('html')
 
-    onMounted(() => {
       const checkMobile = () => {
         isMobile.value = window.innerWidth <= 450
       }
 
-      checkMobile()
-      window.addEventListener('resize', checkMobile)
-    })
+      onMounted(() => {
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+      })
+
+      onUnmounted(() => {
+        window.removeEventListener('resize', checkMobile)
+      })
 
 
     return {
@@ -656,6 +760,8 @@ export default {
       activeUsers,
       outputContainer,
       startResize,
+      isMobile,
+      activeTab,
       output: computed(() => {
         let jsContent = js.value;
         let scriptContent = `
@@ -683,7 +789,7 @@ export default {
   display: flex;
   flex-direction: column;
   background-color: #1e1e1e;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
   color: #ffffff;
   margin-left: -210px;
   margin-left: -210px;
@@ -715,7 +821,7 @@ export default {
 }
 
 .header-title:focus {
-  border-color: #4CAF50;
+  border-color: #4caf50;
   background-color: #292929;
   outline: none;
 }
@@ -753,8 +859,8 @@ export default {
 .layout-buttons {
   display: flex;
   gap: 12px;
-  align-self: flex-end;      /* sitúa el bloque a la derecha */
-  margin: 20px 20px 0 0;     /* separaciones: top, right, bottom, left */
+  align-self: flex-end; /* sitúa el bloque a la derecha */
+  margin: 20px 20px 0 0; /* separaciones: top, right, bottom, left */
 }
 
 .header-button:hover {
@@ -799,7 +905,6 @@ export default {
   background-color: #1e1e1e;
   color: #fff;
 }
-
 
 .output-container {
   position: relative;
@@ -1007,12 +1112,12 @@ export default {
   background-color: #9880ff;
   color: #9880ff;
   animation: dotFlashing 1s infinite linear alternate;
-  animation-delay: .5s;
+  animation-delay: 0.5s;
 }
 
 .dot-flashing::before,
 .dot-flashing::after {
-  content: '';
+  content: "";
   display: inline-block;
   position: absolute;
   top: 0;
@@ -1103,7 +1208,6 @@ export default {
   background-color: transparent;
 }
 
-
 .header-select {
   background-color: #2e2e2e;
   color: #fff;
@@ -1128,89 +1232,86 @@ export default {
   flex-direction: row-reverse;
 }
 
-.layout-left  .editor-container,
+.layout-left .editor-container,
 .layout-right .editor-container {
-  display: flex;           
-  flex-direction: column; 
-  width: 45vw;             
-  max-width: 50vw;         
+  display: flex;
+  flex-direction: column;
+  width: 45vw;
+  max-width: 50vw;
   max-height: 90vh;
-  overflow-y: auto;        
+  overflow-y: auto;
 }
 
-.layout-left  .output-container,
+.layout-left .output-container,
 .layout-right .output-container {
   flex: 1;
 }
 
-
-    
 @media (max-width: 450px) {
   .todo {
-  display: flex;
-  flex-direction: column;
-  background-color: #1e1e1e;
-  font-family: 'Arial', sans-serif;
-  color: #ffffff;
-  margin-left: -90%;
-}
-.button-position{
-  display: none;     
-}
-
-.header {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  height: 100px;
-}
-
-.header-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.header-title {
-  font-size: 18px;
-  color: #ffffff;
-  background-color: transparent;
-  border: 2px solid transparent;
-  padding: 10px 12px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  text-align: center;
-  min-width: 180px;
-}
-
- .editor-container {
-    display: block;
-  } 
-
-.editor-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 15px;
-  color: red;
-}
-
-.editor-tabs button {
-  padding: 10px 20px;
-  border: none;
-  background-color: #444;
-  color: #fff;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-}
-
-.editor-tabs button.active,
-.editor-tabs button:hover {
-  background-color: #666;
-}
-
-
+    display: flex;
+    flex-direction: column;
+    background-color: #1e1e1e;
+    font-family: "Arial", sans-serif;
+    color: #ffffff;
+    margin-left: -90%;
+  }
+  .button-position {
+    display: none;
   }
 
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100px;
+  }
+
+  .header-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-title {
+    font-size: 18px;
+    color: #ffffff;
+    background-color: transparent;
+    border: 2px solid transparent;
+    padding: 10px 12px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    text-align: center;
+    min-width: 180px;
+  }
+
+  .editor-container {
+    display: block;
+  }
+
+  .editor-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    color: red;
+  }
+
+  .editor-tabs button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #444;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+
+  .output-container {
+  height: 50vh;
+}
+
+
+
+}
 </style>
