@@ -93,10 +93,10 @@ io.on('connection', (socket) => {
 
         socket.join(roomId);
         socket.emit('room-created', { roomId });
-        updateActiveUsers(roomId); // 👈 actualitza la llista
+        updateActiveUsers(roomId);
     });
 
-
+    //Unir-se a una room
     socket.on('join-room', ({ roomId, projectId, userName, avatar }) => {
         const room = rooms.get(roomId);
         if (!room) {
@@ -132,7 +132,7 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('active-users', usersInfo);
     }
 
-
+    //Desconecta-se d'una room
     socket.on('disconnect', () => {
         console.log(`Usuari desconnectat: ${socket.id}`);
         for (const [roomId, room] of rooms.entries()) {
@@ -154,8 +154,7 @@ io.on('connection', (socket) => {
     });
 
 
-
-    // Manejar cambios en HTML
+    // Canvis en el editor de codi del HTML
     socket.on('html-change', ({ code, roomId }) => {
         const room = rooms.get(roomId);
         if (!room) return;
@@ -163,7 +162,7 @@ io.on('connection', (socket) => {
         socket.to(roomId).emit('html-change', code);
     });
 
-    // Manejar cambios en CSS
+    // Canvis en el editor de codi del CSS
     socket.on('css-change', ({ code, roomId }) => {
         const room = rooms.get(roomId);
         if (!room) return;
@@ -171,7 +170,7 @@ io.on('connection', (socket) => {
         socket.to(roomId).emit('css-change', code);
     });
 
-    // Manejar cambios en JS
+    // Canvis en el editor de codi del JS
     socket.on('js-change', ({ code, roomId }) => {
         const room = rooms.get(roomId);
         if (!room) return;

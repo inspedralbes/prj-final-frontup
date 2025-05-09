@@ -34,7 +34,6 @@
           </svg>
         </button>
 
-        <!-- Sidebar derecha -->
         <button class="button-position" @click="setLayout('right')" aria-label="Sidebar derecha">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <rect x="15" y="3" width="6" height="18" />
@@ -42,7 +41,6 @@
           </svg>
         </button>
 
-        <!-- Layout normal (editors arriba, salida abajo) -->
         <button class="button-position" @click="setLayout('normal')" aria-label="Layout normal">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <rect x="3" y="3" width="18" height="6" />
@@ -116,9 +114,7 @@
     </div>
 
 
-    <!-- Layout dinámico -->
     <div :class="['layout', 'layout-' + layoutType]">
-      <!-- Contenedor principal de editores -->
       <div class="editor-container">
         <div class="editor-box">
           <div class="editor-label">HTML</div>
@@ -185,7 +181,7 @@ const {
 } = useCommunicationManager();
 const lliureStore = useLliureStore();
 
-// Variables para las alertas mejoradas 
+// Variables per les alertes 
 const alertVisible = ref(false);
 const alertSuccess = ref(false);
 const alertText = ref('');
@@ -208,6 +204,7 @@ const guardarParaSalir = ref(false);
 const isPrivate = ref(0);
 const layoutType = ref('normal');
 
+//Variables per als sockets
 const showShareModal = ref(false);
 const shareCode = ref("");
 const socket = ref(null);
@@ -367,19 +364,14 @@ onMounted(async () => {
     console.error("No se encontró un ID de proyecto válido en la ruta.");
   }
 
-  // Inicializar conexión de socket
   initSocketConnection();
 
-  // Verificar si hay un código de colaboración en la URL
   const collabCode = route.query.code;
   if (collabCode) {
     joinCollaborationSession(collabCode);
   }
 
-  // Modificar los event listeners para incluir la emisión de cambios por socket
-  // y prevenir loops de actualización
   htmlEditorInstance.on("change", (instance) => {
-    // Ignorar cambios que vienen de actualizaciones remotas
     if (isApplyingExternalChanges.value.html) return;
 
 
@@ -398,7 +390,6 @@ onMounted(async () => {
 
 
   cssEditorInstance.on("change", (instance) => {
-    // Ignorar cambios que vienen de actualizaciones remotas
     if (isApplyingExternalChanges.value.css) return;
 
 
@@ -417,7 +408,6 @@ onMounted(async () => {
 
 
   jsEditorInstance.on("change", (instance) => {
-    // Ignorar cambios que vienen de actualizaciones remotas
     if (isApplyingExternalChanges.value.js) return;
 
 
@@ -456,7 +446,6 @@ const initSocketConnection = () => {
         html.value = newValue;
         htmlEditorInstance.setValue(newValue);
       } finally {
-        // Usar setTimeout para asegurar que se ejecuta después de los eventos internos de CodeMirror
         setTimeout(() => {
           isApplyingExternalChanges.value.html = false;
         }, 0);
@@ -590,7 +579,6 @@ const guardarProyecto2 = () => {
   setTimeout(() => {
     if (prevGuardarParaSalir) {
       guardarParaSalir.value = false;
-      // Solo navegar a home si el guardado fue exitoso (no hay alerta de error visible)
       if (!alertVisible.value || alertSuccess.value) {
         router.push("/");
       }
@@ -675,7 +663,6 @@ const guardarProyecto = async () => {
     return;
   }
 
-  // Verificar si el usuario está autenticado
   if (!localStorage.getItem('loginInfo')) {
     showAlert("Has d'iniciar sessió per guardar aquest projecte", false);
     return;
