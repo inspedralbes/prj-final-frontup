@@ -220,6 +220,9 @@
         </div>
       </div>
     </div>
+
+    <AlertComponent v-if="alertVisible" :success="false" :text="'Has d\'iniciar sessió per crear un projecte nou.'"
+      :duration="3000" @close="alertVisible = false" />
   </div>
   <NuxtPage />
   <footer>
@@ -228,13 +231,14 @@
 </template>
 
 <script setup>
-import { useLliureStore } from "~/stores/app";
-import { useAppStore } from "@/stores/app";
-import { useIdProyectoActualStore } from "@/stores/app";
-import useCommunicationManager from "@/stores/comunicationManager";
-import { ref, watch, onMounted, reactive, computed } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import { useBuscadorStore } from "@/stores/app";
+import { useLliureStore } from '~/stores/app';
+import { useAppStore } from '@/stores/app';
+import { useIdProyectoActualStore } from '@/stores/app';
+import useCommunicationManager from '@/stores/comunicationManager';
+import { ref, watch, onMounted, reactive, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useBuscadorStore } from '@/stores/app';
+import AlertComponent from './components/AlertComponent.vue';
 
 const showCollaborationModal = ref(false);
 const idProyectoActualStore = useIdProyectoActualStore();
@@ -248,6 +252,8 @@ const lliureStore = useLliureStore();
 const buscadorStore = useBuscadorStore();
 const comunicationManager = useCommunicationManager();
 const roomId = computed(() => route.params.id || "default-room");
+
+const alertVisible = ref(false);
 
 onMounted(() => {
   comunicationManager.connect();
@@ -293,7 +299,8 @@ const joinCollaboration = () => {
 };
 
 const navigateToLliure = async () => {
-  if (appStore.loginInfo.id != null) {
+  // Verificar si existe loginInfo en localStorage
+  if (localStorage.getItem('loginInfo') !== null) {
     try {
       projecte.result = await comunicationManager.crearProyectoDB({
         nombre: "untitled",
@@ -304,15 +311,16 @@ const navigateToLliure = async () => {
       });
       console.log("lo que devuelve");
       console.log(projecte.result.id);
+
+      let id = projecte.result.id;
+      idProyectoActualStore.actalizarId(id);
+      localStorage.setItem("idProyectoActual", id);
+      router.push(`/lliure/${id}`);
     } catch (error) {
       console.error(error);
     }
-    let id = projecte.result.id;
-    idProyectoActualStore.actalizarId(id);
-    localStorage.setItem("idProyectoActual", id);
-    router.push(`/lliure/${id}`);
   } else {
-    showAlert(`Registra't per crear un projecte`);
+    alertVisible.value = true;
   }
 };
 
@@ -358,12 +366,7 @@ watch(route, () => {
 
 <style>
 body {
-  background-color: rgb(29, 32, 39);
-  margin-left: 200px;
-}
-
-h2 {
-  padding: 10px;
+  margin-left: 205px;
 }
 
 .leftsection-alert {
@@ -372,7 +375,6 @@ h2 {
   top: 20px;
   right: 20px;
   padding: 4vh 4vw;
-  background: #ff4444;
   color: white;
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -404,21 +406,6 @@ h2 {
   100% {
     opacity: 0;
   }
-}
-
-.volver-btn {
-  padding: 10px 15px;
-  background-color: #444;
-  color: #fff;
-  cursor: pointer;
-  text-transform: uppercase;
-  border-radius: 4px;
-  border: none;
-  transition: background-color 0.3s ease;
-}
-
-.volver-btn:hover {
-  background-color: #555;
 }
 
 .leftsection-card {
@@ -597,6 +584,7 @@ footer {
   background: linear-gradient(90deg, #5e81ac, #81a1c1);
   color: #fff;
 }
+
 .modal-actions button:not(.cancel):hover {
   filter: brightness(1.1);
   transform: translateY(-2px);
@@ -606,6 +594,7 @@ footer {
   background: linear-gradient(90deg, #bf616a, #d08770);
   color: #eceff4;
 }
+
 .modal-actions .cancel:hover {
   filter: brightness(1.1);
   transform: translateY(-2px);
@@ -614,8 +603,6 @@ footer {
 .toggle-navbar-btn {
   display: none;
 }
-
-
 
 @media (max-width: 800px) {
   .toggle-navbar-btn {
@@ -631,7 +618,6 @@ footer {
     z-index: 1001;
   }
   
-
   .navbar {
     display: block;
     position: fixed;
@@ -643,30 +629,29 @@ footer {
     transition: transform 0.4s ease-in-out;
     transform: translateX(-100%);
     z-index: 1000;
+  }
 
-    &.show {
-      transform: translateX(0);
-    }
+  .navbar.show {
+    transform: translateX(0);
+  }
 
-    &.hide {
-      transform: translateX(-100%);
-    }
+  .navbar.hide {
+    transform: translateX(-100%);
   }
 
   footer {
-  background-image: linear-gradient(
-    139deg,
-    rgba(34, 38, 47, 1) 0%,
-    rgba(32, 36, 42, 1) 50%,
-    rgba(28, 33, 42, 1) 100%
-  );
-  text-align: center;
-  padding: 10px 0px;
-  color: white;
-  margin-left: -35%;
+    background-image: linear-gradient(
+      139deg,
+      rgba(34, 38, 47, 1) 0%,
+      rgba(32, 36, 42, 1) 50%,
+      rgba(28, 33, 42, 1) 100%
+    );
+    text-align: center;
+    padding: 10px 0px;
+    color: white;
+    margin-left: -35%;
+  }
 }
-}
-
 
 @media (max-width: 450px) {
   .toggle-navbar-btn {
@@ -683,18 +668,18 @@ footer {
   }
 
   .top-navbar {
-  width: 50%;
-  height: 50px; 
-  background-color: transparent;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  box-sizing: border-box;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1002; 
-}
+    width: 50%;
+    height: 50px; 
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1002; 
+  }
 
   .navbar {
     display: block;
@@ -707,26 +692,27 @@ footer {
     transition: transform 0.4s ease-in-out;
     transform: translateX(-100%);
     z-index: 1000;
-
-    &.show {
-      transform: translateX(0);
-    }
-
-    &.hide {
-      transform: translateX(-100%);
-    }
   }
+
+  .navbar.show {
+    transform: translateX(0);
+  }
+
+  .navbar.hide {
+    transform: translateX(-100%);
+  }
+
   footer {
-  background-image: linear-gradient(
-    139deg,
-    rgba(34, 38, 47, 1) 0%,
-    rgba(32, 36, 42, 1) 50%,
-    rgba(28, 33, 42, 1) 100%
-  );
-  text-align: center;
-  padding: 10px 0px;
-  color: white;
-  margin-left: -90%;
-} 
+    background-image: linear-gradient(
+      139deg,
+      rgba(34, 38, 47, 1) 0%,
+      rgba(32, 36, 42, 1) 50%,
+      rgba(28, 33, 42, 1) 100%
+    );
+    text-align: center;
+    padding: 10px 0px;
+    color: white;
+    margin-left: -90%;
+  } 
 }
 </style>

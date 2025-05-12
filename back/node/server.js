@@ -25,25 +25,36 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 app.post("/pregunta", async (req, res) => {
     try {
         const { pregunta, html, css, js } = req.body;
-        let preguntaIA = 'Ets un programador frontend expert, respon a la següent pregunta tenint en compte que la persona a la qual li parles és un desenvolupador novençà, ' + pregunta;
-        if (html) preguntaIA += ' aquest es el meu html ' + html;
-        if (css) preguntaIA += ' aquest es el meu css ' + css;
-        if (js) preguntaIA += ' aquest es el meu js ' + js;
-        preguntaIA += ' Respon amb les mínimes paraules possibles encara que si fa falta pots allargar-te alguna cosa més però sense passar-te abastant tot el que està preguntant';
 
-        if (!preguntaIA) return res.status(400).send("La pregunta es requerida");
+        // 1) Context general en català
+        let prompt =
+            "Ets un programador frontend expert. Explica de forma clara a un desenvolupador novençà.\n\n" +
+            "Petició:\n" + pregunta + "\n\n";
 
-        const result = await model.generateContent(preguntaIA);
+        // 2) Afegeix el codi existent
+        if (html) prompt += "Aquest és el meu HTML:\n" + html + "\n\n";
+        if (css) prompt += "Aquest és el meu CSS:\n" + css + "\n\n";
+        if (js) prompt += "Aquest és el meu JS:\n" + js + "\n\n";
+
+        // 3) Instruccions de format en català
+        prompt += (
+            "INSTRUCCIONS DE FORMAT:\n" +
+            "- Si la petició és per **millorar** o donar suggeriments, respon **només en text**, sense blocs de codi.\n" +
+            "- Si la petició és de **implementació**, primer fes una breu explicació en text i després mostra el codi llest per copiar en un bloc entre triple backticks.\n"
+        );
+
+        // 4) Crida al model
+        const result = await model.generateContent(prompt);
         const response = await result.response;
-        const text = response.text();
+        const text = await response.text();
 
-        console.log('Respuesta:', text);
         res.send(text);
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send("Error al procesar la solicitud: " + error.message);
+        console.error(error);
+        res.status(500).send("Error: " + error.message);
     }
 });
+
 
 // Crear la funcionalitat de rooms
 const rooms = new Map();
@@ -53,34 +64,49 @@ app.get('/', (req, res) => {
     res.send('Socket.IO Server para FrontUp Collaboration');
 });
 
+app.get('/debug-rooms', (req, res) => {
+    const data = {};
+    rooms.forEach((value, key) => {
+        data[key] = {
+            projectId: value.projectId,
+            users: value.users
+        };
+    });
+    res.json(data);
+});
+
+
 io.on('connection', (socket) => {
     console.log(`Usuario conectado: ${socket.id}`);
 
     // Crear una nova room
-    socket.on('create-room', ({ roomId, projectId, initialData }) => {
+    socket.on('create-room', ({ roomId, projectId, initialData, userName, avatar }) => {
         console.log(`Creando room: ${roomId} para proyecto: ${projectId}`);
         rooms.set(roomId, {
             projectId,
             html: initialData.html || '',
             css: initialData.css || '',
             js: initialData.js || '',
-            users: [socket.id]
+            users: [{ id: socket.id, name: userName, avatar }]
         });
         projectRooms.set(projectId, roomId);
 
         socket.join(roomId);
         socket.emit('room-created', { roomId });
-        console.log(`Room ${roomId} creada amb èxit`);
+        updateActiveUsers(roomId);
     });
 
-    // Unir-se a una room existent
-    socket.on('join-room', ({ roomId, projectId }) => {
+    //Unir-se a una room
+    socket.on('join-room', ({ roomId, projectId, userName, avatar }) => {
         const room = rooms.get(roomId);
         if (!room) {
             socket.emit('error', { message: 'La sala no existeix' });
             return;
         }
-        room.users.push(socket.id);
+
+        room.users = room.users.filter(u => u.id !== socket.id && u.name !== userName);
+
+        room.users.push({ id: socket.id, name: userName, avatar });
         socket.join(roomId);
 
         socket.emit('initial-state', {
@@ -89,11 +115,46 @@ io.on('connection', (socket) => {
             js: room.js
         });
 
-        socket.to(roomId).emit('user-joined', { userId: socket.id });
         socket.emit('joinedRoom', { projectId });
+        updateActiveUsers(roomId);
     });
 
-    // Manejar cambios en HTML
+
+    function updateActiveUsers(roomId) {
+        const room = rooms.get(roomId);
+        if (!room) return;
+
+        const usersInfo = room.users.map(user => ({
+            name: user.name,
+            avatar: user.avatar || ''
+        }));
+
+        io.to(roomId).emit('active-users', usersInfo);
+    }
+
+    //Desconecta-se d'una room
+    socket.on('disconnect', () => {
+        console.log(`Usuari desconnectat: ${socket.id}`);
+        for (const [roomId, room] of rooms.entries()) {
+            const index = room.users.indexOf(socket.id);
+            if (index !== -1) {
+                room.users.splice(index, 1);
+                console.log(`Usuari ${socket.id} eliminat de la room ${roomId}`);
+                console.log(`Queden ${room.users.length} usuaris`);
+
+                updateActiveUsers(roomId);
+
+                if (room.users.length === 0) {
+                    rooms.delete(roomId);
+                    console.log(`Room ${roomId} eliminada per estar buida`);
+                }
+                break;
+            }
+        }
+    });
+
+
+    // Canvis en el editor de codi del HTML
     socket.on('html-change', ({ code, roomId }) => {
         const room = rooms.get(roomId);
         if (!room) return;
@@ -101,7 +162,7 @@ io.on('connection', (socket) => {
         socket.to(roomId).emit('html-change', code);
     });
 
-    // Manejar cambios en CSS
+    // Canvis en el editor de codi del CSS
     socket.on('css-change', ({ code, roomId }) => {
         const room = rooms.get(roomId);
         if (!room) return;
@@ -109,7 +170,7 @@ io.on('connection', (socket) => {
         socket.to(roomId).emit('css-change', code);
     });
 
-    // Manejar cambios en JS
+    // Canvis en el editor de codi del JS
     socket.on('js-change', ({ code, roomId }) => {
         const room = rooms.get(roomId);
         if (!room) return;
@@ -134,26 +195,8 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Manejar desconexió
-    socket.on('disconnect', () => {
-        console.log(`Usuario desconectado: ${socket.id}`);
-        rooms.forEach((room, roomId) => {
-            const userIndex = room.users.indexOf(socket.id);
-            if (userIndex !== -1) {
-                room.users.splice(userIndex, 1);
-                if (room.users.length === 0) {
-                    rooms.delete(roomId);
-                    if (projectRooms.get(room.projectId) === roomId) {
-                        projectRooms.delete(room.projectId);
-                    }
-                    console.log(`Room ${roomId} eliminada por inactividad`);
-                } else {
-                    io.to(roomId).emit('user-left', { userId: socket.id });
-                }
-            }
-        });
-    });
 });
+
 
 const PORT = 5000;
 server.listen(PORT, () => console.log("Servidor corriendo en http://localhost:" + PORT));

@@ -172,7 +172,7 @@ export default {
 
 <style scoped>
 .project-card {
-  background-color: #2c2c2c;
+  background: #2A2D3A;
   border-radius: 10px;
   text-align: center;
   color: #ddd;

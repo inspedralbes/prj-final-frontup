@@ -2,13 +2,13 @@
   <div class="login-wrapper">
     <div class="slider" :class="{ slide: showRegister }">
       <div>
-    <button v-if="showRegister" class="atras" @click="gohome">
-      FrontUp
-    </button>
-    <button v-else class="atras" @click="gohome">
-      FrontUp
-    </button>
-  </div>
+        <button v-if="showRegister" class="atras" @click="gohome">
+          FrontUp
+        </button>
+        <button v-else class="atras" @click="gohome">
+          FrontUp
+        </button>
+      </div>
       <div class="Formulario">
         <!-- Formulario de login -->
         <div class="left">
@@ -17,17 +17,9 @@
             <form @submit.prevent="login" novalidate>
               <div class="info">
                 <label for="email" class="label">Correu electrònic</label>
-                <input
-                  type="email"
-                  id="email"
-                  placeholder="Correu electrónic"
-                  v-model="formData.email"
-                  @blur="validateEmail"
-                  @keyup.enter="onEnterPressed('email')"
-                  required
-                  :class="{ 'input-error': errors.email }"
-                  class="input"
-                />
+                <input type="email" id="email" placeholder="Correu electrónic" v-model="formData.email"
+                  @blur="validateEmail" @keyup.enter="onEnterPressed('email')" required
+                  :class="{ 'input-error': errors.email }" class="input" />
                 <div v-if="errors.email" class="input-error-message">
                   {{ errors.email }}
                 </div>
@@ -35,22 +27,10 @@
               <div class="info">
                 <label for="password" class="label">Contrasenya</label>
                 <div class="password-input-Formulario">
-                  <input
-                    :type="passwordVisibleLogin ? 'text' : 'password'"
-                    id="password"
-                    placeholder="Contrasenya"
-                    v-model="formData.password"
-                    @blur="validatePassword"
-                    @keyup.enter="onEnterPressed('password')"
-                    required
-                    :class="{ 'input-error': errors.password }"
-                    class="input"
-                  />
-                  <button
-                    type="button"
-                    @click="togglePasswordVisibilityLogin"
-                    class="show-password-btn"
-                  >
+                  <input :type="passwordVisibleLogin ? 'text' : 'password'" id="password" placeholder="Contrasenya"
+                    v-model="formData.password" @blur="validatePassword" @keyup.enter="onEnterPressed('password')"
+                    required :class="{ 'input-error': errors.password }" class="input" />
+                  <button type="button" @click="togglePasswordVisibilityLogin" class="show-password-btn">
                     <span v-if="passwordVisibleLogin">
                       <img src="/public/close-eye.png" alt="Icono" class="ojo" />
                     </span>
@@ -63,20 +43,14 @@
                   {{ errors.password }}
                 </div>
               </div>
-              <button
-                type="submit"
-                class="button login"
-                :disabled="!isLoginFormValid()"
-              >
+              <button type="submit" class="button login" :disabled="!isLoginFormValid()">
                 Iniciar sessió
               </button>
             </form>
 
             <div class="slide-button-Formulario">
               No tens compte?
-              <span class="slide-button" @click="togglebutton"
-                >Registra't</span
-              >
+              <span class="slide-button" @click="togglebutton">Registra't</span>
             </div>
             <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
           </div>
@@ -88,29 +62,15 @@
             <div class="title">Registrar-se</div>
             <form @submit.prevent="register" novalidate>
               <div class="info">
-                <input
-                  type="text"
-                  placeholder="Nom"
-                  v-model="formData.name"
-                  @blur="validateName"
-                  required
-                  :class="{ 'input-error': errors.name }"
-                  class="input"
-                />
+                <input type="text" placeholder="Nom" v-model="formData.name" @blur="validateName" required
+                  :class="{ 'input-error': errors.name }" class="input" />
                 <div v-if="errors.name" class="input-error-message">
                   {{ errors.name }}
                 </div>
               </div>
               <div class="info">
-                <input
-                  type="email"
-                  placeholder="Correu electrònic"
-                  v-model="formData.email"
-                  @blur="validateEmail"
-                  required
-                  :class="{ 'input-error': errors.email }"
-                  class="input"
-                />
+                <input type="email" placeholder="Correu electrònic" v-model="formData.email" @blur="validateEmail"
+                  required :class="{ 'input-error': errors.email }" class="input" />
                 <div v-if="errors.email" class="input-error-message">
                   {{ errors.email }}
                 </div>
@@ -118,24 +78,13 @@
               <!-- Input de contraseña -->
               <div class="info">
                 <div class="password-input-Formulario">
-                  <input
-                    :type="passwordVisibleRegister ? 'text' : 'password'"
-                    id="password"
-                    placeholder="Contrasenya"
-                    v-model="formData.password"
-                    @blur="validatePassword"
-                    :class="{
+                  <input :type="passwordVisibleRegister ? 'text' : 'password'" id="password" placeholder="Contrasenya"
+                    v-model="formData.password" @blur="validatePassword" :class="{
                       'input-error': errors.password,
                       'input-valid': formData.password && !errors.password,
-                    }"
-                    class="input"
-                  />
+                    }" class="input" />
 
-                  <button
-                    type="button"
-                    @click="togglePasswordVisibilityRegister"
-                    class="show-password-btn"
-                  >
+                  <button type="button" @click="togglePasswordVisibilityRegister" class="show-password-btn">
                     <span v-if="passwordVisibleRegister">
                       <img src="/public/close-eye.png" alt="Icono" class="ojo" />
                     </span>
@@ -152,25 +101,15 @@
               <!-- Input de repetir contraseña -->
               <div class="info">
                 <div class="password-input-Formulario">
-                  <input
-                    :type="passwordVisibleRepeat ? 'text' : 'password'"
-                    id="passwordRepeat"
-                    placeholder="Repetir contrasenya"
-                    v-model="formData.passwordRepeat"
-                    @blur="validatePasswordRepeat"
+                  <input :type="passwordVisibleRepeat ? 'text' : 'password'" id="passwordRepeat"
+                    placeholder="Repetir contrasenya" v-model="formData.passwordRepeat" @blur="validatePasswordRepeat"
                     :class="{
                       'input-error': errors.passwordRepeat,
                       'input-valid':
                         formData.passwordRepeat && !errors.passwordRepeat,
-                    }"
-                    class="input"
-                  />
+                    }" class="input" />
 
-                  <button
-                    type="button"
-                    @click="togglePasswordVisibilityRepeat"
-                    class="show-password-btn"
-                  >
+                  <button type="button" @click="togglePasswordVisibilityRepeat" class="show-password-btn">
                     <span v-if="passwordVisibleRepeat">
                       <img src="/public/close-eye.png" alt="Icono" class="ojo" />
                     </span>
@@ -184,19 +123,13 @@
                 </div>
               </div>
 
-              <button
-                type="submit"
-                class="button password_register"
-                :disabled="!isRegisterFormValid()"
-              >
+              <button type="submit" class="button password_register" :disabled="!isRegisterFormValid()">
                 Registrar-se
               </button>
             </form>
             <div class="slide-button-Formulario">
               Ja tens compte?
-              <span class="slide-button" @click="togglebutton"
-                >Iniciar sessió</span
-              >
+              <span class="slide-button" @click="togglebutton">Iniciar sessió</span>
             </div>
             <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
           </div>
@@ -212,6 +145,10 @@ import { useRouter } from '#app';
 import { useAppStore } from "@/stores/app";
 import { useLliureStore } from "~/stores/app";
 import { onBeforeUnmount } from "vue";
+import useCommunicationManager from "@/stores/comunicationManager";
+
+
+const { loginUser } = useCommunicationManager();
 
 
 onMounted(() => {
@@ -277,7 +214,7 @@ const errors = reactive({
 
 const togglebutton = () => {
   showRegister.value = !showRegister.value;
-  
+
 };
 
 const validateEmail = () => {
@@ -348,39 +285,27 @@ const isRegisterFormValid = () => {
 const login = async () => {
   validateEmail();
   validatePassword();
-  if (!isLoginFormValid()) {
-    return;
-  }
-  try {
-    const response = await fetch("http://127.0.0.1:8000/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: formData.email,
-        password: formData.password,
-      }),
-    });
-    const data = await response.json();
-    if (response.ok) {
-      const loginInfo = {
-        loggedIn: true,
-        id: data.user.id,
-        token: data.token,
-        name: data.user.name,
-        email: data.user.email,
-        nivel: data.user.nivel_html,
-        nivel_css: data.user.nivel_css,
-        nivel_js: data.user.nivel_js,
-        avatar: data.user.avatar,
-      };
-      appStore.setLoginInfo(loginInfo);
-      console.log("Login info:", loginInfo);
-      router.push("/");
-    } else {
-      errorMessage.value = data.message || "Credenciales inválidas";
-    }
-  } catch (err) {
-    errorMessage.value = "Error de red. No se pudo conectar al servidor.";
+  if (!isLoginFormValid()) return;
+
+  const result = await loginUser(formData.email, formData.password);
+
+  if (result.success) {
+    const data = result.data;
+    const loginInfo = {
+      loggedIn: true,
+      id: data.user.id,
+      token: data.token,
+      name: data.user.name,
+      email: data.user.email,
+      nivel: data.user.nivel_html,
+      nivel_css: data.user.nivel_css,
+      nivel_js: data.user.nivel_js,
+      avatar: data.user.avatar,
+    };
+    appStore.setLoginInfo(loginInfo);
+    router.push("/");
+  } else {
+    errorMessage.value = result.message;
   }
 };
 
@@ -460,7 +385,7 @@ const register = async () => {
 </script>
 <style scoped, lang="scss">
 :root {
-  --background-image: url(deserd.png);
+  --background-image: url(/deserd.png);
   --primary-color: #f2eeeb;
   --secondary-color: #5353ff;
   --title-color: black;
@@ -471,7 +396,7 @@ const register = async () => {
   --large-font-size: calc(3rem + 1.625vh);
   --medium-font-size: min(calc(1rem + 0.725vh), 1.25rem);
   --small-font-size: min(calc(0.675rem + 0.5vh), 1rem);
-} 
+}
 
 body.login-page {
   min-height: 100%;
@@ -485,9 +410,12 @@ body.login-page {
   background: var(--background-image) no-repeat center center fixed;
   background-size: cover;
 }
+
 .login-wrapper {
-  min-height: calc(100vh - 60px);  /* Mantiene la altura al 100% */
-  padding-bottom: 60px; /* Deja espacio suficiente para que el contenido no tape el footer */
+  min-height: calc(100vh - 60px);
+  /* Mantiene la altura al 100% */
+  padding-bottom: 60px;
+  /* Deja espacio suficiente para que el contenido no tape el footer */
   display: flex;
   flex-direction: column;
 }
@@ -501,13 +429,14 @@ body.login-page {
   transition: margin-left 0.9s ease;
   margin-left: 0;
 }
+
 .slider.slide {
   margin-left: 50%;
 }
 
 .atras {
   position: relative;
-  z-index: 10; 
+  z-index: 10;
   width: 20%;
   background-color: var(--primary-color);
   font-size: var(--medium-font-size);
@@ -520,8 +449,11 @@ body.login-page {
   margin: auto;
   transition: all 0.25s;
   cursor: pointer;
-  left: 10%;  /* Ajusta este valor para mover más a la derecha */
-  margin-top: 20px;  &:hover {
+  left: 10%;
+  /* Ajusta este valor para mover más a la derecha */
+  margin-top: 20px;
+
+  &:hover {
     background-color: var(--secondary-color);
     color: var(--primary-color);
   }
@@ -665,114 +597,10 @@ body.login-page {
 
 @media (max-width: 1080px) {
 
-@media (max-width: 1080px) {
-  .content {
-    background: rgba(0, 0, 0, 0.6);
-    padding: 10%;
-    text-align: center;
-    color: white;
-    width: 100%;
-    margin: 0 auto;
-    position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    height: 100%;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .slider {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    position: absolute;
-    transition: margin-left 0.9s ease;
-    margin-left: 0;
-  }
-
-  .slider.slide {
-    margin-left: 0%;
-  }
-
-  .left {
-    width: 50%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-  }
-
-  .right {
-    width: 50%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-  }
-
-  .button {
-    width: 40%;
-    background-color: var(--primary-color);
-    font-size: var(--medium-font-size);
-    border: none;
-    border-radius: 25px;
-    padding: 3%;
-    text-transform: capitalize;
-    font-weight: 600;
-    color: var(--title-color);
-    margin: 0.5rem 20%;
-    transition: all 0.25s;
-    cursor: pointer;
-
-    &:hover {
-      background-color: var(--secondary-color);
-      color: var(--primary-color);
-    }
-  }
-
-  .input {
-    width: 80%;
-    border: 5px solid var(--primary-color);
-    background-color: rgba(0, 0, 0, 0.4);
-    border-radius: 50px;
-    padding: 2% 2%;
-    font-size: var(--medium-font-size);
-    color: var(--text-color);
-    outline: none;
-  }
-
-  .show-password-btn {
-    position: absolute;
-    top: 70%;
-    left: 85%;
-    transform: translateY(-70%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-  }
-
-  .input-valid {
-    border-color: var(--valid-color);
-  }
-
-  .input-error {
-    border-color: var(--invalid-color);
-  }
-
-  .input-error-message {
-    font-size: 25px;
-    color: var(--invalid-color);
-    text-align: left;
-    margin-top: 5px;
-  }
-  
-}
-  @media (max-width: 400) {
+  @media (max-width: 1080px) {
     .content {
       background: rgba(0, 0, 0, 0.6);
-      padding: 20%;
+      padding: 10%;
       text-align: center;
       color: white;
       width: 100%;
@@ -787,6 +615,7 @@ body.login-page {
       flex-direction: column;
       justify-content: center;
     }
+
     .slider {
       width: 100%;
       height: 100%;
@@ -795,6 +624,7 @@ body.login-page {
       transition: margin-left 0.9s ease;
       margin-left: 0;
     }
+
     .slider.slide {
       margin-left: 0%;
     }
@@ -804,6 +634,7 @@ body.login-page {
       height: 100%;
       display: flex;
       align-items: center;
+    }
 
     .right {
       width: 50%;
@@ -811,6 +642,7 @@ body.login-page {
       display: flex;
       align-items: center;
     }
+
     .button {
       width: 40%;
       background-color: var(--primary-color);
@@ -824,11 +656,13 @@ body.login-page {
       margin: 0.5rem 20%;
       transition: all 0.25s;
       cursor: pointer;
+
       &:hover {
         background-color: var(--secondary-color);
         color: var(--primary-color);
       }
     }
+
     .input {
       width: 80%;
       border: 5px solid var(--primary-color);
@@ -850,6 +684,7 @@ body.login-page {
       cursor: pointer;
       font-size: 18px;
     }
+
     .input-valid {
       border-color: var(--valid-color);
     }
@@ -857,14 +692,119 @@ body.login-page {
     .input-error {
       border-color: var(--invalid-color);
     }
+
     .input-error-message {
       font-size: 25px;
-      color: var(--invalid-color); 
+      color: var(--invalid-color);
       text-align: left;
       margin-top: 5px;
     }
-  } 
-  
-}
+
+  }
+
+  @media (max-width: 400) {
+    .content {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20%;
+      text-align: center;
+      color: white;
+      width: 100%;
+      margin: 0 auto;
+      position: relative;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      height: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .slider {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: absolute;
+      transition: margin-left 0.9s ease;
+      margin-left: 0;
+    }
+
+    .slider.slide {
+      margin-left: 0%;
+    }
+
+    .left {
+      width: 50%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+
+      .right {
+        width: 50%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
+
+      .button {
+        width: 40%;
+        background-color: var(--primary-color);
+        font-size: var(--medium-font-size);
+        border: none;
+        border-radius: 25px;
+        padding: 3%;
+        text-transform: capitalize;
+        font-weight: 600;
+        color: var(--title-color);
+        margin: 0.5rem 20%;
+        transition: all 0.25s;
+        cursor: pointer;
+
+        &:hover {
+          background-color: var(--secondary-color);
+          color: var(--primary-color);
+        }
+      }
+
+      .input {
+        width: 80%;
+        border: 5px solid var(--primary-color);
+        background-color: rgba(0, 0, 0, 0.4);
+        border-radius: 50px;
+        padding: 2% 2%;
+        font-size: var(--medium-font-size);
+        color: var(--text-color);
+        outline: none;
+      }
+
+      .show-password-btn {
+        position: absolute;
+        top: 70%;
+        left: 85%;
+        transform: translateY(-70%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+      }
+
+      .input-valid {
+        border-color: var(--valid-color);
+      }
+
+      .input-error {
+        border-color: var(--invalid-color);
+      }
+
+      .input-error-message {
+        font-size: 25px;
+        color: var(--invalid-color);
+        text-align: left;
+        margin-top: 5px;
+      }
+    }
+
+  }
 }
 </style>

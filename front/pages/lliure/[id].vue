@@ -1,8 +1,10 @@
 <template>
+  <AlertComponent v-if="alertVisible" :success="alertSuccess" :text="alertText" :duration="1500"
+    @close="alertVisible = false" />
   <div class="todo">
     <header class="header" v-show="!isExpanded">
       <div class="header-row">
-        <button class="header-button" @click="goBack">Atrás</button>
+        <button class="header-button" @click="leaveCollaborationSession(); goBack()">Enrere</button>
         <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false" :readonly="!isEditing"/>
         <button class="header-button" @click="generateShareCode">
           Compartir
@@ -18,50 +20,38 @@
         </select>
       </div>
     </header>
+    <div class="top-bar">
+      <div v-if="activeUsersList.length > 0" class="users-container">
+        <div v-for="(user, index) in activeUsersList" :key="index" class="user-card">
+          <img :src="user.avatar" alt="avatar" class="avatar-img" />
+          <div class="user-info">
+            <div class="user-name">{{ user.name }}</div>
+          </div>
+        </div>
+      </div>
 
-    <!-- Indicador de colaboración activa -->
-    <div v-if="isCollaborating" class="collaboration-active">
-      <span class="collaboration-indicator"></span>
-      <span>Collaboración activa: {{ activeUsers }} usuarios</span>
-    </div>
+      <div class="layout-buttons">
+        <button class="button-position" @click="setLayout('left')" aria-label="Sidebar izquierda">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="3" y="3" width="6" height="18" />
+            <rect x="11" y="3" width="10" height="18" opacity="0.3" />
+          </svg>
+        </button>
 
-    <!-- Botones de layout -->
-    <div class="layout-buttons">
-      <!-- Sidebar izquierda -->
-      <button
-        class="button-position"
-        @click="setLayout('left')"
-        aria-label="Sidebar izquierda"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <rect x="3" y="3" width="6" height="18" />
-          <rect x="11" y="3" width="10" height="18" opacity="0.3" />
-        </svg>
-      </button>
+        <button class="button-position" @click="setLayout('right')" aria-label="Sidebar derecha">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="15" y="3" width="6" height="18" />
+            <rect x="3" y="3" width="10" height="18" opacity="0.3" />
+          </svg>
+        </button>
 
-      <!-- Sidebar derecha -->
-      <button
-        class="button-position"
-        @click="setLayout('right')"
-        aria-label="Sidebar derecha"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <rect x="15" y="3" width="6" height="18" />
-          <rect x="3" y="3" width="10" height="18" opacity="0.3" />
-        </svg>
-      </button>
-
-      <!-- Layout normal (editors arriba, salida abajo) -->
-      <button
-        class="button-position"
-        @click="setLayout('normal')"
-        aria-label="Layout normal"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <rect x="3" y="3" width="18" height="6" />
-          <rect x="3" y="11" width="18" height="10" opacity="0.3" />
-        </svg>
-      </button>
+        <button class="button-position" @click="setLayout('normal')" aria-label="Layout normal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="3" y="3" width="18" height="6" />
+            <rect x="3" y="11" width="18" height="10" opacity="0.3" />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <!-- Modal para compartir código de colaboración -->
@@ -134,7 +124,18 @@
           <div v-if="msg.type === 'loading'" class="loading-indicator">
             <div class="dot-flashing"></div>
           </div>
-          <p v-else>{{ msg.content }}</p>
+          <p v-else-if="msg.type === 'user'">{{ msg.content }}</p>
+          <div v-else-if="msg.type === 'ai'">
+            <template v-if="msg.content.includes('```')">
+              <div class="code-block">
+                <pre><code>{{ extractCode(msg.content) }}</code></pre>
+                <button class="btn-copy" @click="copyCode(extractCode(msg.content))">
+                  Copiar
+                </button>
+              </div>
+            </template>
+            <p v-else>{{ msg.content }}</p>
+          </div>
         </div>
       </div>
       <div class="input-container">
@@ -156,7 +157,7 @@
       </div>
     </div>
 
-    <!-- Layout dinámico -->
+
     <div :class="['layout', 'layout-' + layoutType]">
       <!-- botones solo para móvil -->
       <div class="editor-tabs" v-if="isMobile">
@@ -221,12 +222,12 @@
     </div>
   </div>
 </template>
-
-<script>
+<script setup>
 import { ref, onMounted, computed, onUnmounted, nextTick, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import CodeMirror from "codemirror";
 import { useLliureStore } from "~/stores/app";
+import AlertComponent from '@/components/AlertComponent.vue';
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
 import { io } from "socket.io-client";
@@ -246,538 +247,642 @@ import "codemirror/addon/edit/closebrackets";
 import useCommunicationManager from "@/stores/comunicationManager";
 import { useAppStore, useIdProyectoActualStore } from "@/stores/app";
 
-export default {
-  setup() {
-    const appStore = useAppStore();
-    const idProyectoActualStore = useIdProyectoActualStore();
-    const router = useRouter();
-    const route = useRoute();
-    const {
-      guardarProyectoDB,
-      chatIA,
-      state,
-      borrarProyectoDB,
-      useProyectoStore,
-    } = useCommunicationManager();
-    const lliureStore = useLliureStore();
-
-    const isDragging = ref(false);
-    const chatPosition = ref({ x: 20, y: 20 });
-    const dragStartPosition = ref({ x: 0, y: 0 });
-    const title = ref("Untitled");
-    const html = ref("");
-    const css = ref("");
-    const js = ref("");
-    const isEditing = ref(false);
-    const isExpanded = ref(false);
-    const isChatVisible = ref(false);
-    const newMessage = ref("");
-    const cambiadoSinGuardar = ref(false);
-    const messages = ref([
-      { type: "ai", content: "¡Hola! ¿En qué puedo ayudarte hoy?" },
-    ]);
-    const messagesContainer = ref(null);
-    const guardarParaSalir = ref(false);
-    const isPrivate = ref(0);
-    const layoutType = ref("normal");
-
-    // Nuevas variables para la colaboración en tiempo real
-    const showShareModal = ref(false);
-    const shareCode = ref("");
-    const socket = ref(null);
-    const isCollaborating = ref(false);
-    const activeUsers = ref(1);
-
-    const htmlEditor = ref(null);
-    const cssEditor = ref(null);
-    const jsEditor = ref(null);
-
-    let htmlEditorInstance, cssEditorInstance, jsEditorInstance;
-
-    const startDrag = (event) => {
-      isDragging.value = true;
-      dragStartPosition.value = {
-        x: event.clientX - chatPosition.value.x,
-        y: event.clientY - chatPosition.value.y,
-      };
-      document.addEventListener("mousemove", onDrag);
-      document.addEventListener("mouseup", stopDrag);
-    };
-
-    const markDirty = () => {
-      console.log("entrado en cambio a true", cambiadoSinGuardar.value);
-      cambiadoSinGuardar.value = true;
-    };
-
-    const markClean = () => {
-      cambiadoSinGuardar.value = false;
-      console.log("entrado a cambio a false", cambiadoSinGuardar.value);
-    };
-
-    const onDrag = (event) => {
-      if (isDragging.value) {
-        chatPosition.value = {
-          x: event.clientX - dragStartPosition.value.x,
-          y: event.clientY - dragStartPosition.value.y,
-        };
-      }
-    };
-
-    const volverHome = async () => {
-      console.log("css.value", css.value);
-      router.push("/");
-    };
-
-    const stopDrag = () => {
-      isDragging.value = false;
-      document.removeEventListener("mousemove", onDrag);
-      document.removeEventListener("mouseup", stopDrag);
-    };
-
-    const closeGuardarParaSalir = () => {
-      guardarParaSalir.value = false;
-    };
-
-    const setLayout = (dir) => {
-      layoutType.value = dir;
-    };
-    onMounted(async () => {
-      lliureStore.toggleLliure();
-      htmlEditorInstance = CodeMirror(htmlEditor.value, {
-        mode: "htmlmixed",
-        theme: "dracula",
-        lineNumbers: true,
-        autoCloseTags: true,
-        autoCloseBrackets: true,
-        matchTags: { bothTags: true },
-        extraKeys: {
-          "Ctrl-Space": "autocomplete",
-        },
-      });
-      htmlEditorInstance.on("inputRead", (editor, change) => {
-        if (change.text[0] === "<") {
-          editor.showHint({
-            completeSingle: false,
-          });
-        }
-      });
-
-      cssEditorInstance = CodeMirror(cssEditor.value, {
-        mode: "css",
-        theme: "dracula",
-        lineNumbers: true,
-        autoCloseBrackets: true,
-        extraKeys: {
-          "Ctrl-Space": "autocomplete",
-        },
-      });
-      cssEditorInstance.on("inputRead", (editor, change) => {
-        if (change.text[0].match(/[a-zA-Z\-]/)) {
-          editor.showHint({ completeSingle: false });
-        }
-      });
-
-      jsEditorInstance = CodeMirror(jsEditor.value, {
-        mode: "javascript",
-        theme: "dracula",
-        lineNumbers: true,
-        autoCloseBrackets: true,
-        extraKeys: {
-          "Ctrl-Space": "autocomplete",
-        },
-      });
-
-      const projectId = route.params.id;
-      if (projectId) {
-        idProyectoActualStore.id = projectId;
-
-        const proyectoStore = useProyectoStore();
-        const proyecto = await proyectoStore.obtenerProyecto(projectId);
-        if (proyecto) {
-          html.value = proyecto.html_code || "";
-          css.value = proyecto.css_code || "";
-          js.value = proyecto.js_code || "";
-          title.value = proyecto.nombre || "Untitled";
-          htmlEditorInstance.setValue(html.value);
-          cssEditorInstance.setValue(css.value);
-          jsEditorInstance.setValue(js.value);
-          isPrivate.value = proyecto.statuts || 0;
-        }
-      } else {
-        console.error("No se encontró un ID de proyecto válido en la ruta.");
-      }
-
-      // Inicializar conexión de socket
-      initSocketConnection();
-
-      // Verificar si hay un código de colaboración en la URL
-      const collabCode = route.query.code;
-      if (collabCode) {
-        joinCollaborationSession(collabCode);
-      }
-
-      // Modificar los event listeners para incluir la emisión de cambios por socket
-      htmlEditorInstance.on("change", (instance) => {
-        const newValue = instance.getValue();
-        html.value = newValue;
-        markDirty();
-
-        if (isCollaborating.value) {
-          socket.value.emit("html-change", {
-            code: newValue,
-            roomId: shareCode.value,
-          });
-        }
-      });
-
-      cssEditorInstance.on("change", (instance) => {
-        const newValue = instance.getValue();
-        css.value = newValue;
-        markDirty();
-
-        if (isCollaborating.value) {
-          socket.value.emit("css-change", {
-            code: newValue,
-            roomId: shareCode.value,
-          });
-        }
-      });
-
-      jsEditorInstance.on("change", (instance) => {
-        const newValue = instance.getValue();
-        js.value = newValue;
-        markDirty();
-
-        if (isCollaborating.value) {
-          socket.value.emit("js-change", {
-            code: newValue,
-            roomId: shareCode.value,
-          });
-        }
-      });
-    });
-    const initSocketConnection = () => {
-      socket.value = io("http://localhost:5000");
-
-      socket.value.on("connect", () => {
-        console.log("Conectado al servidor de socket");
-      });
-
-      socket.value.on("html-change", (newValue) => {
-        if (newValue !== html.value) {
-          html.value = newValue;
-          htmlEditorInstance.setValue(newValue);
-        }
-      });
-
-      socket.value.on("css-change", (newValue) => {
-        if (newValue !== css.value) {
-          css.value = newValue;
-          cssEditorInstance.setValue(newValue);
-        }
-      });
-
-      socket.value.on("js-change", (newValue) => {
-        if (newValue !== js.value) {
-          js.value = newValue;
-          jsEditorInstance.setValue(newValue);
-        }
-      });
-
-      socket.value.on(
-        "initial-state",
-        ({ html: htmlCode, css: cssCode, js: jsCode }) => {
-          html.value = htmlCode;
-          css.value = cssCode;
-          js.value = jsCode;
-
-          htmlEditorInstance.setValue(htmlCode);
-          cssEditorInstance.setValue(cssCode);
-          jsEditorInstance.setValue(jsCode);
-        }
-      );
-
-      socket.value.on("user-joined", () => {
-        activeUsers.value++;
-      });
-
-      socket.value.on("user-left", () => {
-        activeUsers.value = Math.max(1, activeUsers.value - 1);
-      });
-
-      socket.value.on("room-users", ({ count }) => {
-        activeUsers.value = count;
-      });
-    };
-
-    onUnmounted(() => {
-      lliureStore.toggleLliure();
-      idProyectoActualStore.vaciarId();
-
-      if (socket.value) {
-        socket.value.disconnect();
-      }
-    });
-
-    const generateShareCode = () => {
-      // Generar un código aleatorio de 6 caracteres alfanuméricos
-      const randomCode = Math.random()
-        .toString(36)
-        .substring(2, 8)
-        .toUpperCase();
-      shareCode.value = randomCode;
-
-      // Crear la room en el servidor
-      socket.value.emit("create-room", {
-        roomId: randomCode,
-        projectId: idProyectoActualStore.id,
-        initialData: {
-          html: html.value,
-          css: css.value,
-          js: js.value,
-        },
-      });
-
-      isCollaborating.value = true;
-      showShareModal.value = true;
-    };
-
-    const closeShareModal = () => {
-      showShareModal.value = false;
-    };
-
-    const copyShareCode = () => {
-      navigator.clipboard.writeText(shareCode.value);
-      alert("Codi copiat al portapapers");
-    };
-
-    const joinCollaborationSession = (code) => {
-      shareCode.value = code;
-
-      socket.value.emit("join-room", {
-        roomId: code,
-        projectId: idProyectoActualStore.id,
-      });
-
-      isCollaborating.value = true;
-    };
-
-    const guardarProyecto2 = () => {
-      guardarProyecto();
-      guardarParaSalir.value = false;
-      router.push("/");
-    };
-
-    const toggleChat = () => {
-      isChatVisible.value = !isChatVisible.value;
-    };
-
-    const sendMessage = async () => {
-      if (!newMessage.value.trim() || state.loading) return;
-
-      const userMessage = newMessage.value;
-      newMessage.value = "";
-
-      messages.value.push({ type: "user", content: userMessage });
-      messages.value.push({ type: "loading", content: "" });
-
-      try {
-        const response = await chatIA(
-          userMessage,
-          html.value,
-          css.value,
-          js.value
-        );
-        messages.value.pop();
-        messages.value.push({ type: "ai", content: response });
-      } catch (error) {
-        messages.value.pop();
-        messages.value.push({
-          type: "ai",
-          content: "❌ Error al obtener respuesta. Intenta nuevamente.",
-        });
-      } finally {
-        await nextTick();
-        if (messagesContainer.value) {
-          messagesContainer.value.scrollTop =
-            messagesContainer.value.scrollHeight;
-        }
-      }
-    };
-
-    const toggleExpand = () => {
-      isExpanded.value = !isExpanded.value;
-    };
-
-    const goBack = async () => {
-      if (!cambiadoSinGuardar.value) {
-        if (html.value === "" && css.value === "" && js.value === "") {
-          try {
-            let id =
-              idProyectoActualStore?.id ||
-              Number(localStorage.getItem("idProyectoActual"));
-            if (id) {
-              await borrarProyectoDB(id);
-            }
-          } catch (error) {
-            console.error("Error al borrar el proyecto:", error);
-          }
-        }
-        router.push("/");
-      } else {
-        guardarParaSalir.value = true;
-        console.log(
-          "¿Se muestra el guardar para salir?",
-          guardarParaSalir.value
-        );
-      }
-    };
-
-    const savePrivacy = async () => {
-      markDirty();
-      await guardarProyecto();
-    };
-
-    const guardarProyecto = async () => {
-      markClean();
-
-      if (!idProyectoActualStore.id) {
-        console.error("ID del proyecto es null o no se encuentra.");
-        return;
-      }
-
-      try {
-        const response = await guardarProyectoDB(
-          {
-            nombre: title.value || "",
-            user_id: appStore.loginInfo.id || null,
-            html_code: html.value || "",
-            css_code: css.value || "",
-            js_code: js.value || "",
-            statuts: isPrivate.value,
-          },
-          idProyectoActualStore.id
-        );
-        if (response.success == false) {
-          console.log(response.message);
-        }
-        if (response.success == false) {
-          console.log(response.message);
-        }
-      } catch (error) {
-        console.error("Error al guardar el proyecto:", error);
-      }
-    };
-
-    // Agregar escuchadores para eventos de resize (para el editor y output)
-    let isResizing = false;
-    const outputContainer = ref(null);
-    const startResize = (event) => {
-      isResizing = true;
-      document.addEventListener("mousemove", handleResize);
-      document.addEventListener("mouseup", stopResize);
-    };
-
-    const handleResize = (event) => {
-      if (!isResizing || !outputContainer.value) return;
-      const newHeight = window.innerHeight - event.clientY;
-      outputContainer.value.style.height = `${newHeight}px`;
-    };
-
-    const stopResize = () => {
-      isResizing = false;
-      document.removeEventListener("mousemove", handleResize);
-      document.removeEventListener("mouseup", stopResize);
-    };
-
-   
-
-      const isMobile = ref(false)
-      const activeTab = ref('html')
-
-      const checkMobile = () => {
-        isMobile.value = window.innerWidth <= 450
-      }
-
-      onMounted(() => {
-        checkMobile()
-        window.addEventListener('resize', checkMobile)
-      })
-
-      onUnmounted(() => {
-        window.removeEventListener('resize', checkMobile)
-      })
-
-
-    return {
-      title,
-      html,
-      css,
-      js,
-      htmlEditor,
-      cssEditor,
-      jsEditor,
-      isEditing,
-      isExpanded,
-      isChatVisible,
-      newMessage,
-      messages,
-      messagesContainer,
-      state,
-      guardarParaSalir,
-      guardarProyecto2,
-      volverHome,
-      toggleChat,
-      sendMessage,
-      toggleExpand,
-      goBack,
-      closeGuardarParaSalir,
-      guardarProyecto,
-      isDragging,
-      chatPosition,
-      startDrag,
-      onDrag,
-      stopDrag,
-      markDirty,
-      isPrivate,
-      savePrivacy,
-      layoutType,
-      setLayout,
-      showShareModal,
-      shareCode,
-      generateShareCode,
-      closeShareModal,
-      copyShareCode,
-      joinCollaborationSession,
-      isCollaborating,
-      activeUsers,
-      outputContainer,
-      startResize,
-      isMobile,
-      activeTab,
-      output: computed(() => {
-        let jsContent = js.value;
-        let scriptContent = `
-          try {
-            ${jsContent}
-          } catch (e) {
-            console.error('Error in JavaScript:', e);
-          }
-        `;
-        return `
-          <html>
-            <head><style>${css.value}</style></head>
-            <body>${html.value}
-              <script>${scriptContent}<\/script>
-            </body>
-          </html>`;
-      }),
-    };
-  },
+const appStore = useAppStore();
+const idProyectoActualStore = useIdProyectoActualStore();
+const router = useRouter();
+const route = useRoute();
+const {
+  guardarProyectoDB,
+  chatIA,
+  state,
+  borrarProyectoDB,
+  useProyectoStore,
+} = useCommunicationManager();
+const lliureStore = useLliureStore();
+
+// Variables per les alertes 
+const alertVisible = ref(false);
+const alertSuccess = ref(false);
+const alertText = ref('');
+
+const isDragging = ref(false);
+const chatPosition = ref({ x: 20, y: 20 });
+const dragStartPosition = ref({ x: 0, y: 0 });
+const title = ref("Untitled");
+const html = ref("");
+const css = ref("");
+const js = ref("");
+const isEditing = ref(false);
+const isExpanded = ref(false);
+const isChatVisible = ref(false);
+const newMessage = ref("");
+const cambiadoSinGuardar = ref(false);
+const messages = ref([{ type: "ai", content: "¡Hola! ¿En qué puedo ayudarte hoy?" }]);
+const messagesContainer = ref(null);
+const guardarParaSalir = ref(false);
+const isPrivate = ref(0);
+const layoutType = ref('normal');
+
+//Variables per als sockets
+const showShareModal = ref(false);
+const shareCode = ref("");
+const socket = ref(null);
+const isCollaborating = ref(false);
+const activeUsers = ref(1);
+const activeUsersList = ref([]);
+
+const isApplyingExternalChanges = ref({
+  html: false,
+  css: false,
+  js: false
+});
+
+const htmlEditor = ref(null);
+const cssEditor = ref(null);
+const jsEditor = ref(null);
+
+let htmlEditorInstance, cssEditorInstance, jsEditorInstance;
+
+const showAlert = (message, isSuccess = false) => {
+  alertText.value = message;
+  alertSuccess.value = isSuccess;
+  alertVisible.value = true;
 };
-</script>
 
+const startDrag = (event) => {
+  isDragging.value = true;
+  dragStartPosition.value = {
+    x: event.clientX - chatPosition.value.x,
+    y: event.clientY - chatPosition.value.y,
+  };
+  document.addEventListener("mousemove", onDrag);
+  document.addEventListener("mouseup", stopDrag);
+};
+
+const markDirty = () => {
+  console.log("entrado en cambio a true", cambiadoSinGuardar.value);
+  cambiadoSinGuardar.value = true;
+};
+
+const markClean = () => {
+  cambiadoSinGuardar.value = false;
+  console.log("entrado a cambio a false", cambiadoSinGuardar.value);
+};
+
+const onDrag = (event) => {
+  if (isDragging.value) {
+    chatPosition.value = {
+      x: event.clientX - dragStartPosition.value.x,
+      y: event.clientY - dragStartPosition.value.y,
+    };
+  }
+};
+
+const volverHome = async () => {
+  console.log("css.value", css.value);
+  router.push("/");
+};
+
+const stopDrag = () => {
+  isDragging.value = false;
+  document.removeEventListener("mousemove", onDrag);
+  document.removeEventListener("mouseup", stopDrag);
+};
+
+const closeGuardarParaSalir = () => {
+  guardarParaSalir.value = false;
+};
+
+const setLayout = (dir) => {
+  layoutType.value = dir
+}
+
+/**
+ * Extrae el contenido entre triple backticks.
+ */
+const extractCode = (text) => {
+  const match = text.match(/```(?:[\w-]+\n)?([\s\S]*?)```/);
+  return match ? match[1].trim() : text;
+};
+
+/**
+ * Copia al portapapeles y muestra alerta.
+ */
+const copyCode = async (code) => {
+  try {
+    await navigator.clipboard.writeText(code);
+    showAlert("Código copiado al portapapeles", true);
+  } catch {
+    showAlert("Error al copiar el código", false);
+  }
+};
+
+// Soporte para móviles
+const isMobile = ref(false);
+const activeTab = ref('html');
+
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 450;
+}
+
+onMounted(async () => {
+  lliureStore.toggleLliure();
+  
+  // Verificar si es dispositivo móvil
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+  
+  htmlEditorInstance = CodeMirror(htmlEditor.value, {
+    mode: "htmlmixed",
+    theme: "dracula",
+    lineNumbers: true,
+    autoCloseTags: true,
+    autoCloseBrackets: true,
+    matchTags: { bothTags: true },
+    extraKeys: {
+      "Ctrl-Space": "autocomplete"
+    },
+  });
+  htmlEditorInstance.on("inputRead", (editor, change) => {
+    if (change.text[0] === "<") {
+      editor.showHint({
+        completeSingle: false
+      });
+    }
+  });
+
+  cssEditorInstance = CodeMirror(cssEditor.value, {
+    mode: "css",
+    theme: "dracula",
+    lineNumbers: true,
+    autoCloseBrackets: true,
+    extraKeys: {
+      "Ctrl-Space": "autocomplete",
+    },
+  });
+  cssEditorInstance.on("inputRead", (editor, change) => {
+    if (change.text[0].match(/[a-zA-Z\-]/)) {
+      editor.showHint({ completeSingle: false });
+    }
+  });
+
+  jsEditorInstance = CodeMirror(jsEditor.value, {
+    mode: "javascript",
+    theme: "dracula",
+    lineNumbers: true,
+    autoCloseBrackets: true,
+    extraKeys: {
+      "Ctrl-Space": "autocomplete"
+    }
+  });
+
+  const projectId = route.params.id;
+  if (projectId) {
+    idProyectoActualStore.id = projectId;
+
+    const proyectoStore = useProyectoStore();
+    const proyecto = await proyectoStore.obtenerProyecto(projectId);
+    if (proyecto) {
+      html.value = proyecto.html_code || "";
+      css.value = proyecto.css_code || "";
+      js.value = proyecto.js_code || "";
+      title.value = proyecto.nombre || "Untitled";
+      htmlEditorInstance.setValue(html.value);
+      cssEditorInstance.setValue(css.value);
+      jsEditorInstance.setValue(js.value);
+      isPrivate.value = proyecto.statuts || 0;
+    }
+  } else {
+    console.error("No se encontró un ID de proyecto válido en la ruta.");
+  }
+
+  initSocketConnection();
+
+  const collabCode = route.query.code;
+  if (collabCode) {
+    joinCollaborationSession(collabCode);
+  }
+
+  htmlEditorInstance.on("change", (instance) => {
+    if (isApplyingExternalChanges.value.html) return;
+
+    const newValue = instance.getValue();
+    html.value = newValue;
+    markDirty();
+
+    if (isCollaborating.value) {
+      socket.value.emit("html-change", {
+        code: newValue,
+        roomId: shareCode.value
+      });
+    }
+  });
+
+  cssEditorInstance.on("change", (instance) => {
+    if (isApplyingExternalChanges.value.css) return;
+
+    const newValue = instance.getValue();
+    css.value = newValue;
+    markDirty();
+
+    if (isCollaborating.value) {
+      socket.value.emit("css-change", {
+        code: newValue,
+        roomId: shareCode.value
+      });
+    }
+  });
+
+  jsEditorInstance.on("change", (instance) => {
+    if (isApplyingExternalChanges.value.js) return;
+
+    const newValue = instance.getValue();
+    js.value = newValue;
+    markDirty();
+
+    if (isCollaborating.value) {
+      socket.value.emit("js-change", {
+        code: newValue,
+        roomId: shareCode.value
+      });
+    }
+  });
+});
+
+const initSocketConnection = () => {
+  socket.value = io("http://localhost:5000");
+
+  socket.value.on("connect", () => {
+    console.log("Conectado al servidor de socket");
+  });
+
+  socket.value.on("active-users", (users) => {
+    activeUsersList.value = users;
+  });
+
+  socket.value.on("html-change", (newValue) => {
+    if (newValue !== html.value) {
+      try {
+        isApplyingExternalChanges.value.html = true;
+        html.value = newValue;
+        htmlEditorInstance.setValue(newValue);
+      } finally {
+        setTimeout(() => {
+          isApplyingExternalChanges.value.html = false;
+        }, 0);
+      }
+    }
+  });
+
+  socket.value.on("css-change", (newValue) => {
+    if (newValue !== css.value) {
+      try {
+        isApplyingExternalChanges.value.css = true;
+        css.value = newValue;
+        cssEditorInstance.setValue(newValue);
+      } finally {
+        setTimeout(() => {
+          isApplyingExternalChanges.value.css = false;
+        }, 0);
+      }
+    }
+  });
+
+  socket.value.on("js-change", (newValue) => {
+    if (newValue !== js.value) {
+      try {
+        isApplyingExternalChanges.value.js = true;
+        js.value = newValue;
+        jsEditorInstance.setValue(newValue);
+      } finally {
+        setTimeout(() => {
+          isApplyingExternalChanges.value.js = false;
+        }, 0);
+      }
+    }
+  });
+
+  socket.value.on("initial-state", ({ html: htmlCode, css: cssCode, js: jsCode }) => {
+    try {
+      isApplyingExternalChanges.value = {
+        html: true,
+        css: true,
+        js: true
+      };
+
+      html.value = htmlCode;
+      css.value = cssCode;
+      js.value = jsCode;
+
+      htmlEditorInstance.setValue(htmlCode);
+      cssEditorInstance.setValue(cssCode);
+      jsEditorInstance.setValue(jsCode);
+    } finally {
+      setTimeout(() => {
+        isApplyingExternalChanges.value = {
+          html: false,
+          css: false,
+          js: false
+        };
+      }, 0);
+    }
+  });
+
+  socket.value.on("user-joined", () => {
+    activeUsers.value++;
+  });
+
+  socket.value.on("user-left", () => {
+    activeUsers.value = Math.max(1, activeUsers.value - 1);
+  });
+
+  socket.value.on("room-users", ({ count }) => {
+    activeUsers.value = count;
+  });
+};
+
+onUnmounted(() => {
+  lliureStore.toggleLliure();
+  idProyectoActualStore.vaciarId();
+
+  // Eliminar el listener de resize para soporte móvil
+  window.removeEventListener('resize', checkMobile);
+
+  if (socket.value) {
+    socket.value.disconnect();
+  }
+});
+
+const generateShareCode = () => {
+  const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+  shareCode.value = randomCode;
+  socket.value.emit("create-room", {
+    roomId: randomCode,
+    projectId: idProyectoActualStore.id,
+    userName: appStore.loginInfo.name,
+    avatar: appStore.loginInfo.avatar,
+    initialData: {
+      html: html.value,
+      css: css.value,
+      js: js.value
+    }
+  });
+
+  isCollaborating.value = true;
+  showShareModal.value = true;
+};
+
+const closeShareModal = () => {
+  showShareModal.value = false;
+};
+
+const copyShareCode = () => {
+  navigator.clipboard.writeText(shareCode.value);
+  showAlert("Codi copiat correctament al portapapers", true);
+  closeShareModal();
+};
+
+const joinCollaborationSession = (code) => {
+  if (!code) return;
+
+  console.log("Intentant unir-se a la room:", code);
+  shareCode.value = code;
+
+  socket.value.emit("join-room", {
+    roomId: code,
+    projectId: idProyectoActualStore.id,
+    userName: appStore.loginInfo.name,
+    avatar: appStore.loginInfo.avatar
+  });
+
+  isCollaborating.value = true;
+};
+
+const guardarProyecto2 = () => {
+  const prevGuardarParaSalir = guardarParaSalir.value;
+
+  guardarProyecto();
+
+  setTimeout(() => {
+    if (prevGuardarParaSalir) {
+      guardarParaSalir.value = false;
+      if (!alertVisible.value || alertSuccess.value) {
+        router.push("/");
+      }
+    }
+  }, 500);
+};
+
+const toggleChat = () => {
+  isChatVisible.value = !isChatVisible.value;
+};
+
+const sendMessage = async () => {
+  if (!newMessage.value.trim() || state.loading) return;
+
+  const userMessage = newMessage.value;
+  newMessage.value = "";
+
+  messages.value.push({ type: "user", content: userMessage });
+  messages.value.push({ type: "loading", content: "" });
+
+  try {
+    const response = await chatIA(userMessage, html.value, css.value, js.value);
+    messages.value.pop();
+    messages.value.push({ type: "ai", content: response });
+  } catch (error) {
+    messages.value.pop();
+    messages.value.push({
+      type: "ai",
+      content: "❌ Error al obtener respuesta. Intenta nuevamente.",
+    });
+  } finally {
+    await nextTick();
+    if (messagesContainer.value) {
+      messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+    }
+  }
+};
+
+const toggleExpand = () => {
+  isExpanded.value = !isExpanded.value;
+};
+
+const goBack = async () => {
+  if (!cambiadoSinGuardar.value) {
+    if (html.value === "" && css.value === "" && js.value === "") {
+      try {
+        let id =
+          idProyectoActualStore?.id ||
+          Number(localStorage.getItem("idProyectoActual"));
+        if (id) {
+          await borrarProyectoDB(id);
+        }
+      } catch (error) {
+        console.error("Error al borrar el proyecto:", error);
+      }
+    }
+    router.push("/");
+  } else {
+    guardarParaSalir.value = true;
+    console.log("¿Se muestra el guardar para salir?", guardarParaSalir.value);
+  }
+};
+
+const savePrivacy = async () => {
+  markDirty();
+
+  try {
+    await guardarProyecto();
+    if (!alertVisible.value) {
+    }
+  } catch (error) {
+    showAlert(`Error al canviar la privacitat del projecte`, false);
+  }
+};
+
+const guardarProyecto = async () => {
+  markClean();
+
+  if (!idProyectoActualStore.id) {
+    console.error("ID del proyecto es null o no se encuentra.");
+    showAlert("Error: No s'ha trobat l'ID del projecte", false);
+    return;
+  }
+
+  if (!localStorage.getItem('loginInfo')) {
+    showAlert("Has d'iniciar sessió per guardar aquest projecte", false);
+    return;
+  }
+
+  try {
+    const response = await guardarProyectoDB(
+      {
+        nombre: title.value || "",
+        user_id: appStore.loginInfo.id || null,
+        html_code: html.value || "",
+        css_code: css.value || "",
+        js_code: js.value || "",
+        statuts: isPrivate.value,
+      },
+      idProyectoActualStore.id
+    );
+
+    if (response.success === false) {
+      showAlert("Cal ser el propietari del projecte per poder-lo guardar", false);
+      console.log(response.message);
+    } else {
+      showAlert("Projecte guardat correctament", true);
+    }
+  } catch (error) {
+    console.error("Error al guardar el proyecto:", error);
+    showAlert("Error al guardar el projecte", false);
+  }
+};
+
+let isResizing = false;
+const outputContainer = ref(null);
+const startResize = (event) => {
+  isResizing = true;
+  document.addEventListener('mousemove', handleResize);
+  document.addEventListener('mouseup', stopResize);
+};
+
+const handleResize = (event) => {
+  if (!isResizing || !outputContainer.value) return;
+  const newHeight = window.innerHeight - event.clientY;
+  outputContainer.value.style.height = `${newHeight}px`;
+};
+
+const stopResize = () => {
+  isResizing = false;
+  document.removeEventListener('mousemove', handleResize);
+  document.removeEventListener('mouseup', stopResize);
+};
+
+const leaveCollaborationSession = () => {
+  if (socket.value) {
+    socket.value.disconnect();
+    socket.value = null;
+  }
+
+  isCollaborating.value = false;
+  shareCode.value = "";
+  activeUsers.value = 0;
+
+  initSocketConnection();
+};
+
+const output = computed(() => {
+  let jsContent = js.value;
+  let scriptContent = `
+        try {
+          ${jsContent}
+        } catch (e) {
+          console.error('Error in JavaScript:', e);
+        }
+      `;
+  return `
+        <html>
+          <head><style>${css.value}</style></head>
+          <body>${html.value}
+            <script>${scriptContent}<\/script>
+          </body>
+        </html>`;
+});
+</script>
 <style scoped>
+
+.layout-buttons {
+  display: flex;
+  gap: 12px;
+  margin-left: auto; 
+  margin-top: 20px;
+  margin-right: 20px;
+}
+
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.users-container {
+  display: flex;
+  flex-direction: row; 
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+
+.user-card {
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  background: #222;
+  padding: 0.5rem;
+  border-radius: 8px;
+  color: white;
+  width: 80px;
+}
+
+.avatar-img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 9999px;
+}
+
+.user-info {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+
 .todo {
   display: flex;
   flex-direction: column;
@@ -834,6 +939,7 @@ export default {
   font-size: 14px;
   transition: background-color 0.3s ease;
 }
+
 .button-position {
   background-color: #2e2e2e;
   border: 1px solid #444;
@@ -844,6 +950,7 @@ export default {
   font-size: 14px;
   transition: background-color 0.3s ease;
 }
+
 .button-position svg {
   width: 20px;
   height: 20px;
@@ -852,8 +959,8 @@ export default {
 .layout-buttons {
   display: flex;
   gap: 12px;
-  align-self: flex-end; /* sitúa el bloque a la derecha */
-  margin: 20px 20px 0 0; /* separaciones: top, right, bottom, left */
+  align-self: flex-end;
+  margin: 20px 20px 0 0; 
 }
 
 .header-button:hover {
@@ -1209,18 +1316,22 @@ export default {
   border-radius: 6px;
   font-size: 14px;
 }
+
 .layout {
   display: flex;
   width: 100%;
   height: 100%;
   transition: all 0.3s ease;
 }
+
 .layout-normal {
   flex-direction: column;
 }
+
 .layout-left {
   flex-direction: row;
 }
+
 .layout-right {
   flex-direction: row-reverse;
 }
@@ -1240,6 +1351,32 @@ export default {
   flex: 1;
 }
 
+.code-block {
+  position: relative;
+  background: #2d2d2d;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+.code-block pre {
+  margin: 0;
+  overflow-x: auto;
+}
+.btn-copy {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+.btn-copy:hover {
+  background: #45a049;
+}
 @media (max-width: 450px) {
   .todo {
     display: flex;
@@ -1303,8 +1440,6 @@ export default {
   .output-container {
   height: 50vh;
 }
-
-
-
 }
 </style>
+
