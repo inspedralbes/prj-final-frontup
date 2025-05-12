@@ -80,12 +80,10 @@ app.post('/generate-share-code', (req, res) => {
     try {
         const { projectId, html, css, js, userName, avatar } = req.body;
         
-        // Verificar si el projecte ja té una sala
         if (projectRooms.has(projectId)) {
             const existingRoomId = projectRooms.get(projectId);
             const room = rooms.get(existingRoomId);
             
-            // Si la sala existeix, retornem el codi existent
             if (room) {
                 return res.json({
                     success: true,
@@ -95,22 +93,18 @@ app.post('/generate-share-code', (req, res) => {
             }
         }
         
-        // Generar un codi aleatori pel compartir (6 caràcters alfanumèrics en majúscules)
         const shareCode = Math.random().toString(36).substring(2, 8).toUpperCase();
         
-        // Crear la sala amb el codi generat
         rooms.set(shareCode, {
             projectId,
             html: html || '',
             css: css || '',
             js: js || '',
-            users: []  // No afegim l'usuari aquí, es connectarà via socket
+            users: []  
         });
         
-        // Associar el projectId amb la sala
         projectRooms.set(projectId, shareCode);
         
-        // Retornar el codi generat
         res.json({
             success: true,
             roomId: shareCode,
