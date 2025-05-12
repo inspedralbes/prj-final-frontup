@@ -497,6 +497,37 @@ const useCommunicationManager = () => {
       };
     }
   };
+
+  const fetchAllProjects = async ({ page = 1, searchQuery = "", sortCriteria = "default" }) => {
+    try {
+      const params = new URLSearchParams();
+      params.append("page", page);
+      if (searchQuery) params.append("search", searchQuery);
+      if (sortCriteria && sortCriteria !== "default") params.append("sort", sortCriteria);
+  
+      const response = await fetch(`http://localhost:8000/api/projects/all?${params.toString()}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.message || "Error cargando proyectos");
+      }
+  
+      return {
+        success: true,
+        data,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  };  
   
 
   return {
@@ -521,6 +552,7 @@ const useCommunicationManager = () => {
     loginUser,
     registerUser,
     fetchProjects,
+    fetchAllProjects,
   };
 };
 
