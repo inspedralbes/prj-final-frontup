@@ -165,6 +165,7 @@ import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/matchtags";
 import "codemirror/addon/hint/javascript-hint";
 import "codemirror/addon/edit/closebrackets";
+import "codemirror/addon/display/placeholder";
 import useCommunicationManager from "@/stores/comunicationManager";
 import { useAppStore, useIdProyectoActualStore } from "@/stores/app";
 
@@ -341,7 +342,8 @@ onMounted(async () => {
     autoCloseBrackets: true,
     extraKeys: {
       "Ctrl-Space": "autocomplete"
-    }
+    },
+    placeholder: "// ctrl + espai per suggeriments d’etiquetes"
   });
 
   const projectId = route.params.id;
