@@ -151,7 +151,6 @@ import { useLliureStore } from "~/stores/app";
 import AlertComponent from '@/components/AlertComponent.vue';
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
-import { io } from "socket.io-client";
 
 import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
@@ -458,25 +457,58 @@ onUnmounted(() => {
   }
 });
 
-const generateShareCode = () => {
-  const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-  shareCode.value = randomCode;
-  socket.value.emit("create-room", {
-    roomId: randomCode,
-    projectId: idProyectoActualStore.id,
-    userName: appStore.loginInfo.name,
-    avatar: appStore.loginInfo.avatar,
-    initialData: {
-      html: html.value,
-      css: css.value,
-      js: js.value
+const generateShareCode = async () => {
+  try {
+    // Demanem al servidor que generi el codi de compartir
+    const response = await fetch('http://localhost:5000/generate-share-code', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        projectId: idProyectoActualStore.id,
+        html: html.value,
+        css: css.value,
+        js: js.value,
+        userName: appStore.loginInfo.name,
+        avatar: appStore.loginInfo.avatar
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      shareCode.value = data.roomId;
+
+      // Si la sala és nova, ens connectarem a través del socket
+      if (data.isNewRoom) {
+        // Ens unim a la sala que acabem de crear
+        socket.value.emit("join-room", {
+          roomId: data.roomId,
+          projectId: idProyectoActualStore.id,
+          userName: appStore.loginInfo.name,
+          avatar: appStore.loginInfo.avatar
+        });
+      } else {
+        // Si la sala ja existia, simplement ens hi unim
+        socket.value.emit("join-room", {
+          roomId: data.roomId,
+          projectId: idProyectoActualStore.id,
+          userName: appStore.loginInfo.name,
+          avatar: appStore.loginInfo.avatar
+        });
+      }
+
+      isCollaborating.value = true;
+      showShareModal.value = true;
+    } else {
+      console.error('Error al generar el codi de compartir:', data.error);
+      // Mostrar algun missatge d'error
     }
-  });
-
-
-
-  isCollaborating.value = true;
-  showShareModal.value = true;
+  } catch (error) {
+    console.error('Error al generar el codi de compartir:', error);
+    // Mostrar algun missatge d'error
+  }
 };
 
 const closeShareModal = () => {
