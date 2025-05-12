@@ -42,17 +42,15 @@
             <div class="skill">
               <span class="skill-icon">🎨</span>
               <div class="skill-progress">
-                <div class="progress-bar css" :style="{ width: ((user.nivel_css - 11) / (20 - 11) * 90 + 10) + '%' }">
-                </div>
-                <span>CSS {{ ((user.nivel_css - 11) / (20 - 11) * 90 + 10).toFixed(0) }}%</span>
+                <div class="progress-bar css" :style="{ width: (user.nivel_css * 10) + '%' }"></div>
+                <span>CSS {{ user.nivel_css * 10 }}%</span>
               </div>
             </div>
-
             <div class="skill">
               <span class="skill-icon">⚙️</span>
               <div class="skill-progress">
-                <div class="progress-bar js" :style="{ width: ((user.nivel_js - 21) / 9 * 90 + 10) + '%' }"></div>
-                <span>JS {{ ((user.nivel_js - 21) / 9 * 90 + 10).toFixed(0) }}%</span>
+                <div class="progress-bar js" :style="{ width: (user.nivel_js * 10) + '%' }"></div>
+                <span>JS {{ user.nivel_js * 10 }}%</span>
               </div>
             </div>
           </div>

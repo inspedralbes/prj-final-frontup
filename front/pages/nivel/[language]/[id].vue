@@ -54,43 +54,61 @@ export default {
     const lliureStore = useLliureStore();
 
     const title = computed(() => `Exercici ${id.value}`);
+    const language = ref(route.params.language);
+    const id = ref(parseInt(route.params.id));
 
     const languageLabel = computed(() => {
-      if (language.value === 'html') return 'Llenguatge: HTML';
-      if (language.value === 'css') return 'Llenguatge: CSS';
-      if (language.value === 'js') return 'Llenguatge: JavaScript';
-      return 'Llenguatge desconegut';
+      return {
+        'html': 'Llenguatge: HTML',
+        'css': 'Llenguatge: CSS',
+        'js': 'Llenguatge: JavaScript'
+      }[language.value] || 'Llenguatge desconegut';
     });
 
     const html = ref("");
     const css = ref("");
     const js = ref("");
-    const isEditing = ref(false);
     const question = ref("");
     const loading = ref(true);
     const error = ref(false);
-    const language = ref(route.params.language);
-    const id = ref(route.params.id);
-
     const htmlEditor = ref(null);
     let htmlEditorInstance;
 
+    const levelLimits = {
+      html: { min: 1, max: 10 },
+      css: { min: 1, max: 10 },
+      js: { min: 1, max: 10 }
+    };
+
     watch(() => route.params.language, (newLanguage) => {
-      if (newLanguage === 'html') {
-        id.value = Math.max(1, Math.min(10, parseInt(route.params.id)));
-      } else if (newLanguage === 'css') {
-        id.value = Math.max(11, Math.min(20, parseInt(route.params.id)));
-      } else if (newLanguage === 'js') {
-        id.value = Math.max(21, Math.min(30, parseInt(route.params.id)));
-      }
+      language.value = newLanguage;
+      id.value = Math.max(
+        levelLimits[newLanguage].min,
+
+        Math.min(levelLimits[newLanguage].max, id.value)
+      );
     }, { immediate: true });
+
+    watch(() => route.fullPath, () => {
+      id.value = parseInt(route.params.id);
+      fetchQuestion();
+      clearEditors();
+    });
 
     const fetchQuestion = async () => {
       try {
         loading.value = true;
         error.value = false;
 
-        const response = await fetch(`http://localhost:8000/api/preguntas/${language.value}/${id.value}`);
+        const response = await fetch(
+          `http://localhost:8000/api/niveles/${language.value}/pregunta/${id.value}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          }
+        );
+
         if (!response.ok) throw new Error("Error a l'obtenir la pregunta");
 
         const data = await response.json();
@@ -98,6 +116,11 @@ export default {
       } catch (err) {
         console.error("Error en fetchQuestion:", err);
         error.value = true;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: "No s'ha pogut carregar la pregunta",
+        });
       } finally {
         loading.value = false;
       }
@@ -110,94 +133,95 @@ export default {
       }
 
       try {
-        const response = await fetch(`http://localhost:8000/api/preguntas/${language.value}/${id.value}`);
-        if (!response.ok) throw new Error("Error a l'obtenir la resposta correcta");
+        const response = await fetch(
+          `http://localhost:8000/api/niveles/${language.value}/verificar/${id.value}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+              respuesta_usuario: {
+                html: html.value,
+                css: css.value,
+                js: js.value
+              }[language.value]
+            })
+          }
+        );
 
-        const data = await response.json();
+        if (!response.ok) throw new Error("Error en la verificació");
 
-        const cleanString = (str) => {
-          return str.replace(/[\s\u200B\u200C\u200D\uFEFF]+/g, '').toUpperCase();
-        };
+        const { correct, message } = await response.json();
 
-        const respuestaCorrecta = cleanString(data.resp_correcta);
-        console.log("respuesta correcta", respuestaCorrecta);
-        const respuestaUsuario = cleanString(html.value);
-        console.log("respuesta usuari", respuestaUsuario);
-
-
-        if (respuestaUsuario === respuestaCorrecta) {
+        if (correct) {
           await Swal.fire({
             icon: 'success',
             title: '¡Felicitats!',
-            text: "Has completat l'exercici.",
+            text: message,
           });
 
-          await actualizarNivel();
+          await updateUserLevel();
 
-          let nextId = parseInt(id.value) + 1;
-
-          if (
-            (language.value === "html" && nextId > 10) ||
-            (language.value === "css" && nextId > 20) ||
-            (language.value === "js" && nextId > 30)
-          ) {
+          const nextId = id.value + 1;
+          if (nextId > levelLimits[language.value].max) {
             await Swal.fire({
               icon: 'info',
               title: '🎉 Enhorabona!',
               text: "Has completat totes les preguntes d'aquest llenguatge.",
             });
-            return;
+          } else {
+            router.push(`/nivel/${language.value}/${nextId}`);
           }
-
-          router.push(`/nivel/${language.value}/${nextId}`);
         } else {
           Swal.fire({
             icon: 'error',
             title: 'Incorrecte',
-            text: "La teva resposta no es correcta. Torna-ho a intentar.",
+            text: message,
           });
         }
-
-
       } catch (error) {
         console.error("Error al validar l'exercici:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: "Hi ha hagut un problema en verificar la resposta",
+        });
       }
     };
 
-
-    const actualizarNivel = async () => {
+    const updateUserLevel = async () => {
       try {
-        const userId = 1;
-        let campoNivel = "";
-
-        if (language.value === "html") campoNivel = "nivel";
-        else if (language.value === "css") campoNivel = "nivel_css";
-        else if (language.value === "js") campoNivel = "nivel_js";
-
-        const response = await fetch(`http://localhost:8000/api/actualizar-nivel`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: userId,
-            campo: campoNivel,
-            nivel: id.value,
-          }),
-        });
+        const response = await fetch(
+          `http://localhost:8000/api/niveles/${language.value}/actualizar`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+              userId: parseInt(localStorage.getItem('userId')),
+              nivel: id.value,
+              language: language.value
+            })
+          }
+        );
 
         if (!response.ok) throw new Error("Error a l'actualizar el nivell");
 
+        const data = await response.json();
+        console.log("Nivel actualizado:", data);
       } catch (error) {
         console.error("Error en actualizarNivel:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: "No s'ha pogut actualitzar el nivell",
+        });
       }
     };
-
-    watch(() => route.params.id, (newId) => {
-      id.value = newId;
-      fetchQuestion();
-      clearEditors();
-    });
 
     const clearEditors = () => {
       html.value = '';
@@ -209,55 +233,42 @@ export default {
       }
     };
 
+    const goBack = () => {
+      router.push(`/nivel_${language.value}`);
+    };
+
     onMounted(() => {
       lliureStore.toggleLliure();
-
       fetchQuestion();
 
+      let mode = "htmlmixed";
+      if (language.value === "css") mode = "css";
+      else if (language.value === "js") mode = "javascript";
+
       htmlEditorInstance = CodeMirror(htmlEditor.value, {
-        mode: "htmlmixed",
+        mode,
         theme: "dracula",
         lineNumbers: true,
       });
 
+      const initialContent = {
+        html: "<!-- Escriu el teu codi HTML aquí -->",
+        css: "/* Escriu el teu codi CSS aquí */",
+        js: "// Escriu el teu codi JavaScript aquí"
+      }[language.value];
+
+      htmlEditorInstance.setValue(initialContent);
+      if (language.value === "html") html.value = initialContent;
+      else if (language.value === "css") css.value = initialContent;
+      else if (language.value === "js") js.value = initialContent;
+
       htmlEditorInstance.on("change", (instance) => {
-        html.value = instance.getValue();
+        const value = instance.getValue();
+        if (language.value === "html") html.value = value;
+        else if (language.value === "css") css.value = value;
+        else if (language.value === "js") js.value = value;
       });
-
-      if (language.value === "css") {
-        const basicHTML = `<!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<style>
-
-</style>
-<body>
-    <h1>Hola, mon</h1>
-    <p>Modifica el CSS per cambiar l'estil.</p>
-</body>
-</html>`;
-        htmlEditorInstance.setValue(basicHTML);
-        html.value = basicHTML;
-      }
     });
-
-    const goBack = () => {
-      let rutaBase = "/nivel_";
-
-      if (language.value === "html") {
-        rutaBase += "html";
-      } else if (language.value === "css") {
-        rutaBase += "css";
-      } else if (language.value === "js") {
-        rutaBase += "js";
-      }
-
-      router.push(rutaBase);
-    };
-
-
 
     onUnmounted(() => {
       lliureStore.toggleLliure();
@@ -269,24 +280,27 @@ export default {
       css,
       js,
       htmlEditor,
-      isEditing,
-      goBack,
       question,
       loading,
       error,
       output: computed(() => `
-        <html>
-          <head><style>${css.value}</style></head>
-          <body>${html.value}</body>
-        </html>
-      `),
+  <html>
+    <head>
+      <style>${css.value}</style>
+    </head>
+    <body>
+      ${html.value}
+      <script>${js.value}<\/script>
+    </body>
+  </html>
+`),
       validateExercise,
       languageLabel,
+      goBack
     };
   },
 };
 </script>
-
 
 <style scoped>
 .todo {

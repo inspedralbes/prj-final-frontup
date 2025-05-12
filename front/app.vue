@@ -59,6 +59,20 @@
           </svg>
           <p class="label">Likes</p>
         </li>
+        <li class="leftsection-element" @click="navigateToCreadorNiveles">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
+            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3h18v18H3zM12 8v8m-4-4h8" />
+          </svg>
+          <p class="label">Creador nivells</p>
+        </li>
+        <li class="leftsection-element" @click="navigateToNivelesUsuarios">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
+            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3h18v18H3zM12 8v8m-4-4h8" />
+          </svg>
+          <p class="label">Nivells d'usuaris</p>
+        </li>
       </ul>
       <li class="leftsection-element" @click="showCollaborationModal = true">
         <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#7e8590"
@@ -203,6 +217,15 @@ const navigateToLliure = async () => {
 const navigateToNiveles = () => {
   router.push('/niveles');
 }
+
+const navigateToCreadorNiveles = () => {
+  router.push('/creadorNiveles');
+}
+
+const navigateToNivelesUsuarios = () => {
+  router.push('/nivelesUsuarios');
+}
+
 const navigateToLikes = () => {
   router.push('/likes');
 }
