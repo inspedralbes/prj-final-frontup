@@ -458,6 +458,45 @@ const useCommunicationManager = () => {
       };
     }
   };
+
+  const fetchProjects = async ({ page = 1, searchQuery = "", sortCriteria = "default" }) => {
+    try {
+      const url = new URL("http://localhost:8000/api/projects");
+      url.searchParams.append("page", page);
+      if (searchQuery) {
+        url.searchParams.append("search", searchQuery);
+      }
+      if (sortCriteria && sortCriteria !== "default") {
+        url.searchParams.append("sort", sortCriteria);
+      }
+  
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No hay token guardado");
+  
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.message || "Error cargando proyectos");
+      }
+  
+      return {
+        success: true,
+        data,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  };
   
 
   return {
@@ -481,6 +520,7 @@ const useCommunicationManager = () => {
     socket,
     loginUser,
     registerUser,
+    fetchProjects,
   };
 };
 
