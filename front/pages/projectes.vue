@@ -31,13 +31,9 @@
       </div>
 
       <div class="pagination">
-        <button @click="prevPage" :disabled="currentPage === 1" class="page-btn">
-          Anterior
-        </button>
+        <button @click="prevPage" :disabled="currentPage === 1" class="page-btn">Anterior</button>
         <span>Pàgina {{ currentPage }} de {{ totalPages }}</span>
-        <button @click="nextPage" :disabled="currentPage === totalPages" class="page-btn">
-          Següent
-        </button>
+        <button @click="nextPage" :disabled="currentPage === totalPages" class="page-btn">Següent</button>
       </div>
     </div>
   </div>
@@ -64,35 +60,31 @@ export default {
     };
   },
   watch: {
-    searchQuery() {
-      this.currentPage = 1;
-      this.fetchProjects();
-    },
-    sortCriteria() {
-      this.currentPage = 1;
-      this.fetchProjects();
-    },
+    searchQuery: 'handleFilterChange',
+    sortCriteria: 'handleFilterChange',
   },
   async mounted() {
     await this.fetchProjects();
   },
   methods: {
-    async fetchProjects(page = 1) {
+    handleFilterChange() {
+      this.currentPage = 1;
+      this.fetchProjects();
+    },
+    async fetchProjects(page = this.currentPage) {
+      this.loading = true;
+      this.error = null;
       try {
-        this.loading = true;
-        const url = new URL("http://localhost:8000/api/projects");
-        url.searchParams.append("page", page);
-        if (this.searchQuery) {
-          url.searchParams.append("search", this.searchQuery);
-        }
-        if (this.sortCriteria && this.sortCriteria !== "default") {
-          url.searchParams.append("sort", this.sortCriteria);
-        }
+        const params = new URLSearchParams({
+          page,
+          ...(this.searchQuery && { search: this.searchQuery }),
+          ...(this.sortCriteria !== 'default' && { sort: this.sortCriteria }),
+        });
 
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("No hay token guardado");
+        if (!token) throw new Error("No hi ha token guardat");
 
-        const response = await fetch(url, {
+        const response = await fetch(`http://localhost:8000/api/projects?${params}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -108,22 +100,22 @@ export default {
         this.projects = data.data;
         this.currentPage = data.current_page;
         this.totalPages = data.last_page;
-        this.loading = false;
       } catch (error) {
         this.error = error.message;
+      } finally {
         this.loading = false;
       }
     },
     nextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
-        this.fetchProjects(this.currentPage);
+        this.fetchProjects();
       }
     },
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
-        this.fetchProjects(this.currentPage);
+        this.fetchProjects();
       }
     },
     async deleteProject(id) {
@@ -131,11 +123,15 @@ export default {
       try {
         const manager = useCommunicationManager();
         await manager.borrarProyectoDB(id);
-        this.fetchProjects(this.currentPage);
+        await this.fetchProjects();
+        if (this.projects.length === 0 && this.currentPage > 1) {
+          this.currentPage--;
+          this.fetchProjects();
+        }
       } catch (err) {
         alert('Error eliminant el projecte: ' + err.message);
       }
-    }, 
+    },
   },
 };
 </script>
@@ -149,7 +145,6 @@ export default {
   margin: auto;
   padding: 30px;
   text-align: center;
-
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 

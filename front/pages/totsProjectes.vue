@@ -108,7 +108,6 @@ export default {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  max-width: 100%;
   margin: auto;
   padding: 30px;
   text-align: center;
@@ -186,22 +185,6 @@ export default {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 30px;
   padding: 10px 0;
-}
-
-.delete-btn {
-  margin-top: 10px;
-  padding: 8px 14px;
-  background-color: #ef4444;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.delete-btn:hover {
-  background-color: #dc2626;
 }
 
 .pagination {

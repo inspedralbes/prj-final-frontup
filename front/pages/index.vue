@@ -99,7 +99,6 @@ export default {
 }
 
 .main-container {
-  flex-direction: flex;
   justify-content: space-between;
   margin-left: 2%;
 }
@@ -166,7 +165,6 @@ export default {
 }
 
 .card p {
-  color: #d4cece;
   margin-bottom: 20px;
   flex-grow: 1;
   font-size: 1.1em;
