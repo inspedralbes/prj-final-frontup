@@ -151,7 +151,6 @@ import { useLliureStore } from "~/stores/app";
 import AlertComponent from '@/components/AlertComponent.vue';
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
-import { io } from "socket.io-client";
 
 import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
@@ -169,6 +168,7 @@ import "codemirror/addon/display/placeholder";
 import useCommunicationManager from "@/stores/comunicationManager";
 import { useAppStore, useIdProyectoActualStore } from "@/stores/app";
 
+const manager = useCommunicationManager();
 const appStore = useAppStore();
 const idProyectoActualStore = useIdProyectoActualStore();
 const router = useRouter();
@@ -366,7 +366,17 @@ onMounted(async () => {
     console.error("No se encontró un ID de proyecto válido en la ruta.");
   }
 
-  initSocketConnection();
+  manager.initSocketConnection({
+    socket,
+    activeUsersList,
+    html,
+    css,
+    js,
+    isApplyingExternalChanges,
+    htmlEditorInstance,
+    cssEditorInstance,
+    jsEditorInstance,
+  });
 
   const collabCode = route.query.code;
   if (collabCode) {
@@ -428,93 +438,17 @@ onMounted(async () => {
 });
 
 
-const initSocketConnection = () => {
-  socket.value = io("http://localhost:5000");
-
-
-  socket.value.on("connect", () => {
-    console.log("Conectado al servidor de socket");
-  });
-
-  socket.value.on("active-users", (users) => {
-    activeUsersList.value = users;
-  });
-
-
-  socket.value.on("html-change", (newValue) => {
-    if (newValue !== html.value) {
-      try {
-        isApplyingExternalChanges.value.html = true;
-        html.value = newValue;
-        htmlEditorInstance.setValue(newValue);
-      } finally {
-        setTimeout(() => {
-          isApplyingExternalChanges.value.html = false;
-        }, 0);
-      }
-    }
-  });
-
-
-  socket.value.on("css-change", (newValue) => {
-    if (newValue !== css.value) {
-      try {
-        isApplyingExternalChanges.value.css = true;
-        css.value = newValue;
-        cssEditorInstance.setValue(newValue);
-      } finally {
-        setTimeout(() => {
-          isApplyingExternalChanges.value.css = false;
-        }, 0);
-      }
-    }
-  });
-
-
-  socket.value.on("js-change", (newValue) => {
-    if (newValue !== js.value) {
-      try {
-        isApplyingExternalChanges.value.js = true;
-        js.value = newValue;
-        jsEditorInstance.setValue(newValue);
-      } finally {
-        setTimeout(() => {
-          isApplyingExternalChanges.value.js = false;
-        }, 0);
-      }
-    }
-  });
-
-
-  socket.value.on("initial-state", ({ html: htmlCode, css: cssCode, js: jsCode }) => {
-    try {
-      isApplyingExternalChanges.value = {
-        html: true,
-        css: true,
-        js: true
-      };
-
-
-      html.value = htmlCode;
-      css.value = cssCode;
-      js.value = jsCode;
-
-
-      htmlEditorInstance.setValue(htmlCode);
-      cssEditorInstance.setValue(cssCode);
-      jsEditorInstance.setValue(jsCode);
-    } finally {
-      setTimeout(() => {
-        isApplyingExternalChanges.value = {
-          html: false,
-          css: false,
-          js: false
-        };
-      }, 0);
-    }
-  });
-
-};
+manager.initSocketConnection({
+  socket,
+  activeUsersList,
+  html,
+  css,
+  js,
+  isApplyingExternalChanges,
+  htmlEditorInstance,
+  cssEditorInstance,
+  jsEditorInstance,
+});
 
 onUnmounted(() => {
   lliureStore.toggleLliure();
@@ -525,25 +459,58 @@ onUnmounted(() => {
   }
 });
 
-const generateShareCode = () => {
-  const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-  shareCode.value = randomCode;
-  socket.value.emit("create-room", {
-    roomId: randomCode,
-    projectId: idProyectoActualStore.id,
-    userName: appStore.loginInfo.name,
-    avatar: appStore.loginInfo.avatar,
-    initialData: {
-      html: html.value,
-      css: css.value,
-      js: js.value
+const generateShareCode = async () => {
+  try {
+    // Demanem al servidor que generi el codi de compartir
+    const response = await fetch('http://localhost:5000/generate-share-code', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        projectId: idProyectoActualStore.id,
+        html: html.value,
+        css: css.value,
+        js: js.value,
+        userName: appStore.loginInfo.name,
+        avatar: appStore.loginInfo.avatar
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      shareCode.value = data.roomId;
+
+      // Si la sala és nova, ens connectarem a través del socket
+      if (data.isNewRoom) {
+        // Ens unim a la sala que acabem de crear
+        socket.value.emit("join-room", {
+          roomId: data.roomId,
+          projectId: idProyectoActualStore.id,
+          userName: appStore.loginInfo.name,
+          avatar: appStore.loginInfo.avatar
+        });
+      } else {
+        // Si la sala ja existia, simplement ens hi unim
+        socket.value.emit("join-room", {
+          roomId: data.roomId,
+          projectId: idProyectoActualStore.id,
+          userName: appStore.loginInfo.name,
+          avatar: appStore.loginInfo.avatar
+        });
+      }
+
+      isCollaborating.value = true;
+      showShareModal.value = true;
+    } else {
+      console.error('Error al generar el codi de compartir:', data.error);
+      // Mostrar algun missatge d'error
     }
-  });
-
-
-
-  isCollaborating.value = true;
-  showShareModal.value = true;
+  } catch (error) {
+    console.error('Error al generar el codi de compartir:', error);
+    // Mostrar algun missatge d'error
+  }
 };
 
 const closeShareModal = () => {
@@ -725,7 +692,17 @@ const leaveCollaborationSession = () => {
   shareCode.value = "";
   activeUsers.value = 0;
 
-  initSocketConnection();
+  manager.initSocketConnection({
+    socket,
+    activeUsersList,
+    html,
+    css,
+    js,
+    isApplyingExternalChanges,
+    htmlEditorInstance,
+    cssEditorInstance,
+    jsEditorInstance,
+  });
 };
 
 const output = computed(() => {
@@ -748,11 +725,10 @@ const output = computed(() => {
 </script>
 
 <style scoped>
-
 .layout-buttons {
   display: flex;
   gap: 12px;
-  margin-left: auto; 
+  margin-left: auto;
   margin-top: 20px;
   margin-right: 20px;
 }
@@ -769,7 +745,7 @@ const output = computed(() => {
 
 .users-container {
   display: flex;
-  flex-direction: row; 
+  flex-direction: row;
   flex-wrap: wrap;
   gap: 1rem;
 }
@@ -777,7 +753,7 @@ const output = computed(() => {
 
 .user-card {
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   align-items: center;
   background: #222;
   padding: 0.5rem;
@@ -1269,10 +1245,12 @@ const output = computed(() => {
   border-radius: 4px;
   margin-bottom: 0.5rem;
 }
+
 .code-block pre {
   margin: 0;
   overflow-x: auto;
 }
+
 .btn-copy {
   position: absolute;
   top: 0.5rem;
@@ -1285,6 +1263,7 @@ const output = computed(() => {
   cursor: pointer;
   font-size: 0.75rem;
 }
+
 .btn-copy:hover {
   background: #45a049;
 }
