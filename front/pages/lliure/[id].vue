@@ -889,6 +889,7 @@ const output = computed(() => {
   border-radius: 4px;
   background-color: #1e1e1e;
   color: #fff;
+  overflow-y: auto;
 }
 
 
