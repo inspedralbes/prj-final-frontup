@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { io } from 'socket.io-client';
 
 const useCommunicationManager = () => {
-  const config = useRuntimeConfig(); 
+  const config = useRuntimeConfig();
   const laravelURL = config.public.apiLaravelUrl;
   const nodeURL = config.public.nodeUrl;
 
@@ -15,11 +15,11 @@ const useCommunicationManager = () => {
         transports: ['websocket'],
         withCredentials: true,
       });
-      
+
       socket.value.on('connect', () => {
         console.log('Conectado al servidor WebSocket');
       });
-  
+
       socket.value.on('disconnect', () => {
         console.log('Desconectado del servidor WebSocket');
         socket.value = false; // Indicar que la conexión s'ha perdut
@@ -81,32 +81,6 @@ const useCommunicationManager = () => {
     }
   };
 
-  const loginUser = async (credentials) => {
-    try {
-      const response = await request('/login', 'POST', credentials);
-      if (response.token) {
-        localStorage.setItem('auth_token', response.token);
-        state.token = response.token;
-      }
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  const registerUser = async (userData) => {
-    try {
-      const response = await request('/register', 'POST', userData);
-      if (response.token) {
-        localStorage.setItem('auth_token', response.token);
-        state.token = response.token;
-      }
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-
   const crearProyectoDB = async (proyecto) => {
     try {
       const response = await fetch(`${laravelURL}/projects`, {
@@ -142,7 +116,7 @@ const useCommunicationManager = () => {
         },
         body: JSON.stringify(proyecto),
       });
-      console.log('token que se manda',token);
+      console.log('token que se manda', token);
       if (!response.ok) {
         throw new Error('Error en la solicitud: ' + response.status);
       }
@@ -167,11 +141,11 @@ const useCommunicationManager = () => {
           'Accept': 'application/json',
         },
       });
-  
+
       if (!response.ok) {
         throw new Error('Error en la solicitud: ' + response.status);
       }
-  
+
       const data = await response.json();
       console.log('Respuesta del servidor:', data);
       return data;
@@ -180,12 +154,12 @@ const useCommunicationManager = () => {
       throw error;
     }
   };
-  
+
   const addLike = async (projectId) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return false;
-      
+
       const response = await fetch(`${laravelURL}/likes`, {
         method: 'POST',
         headers: {
@@ -195,23 +169,23 @@ const useCommunicationManager = () => {
         },
         body: JSON.stringify({ project_id: projectId })
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       return true;
     } catch (error) {
       console.error('Error adding like:', error);
       return false;
     }
   };
-  
+
   const removeLike = async (projectId) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return false;
-      
+
       const response = await fetch(`${laravelURL}/likes/${projectId}`, {
         method: 'DELETE',
         headers: {
@@ -220,23 +194,23 @@ const useCommunicationManager = () => {
           'Accept': 'application/json'
         }
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       return true;
     } catch (error) {
       console.error('Error removing like:', error);
       return false;
     }
   };
-  
+
   const checkLike = async (projectId) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return false;
-      
+
       const response = await fetch(`${laravelURL}/likes/check/${projectId}`, {
         method: 'GET',
         headers: {
@@ -245,11 +219,11 @@ const useCommunicationManager = () => {
           'Accept': 'application/json'
         }
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       return data.hasLiked || false;
     } catch (error) {
@@ -257,7 +231,7 @@ const useCommunicationManager = () => {
       return false;
     }
   };
-  
+
   const getLikeCount = async (projectId) => {
     try {
       const response = await fetch(`${laravelURL}/likes/count/${projectId}`, {
@@ -267,11 +241,11 @@ const useCommunicationManager = () => {
           'Accept': 'application/json'
         }
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       return data.count || 0;
     } catch (error) {
@@ -279,12 +253,12 @@ const useCommunicationManager = () => {
       return 0;
     }
   };
-  
+
   const toggleLike = async (projectId) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return false;
-      
+
       const hasLiked = await checkLike(projectId);
       if (hasLiked) {
         await removeLike(projectId);
@@ -297,12 +271,12 @@ const useCommunicationManager = () => {
       return false;
     }
   };
-  
+
   const getUserLikes = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return [];
-      
+
       const response = await fetch(`${laravelURL}/likes/user`, {
         method: 'GET',
         headers: {
@@ -311,11 +285,11 @@ const useCommunicationManager = () => {
           'Accept': 'application/json'
         }
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       return data || [];
     } catch (error) {
@@ -328,7 +302,7 @@ const useCommunicationManager = () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return [];
-      
+
       const response = await fetch(`${laravelURL}/likes/user`, {
         method: 'GET',
         headers: {
@@ -337,11 +311,11 @@ const useCommunicationManager = () => {
           'Accept': 'application/json'
         }
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       return data || [];
     } catch (error) {
@@ -410,10 +384,34 @@ const useCommunicationManager = () => {
     },
   });
 
+  const loginUser = async (email, password) => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Credenciales inválidas");
+      }
+
+      return {
+        success: true,
+        data,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || "Error de red. No se pudo conectar al servidor.",
+      };
+    }
+  };
+
   return {
     state,
-    loginUser,
-    registerUser,
     logoutUser,
     guardarProyectoDB,
     chatIA,
@@ -431,6 +429,7 @@ const useCommunicationManager = () => {
     disconnect,
     joinRoom,
     socket,
+    loginUser,
   };
 };
 
