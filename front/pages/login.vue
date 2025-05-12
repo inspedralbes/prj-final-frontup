@@ -147,7 +147,7 @@ import { useLliureStore } from "~/stores/app";
 import { onBeforeUnmount } from "vue";
 import useCommunicationManager from "@/stores/comunicationManager";
 
-
+const { registerUser } = useCommunicationManager();
 const { loginUser } = useCommunicationManager();
 
 
@@ -315,71 +315,25 @@ const register = async () => {
   validatePassword();
   validatePasswordRepeat();
 
-  if (isRegisterFormValid()) {
-    // Genera la URL del avatar basado en el nombre de usuario
-    const avatarUrl = `https://api.dicebear.com/9.x/personas/svg?seed=${formData.name}`;
+  if (!isRegisterFormValid()) return;
 
-    try {
-      // Llamada al endpoint de registro
-      console.log("entrado en fetch register", {
-        ...formData,
-        avatar: avatarUrl,
-      });
+  const result = await registerUser(formData);
 
-      const response = await fetch("http://localhost:8000/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          avatar: avatarUrl,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Luego de registrarse, se inicia sesión automáticamente
-        const loginResponse = await fetch("http://127.0.0.1:8000/api/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-          }),
-        });
-
-        const loginData = await loginResponse.json();
-        if (loginResponse.ok) {
-          // Guarda en Pinia y en localStorage la misma información que en el login
-          appStore.setLoginInfo({
-            loggedIn: true,
-            id: loginData.user.id,
-            token: loginData.token,
-            name: loginData.user.name,
-            email: loginData.user.email,
-            nivel: data.user.nivel_html,
-            nivel_css: loginData.user.nivel_css,
-            nivel_js: loginData.user.nivel_js,
-            avatar: avatarUrl,
-          });
-
-          router.push("/");
-        } else {
-          errorMessage.value =
-            loginData.message || "Error al iniciar sesión automáticamente";
-        }
-      } else {
-        errorMessage.value = data.message || "Error al crear la cuenta";
-      }
-    } catch (error) {
-      console.error("Error durante el registro:", error);
-      errorMessage.value = "Error de red. No se pudo conectar al servidor.";
-    }
+  if (result.success) {
+    appStore.setLoginInfo({
+      loggedIn: true,
+      id: result.user.id,
+      token: result.token,
+      name: result.user.name,
+      email: result.user.email,
+      nivel: result.user.nivel_html,
+      nivel_css: result.user.nivel_css,
+      nivel_js: result.user.nivel_js,
+      avatar: result.avatar,
+    });
+    router.push("/");
+  } else {
+    errorMessage.value = result.message;
   }
 };
 </script>

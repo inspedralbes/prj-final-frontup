@@ -410,6 +410,56 @@ const useCommunicationManager = () => {
     }
   };
 
+  const registerUser = async (formData) => {
+    const avatarUrl = `https://api.dicebear.com/9.x/personas/svg?seed=${formData.name}`;
+  
+    try {
+      const response = await fetch("http://localhost:8000/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          avatar: avatarUrl,
+        }),
+      });
+  
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Error al crear la cuenta");
+      }
+  
+      const loginResponse = await fetch("http://127.0.0.1:8000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+  
+      const loginData = await loginResponse.json();
+      if (!loginResponse.ok) {
+        throw new Error(loginData.message || "Error al iniciar sesión automáticamente");
+      }
+  
+      return {
+        success: true,
+        user: loginData.user,
+        token: loginData.token,
+        avatar: avatarUrl,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || "Error de red. No se pudo conectar al servidor.",
+      };
+    }
+  };
+  
+
   return {
     state,
     logoutUser,
@@ -430,6 +480,7 @@ const useCommunicationManager = () => {
     joinRoom,
     socket,
     loginUser,
+    registerUser,
   };
 };
 
