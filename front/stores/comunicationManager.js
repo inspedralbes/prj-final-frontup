@@ -412,7 +412,7 @@ const useCommunicationManager = () => {
 
   const registerUser = async (formData) => {
     const avatarUrl = `https://api.dicebear.com/9.x/personas/svg?seed=${formData.name}`;
-  
+
     try {
       const response = await fetch("http://localhost:8000/api/register", {
         method: "POST",
@@ -425,12 +425,12 @@ const useCommunicationManager = () => {
           avatar: avatarUrl,
         }),
       });
-  
+
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message || "Error al crear la cuenta");
       }
-  
+
       const loginResponse = await fetch("http://127.0.0.1:8000/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -439,12 +439,12 @@ const useCommunicationManager = () => {
           password: formData.password,
         }),
       });
-  
+
       const loginData = await loginResponse.json();
       if (!loginResponse.ok) {
         throw new Error(loginData.message || "Error al iniciar sesión automáticamente");
       }
-  
+
       return {
         success: true,
         user: loginData.user,
@@ -469,23 +469,23 @@ const useCommunicationManager = () => {
       if (sortCriteria && sortCriteria !== "default") {
         url.searchParams.append("sort", sortCriteria);
       }
-  
+
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No hay token guardado");
-  
+
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         throw new Error(data.message || "Error cargando proyectos");
       }
-  
+
       return {
         success: true,
         data,
@@ -504,19 +504,19 @@ const useCommunicationManager = () => {
       params.append("page", page);
       if (searchQuery) params.append("search", searchQuery);
       if (sortCriteria && sortCriteria !== "default") params.append("sort", sortCriteria);
-  
+
       const response = await fetch(`http://localhost:8000/api/projects/all?${params.toString()}`, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         throw new Error(data.message || "Error cargando proyectos");
       }
-  
+
       return {
         success: true,
         data,
@@ -527,8 +527,97 @@ const useCommunicationManager = () => {
         message: error.message,
       };
     }
-  };  
-  
+  };
+
+  const initSocketConnection = ({
+    socket,
+    activeUsersList,
+    html,
+    css,
+    js,
+    isApplyingExternalChanges,
+    htmlEditorInstance,
+    cssEditorInstance,
+    jsEditorInstance,
+  }) => {
+    socket.value = io("http://localhost:5000");
+
+    socket.value.on("connect", () => {
+      console.log("Conectado al servidor de socket");
+    });
+
+    socket.value.on("active-users", (users) => {
+      activeUsersList.value = users;
+    });
+
+    socket.value.on("html-change", (newValue) => {
+      if (newValue !== html.value) {
+        try {
+          isApplyingExternalChanges.value.html = true;
+          html.value = newValue;
+          htmlEditorInstance.setValue(newValue);
+        } finally {
+          setTimeout(() => {
+            isApplyingExternalChanges.value.html = false;
+          }, 0);
+        }
+      }
+    });
+
+    socket.value.on("css-change", (newValue) => {
+      if (newValue !== css.value) {
+        try {
+          isApplyingExternalChanges.value.css = true;
+          css.value = newValue;
+          cssEditorInstance.setValue(newValue);
+        } finally {
+          setTimeout(() => {
+            isApplyingExternalChanges.value.css = false;
+          }, 0);
+        }
+      }
+    });
+
+    socket.value.on("js-change", (newValue) => {
+      if (newValue !== js.value) {
+        try {
+          isApplyingExternalChanges.value.js = true;
+          js.value = newValue;
+          jsEditorInstance.setValue(newValue);
+        } finally {
+          setTimeout(() => {
+            isApplyingExternalChanges.value.js = false;
+          }, 0);
+        }
+      }
+    });
+
+    socket.value.on("initial-state", ({ html: htmlCode, css: cssCode, js: jsCode }) => {
+      try {
+        isApplyingExternalChanges.value = {
+          html: true,
+          css: true,
+          js: true,
+        };
+
+        html.value = htmlCode;
+        css.value = cssCode;
+        js.value = jsCode;
+
+        htmlEditorInstance.setValue(htmlCode);
+        cssEditorInstance.setValue(cssCode);
+        jsEditorInstance.setValue(jsCode);
+      } finally {
+        setTimeout(() => {
+          isApplyingExternalChanges.value = {
+            html: false,
+            css: false,
+            js: false,
+          };
+        }, 0);
+      }
+    });
+  };
 
   return {
     state,
@@ -553,6 +642,7 @@ const useCommunicationManager = () => {
     registerUser,
     fetchProjects,
     fetchAllProjects,
+    initSocketConnection,
   };
 };
 
