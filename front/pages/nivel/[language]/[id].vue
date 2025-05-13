@@ -202,7 +202,6 @@ export default {
               'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify({
-              userId: parseInt(localStorage.getItem('userId')),
               nivel: id.value,
               language: language.value
             })

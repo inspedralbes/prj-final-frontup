@@ -75,11 +75,55 @@ app.get('/debug-rooms', (req, res) => {
     res.json(data);
 });
 
+// Nova ruta per generar un codi d'invitació i crear una sala
+app.post('/generate-share-code', (req, res) => {
+    try {
+        const { projectId, html, css, js, userName, avatar } = req.body;
+        
+        if (projectRooms.has(projectId)) {
+            const existingRoomId = projectRooms.get(projectId);
+            const room = rooms.get(existingRoomId);
+            
+            if (room) {
+                return res.json({
+                    success: true,
+                    roomId: existingRoomId,
+                    isNewRoom: false
+                });
+            }
+        }
+        
+        const shareCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        
+        rooms.set(shareCode, {
+            projectId,
+            html: html || '',
+            css: css || '',
+            js: js || '',
+            users: []  
+        });
+        
+        projectRooms.set(projectId, shareCode);
+        
+        res.json({
+            success: true,
+            roomId: shareCode,
+            isNewRoom: true
+        });
+    } catch (error) {
+        console.error('Error generant codi de compartir:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
 
 io.on('connection', (socket) => {
     console.log(`Usuario conectado: ${socket.id}`);
 
-    // Crear una nova room
+    // Crear una nova room (mantenim per compatibilitat)
     socket.on('create-room', ({ roomId, projectId, initialData, userName, avatar }) => {
         console.log(`Creando room: ${roomId} para proyecto: ${projectId}`);
         rooms.set(roomId, {
@@ -136,9 +180,9 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log(`Usuari desconnectat: ${socket.id}`);
         for (const [roomId, room] of rooms.entries()) {
-            const index = room.users.indexOf(socket.id);
-            if (index !== -1) {
-                room.users.splice(index, 1);
+            const userIndex = room.users.findIndex(user => user.id === socket.id);
+            if (userIndex !== -1) {
+                room.users.splice(userIndex, 1);
                 console.log(`Usuari ${socket.id} eliminat de la room ${roomId}`);
                 console.log(`Queden ${room.users.length} usuaris`);
 
@@ -146,6 +190,13 @@ io.on('connection', (socket) => {
 
                 if (room.users.length === 0) {
                     rooms.delete(roomId);
+                    // També eliminem la relació projecte-sala
+                    for (const [projectId, roomCode] of projectRooms.entries()) {
+                        if (roomCode === roomId) {
+                            projectRooms.delete(projectId);
+                            break;
+                        }
+                    }
                     console.log(`Room ${roomId} eliminada per estar buida`);
                 }
                 break;
