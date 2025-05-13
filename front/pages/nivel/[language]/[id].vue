@@ -171,6 +171,7 @@ export default {
               title: '🎉 Enhorabona!',
               text: "Has completat totes les preguntes d'aquest llenguatge.",
             });
+            router.push('/niveles');
           } else {
             router.push(`/nivel/${language.value}/${nextId}`);
           }

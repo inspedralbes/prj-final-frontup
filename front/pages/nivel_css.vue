@@ -39,7 +39,6 @@ export default {
         const data = await response.json();
         const userData = data.user;
 
-        // 👇 AQUI defines userLevel
         let userLevel = 1;
 
         switch (this.language) {
