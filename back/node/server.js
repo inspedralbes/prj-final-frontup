@@ -61,7 +61,7 @@ const rooms = new Map();
 const projectRooms = new Map();
 
 app.get('/', (req, res) => {
-    res.send('Socket.IO Server para FrontUp Collaboration');
+    res.send('Prueba');
 });
 
 app.get('/debug-rooms', (req, res) => {
