@@ -39,121 +39,70 @@
 
         <div class="leftsection-separator"></div>
 
-        <ul class="leftsection-list">
-          <li
-            class="leftsection-element leftsection-element--crear"
-            @click="navigateToLliure"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="25"
-              height="25"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#7e8590"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            <p class="label">Crear Projecte</p>
-          </li>
-          <li
-            v-if="isLoged"
-            class="leftsection-element"
-            @click="navigateToMeusProjectes"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="25"
-              height="25"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#7e8590"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <p class="label">Els Meus Projectes</p>
-          </li>
-          <li class="leftsection-element" @click="navigateToNiveles">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="25"
-              height="25"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#7e8590"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M3 3h18v18H3zM12 8v8m-4-4h8" />
-            </svg>
-            <p class="label">Nivells</p>
-          </li>
-          <li class="leftsection-element" @click="navigateToTotsProjectes">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="25"
-              height="25"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#7e8590"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <path d="M8 7v10M16 7v10M12 7v10" />
-            </svg>
-            <p class="label">Tots els Projectes</p>
-          </li>
-          <li
-            v-if="isLoged"
-            class="leftsection-element"
-            @click="navigateToLikes"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="25"
-              height="25"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#7e8590"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-              ></path>
-            </svg>
-            <p class="label">Likes</p>
-          </li>
-        </ul>
-        <li class="leftsection-element" @click="showCollaborationModal = true">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="25"
-            height="25"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#7e8590"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M10 20v-6h4v6m-7-8h10V4H7z" />
+      <ul class="leftsection-list">
+        <li class="leftsection-element leftsection-element--crear" @click="navigateToLliure">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
+            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
-          <p class="label">Unir-se a Projecte</p>
+          <p class="label">Crear Projecte</p>
         </li>
-        <div class="leftsection-separator"></div>
+        <li v-if="isLoged" class="leftsection-element" @click="navigateToMeusProjectes">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
+            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <p class="label">Els Meus Projectes</p>
+        </li>
+        <li class="leftsection-element" @click="navigateToNiveles">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
+            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3h18v18H3zM12 8v8m-4-4h8" />
+          </svg>
+          <p class="label">Nivells</p>
+        </li>
+        <li class="leftsection-element" @click="navigateToTotsProjectes">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
+            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M8 7v10M16 7v10M12 7v10" />
+          </svg>
+          <p class="label">Tots els Projectes</p>
+        </li>
+        <li v-if="isLoged" class="leftsection-element" @click="navigateToLikes">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
+            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+            </path>
+          </svg>
+          <p class="label">Likes</p>
+        </li>
+        <li class="leftsection-element" @click="navigateToCreadorNiveles">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
+            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3h18v18H3zM12 8v8m-4-4h8" />
+          </svg>
+          <p class="label">Creador nivells</p>
+        </li>
+        <li class="leftsection-element" @click="navigateToNivelesUsuarios">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
+            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3h18v18H3zM12 8v8m-4-4h8" />
+          </svg>
+          <p class="label">Nivells d'usuaris</p>
+        </li>
+      </ul>
+      <li class="leftsection-element" @click="showCollaborationModal = true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#7e8590"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 20v-6h4v6m-7-8h10V4H7z" />
+        </svg>
+        <p class="label">Unir-se a Projecte</p>
+      </li>
+      <div class="leftsection-separator"></div>
 
         <ul class="leftsection-list">
           <li
@@ -325,8 +274,17 @@ const navigateToLliure = async () => {
 };
 
 const navigateToNiveles = () => {
-  router.push("/niveles");
-};
+  router.push('/niveles');
+}
+
+const navigateToCreadorNiveles = () => {
+  router.push('/creadorNiveles');
+}
+
+const navigateToNivelesUsuarios = () => {
+  router.push('/nivelesUsuarios');
+}
+
 const navigateToLikes = () => {
   router.push("/likes");
 };

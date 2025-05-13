@@ -62,6 +62,7 @@ export default {
       error: null,
       currentPage: 1,
       totalPages: 1,
+      communicationManager: null,
     };
   },
   watch: {
@@ -75,45 +76,30 @@ export default {
     },
   },
   async mounted() {
+    this.communicationManager = useCommunicationManager();
     await this.fetchProjects();
   },
   methods: {
     async fetchProjects(page = 1) {
-      try {
-        this.loading = true;
-        const url = new URL("http://localhost:8000/api/projects");
-        url.searchParams.append("page", page);
-        if (this.searchQuery) {
-          url.searchParams.append("search", this.searchQuery);
-        }
-        if (this.sortCriteria && this.sortCriteria !== "default") {
-          url.searchParams.append("sort", this.sortCriteria);
-        }
+      this.loading = true;
 
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("No hay token guardado");
+      const result = await this.communicationManager.fetchProjects({
+        page,
+        searchQuery: this.searchQuery,
+        sortCriteria: this.sortCriteria,
+      });
 
-        const response = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Error carregant projectes");
-        }
-
-        const data = await response.json();
+      if (result.success) {
+        const data = result.data;
         this.projects = data.data;
         this.currentPage = data.current_page;
         this.totalPages = data.last_page;
-        this.loading = false;
-      } catch (error) {
-        this.error = error.message;
-        this.loading = false;
+        this.error = null;
+      } else {
+        this.error = result.message;
       }
+
+      this.loading = false;
     },
     nextPage() {
       if (this.currentPage < this.totalPages) {
@@ -128,15 +114,15 @@ export default {
       }
     },
     async deleteProject(id) {
-      if (!confirm('Segur que vols eliminar aquest projecte?')) return;
+      if (!confirm("¿Seguro que quieres eliminar este proyecto?")) return;
+
       try {
-        const manager = useCommunicationManager();
-        await manager.borrarProyectoDB(id);
+        await this.communicationManager.borrarProyectoDB(id);
         this.fetchProjects(this.currentPage);
       } catch (err) {
-        alert('Error eliminant el projecte: ' + err.message);
+        alert("Error eliminando el proyecto: " + err.message);
       }
-    }, 
+    },
   },
 };
 </script>

@@ -37,6 +37,8 @@
 
 <script>
 import Item from "~/components/item.vue";
+import useCommunicationManager from "@/stores/comunicationManager";
+
 export default {
   name: "TotsProjectes",
   components: { Item },
@@ -48,10 +50,12 @@ export default {
       loading: true,
       error: null,
       currentPage: 1,
-      totalPages: 1
+      totalPages: 1,
+      communicationManager: null,
     };
   },
   async mounted() {
+    this.communicationManager = useCommunicationManager();
     await this.fetchProjects(this.currentPage);
   },
   watch: {
@@ -67,25 +71,24 @@ export default {
   methods: {
     async fetchProjects(page = 1) {
       this.loading = true;
-      const params = new URLSearchParams();
-      params.append("page", page);
-      if (this.searchQuery) params.append("search", this.searchQuery);
-      if (this.sortCriteria && this.sortCriteria !== "default") params.append("sort", this.sortCriteria);
-      try {
-        const response = await fetch(`http://localhost:8000/api/projects/all?${params.toString()}`, { headers: { "Content-Type": "application/json" } });
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Error carregant projectes");
-        }
-        const data = await response.json();
+
+      const result = await this.communicationManager.fetchAllProjects({
+        page,
+        searchQuery: this.searchQuery,
+        sortCriteria: this.sortCriteria,
+      });
+
+      if (result.success) {
+        const data = result.data;
         this.projects = data.data;
         this.currentPage = data.current_page;
         this.totalPages = data.last_page;
-        this.loading = false;
-      } catch (error) {
-        this.error = error.message;
-        this.loading = false;
+        this.error = null;
+      } else {
+        this.error = result.message;
       }
+
+      this.loading = false;
     },
     nextPage() {
       if (this.currentPage < this.totalPages) {
