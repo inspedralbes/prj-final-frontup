@@ -15,8 +15,6 @@
       <div :class="'leftsection-card'">
         <ul class="leftsection-list">
           <li>
-            <br>
-            <br>
           </li>
           <li class="leftsection-element" @click="navigateToHome">
             <svg
@@ -369,7 +367,6 @@ body {
 .leftsection-card {
   width: 220px;
   height: 100vh;
-  background-color: rgba(36, 40, 50, 1);
   background-image: linear-gradient(
     139deg,
     rgba(36, 40, 50, 1) 0%,
@@ -385,6 +382,9 @@ body {
   left: 0;
   top: -30px;
   z-index: 1000;
+}
+.leftsection-card, .navbar {
+  transition: transform 0.3s ease;
 }
 
 .leftsection-separator {
@@ -558,102 +558,65 @@ footer {
   transform: translateY(-2px);
 }
 
+
 .toggle-navbar-btn {
   display: none;
+ 
 }
+
 
 .br{
   display: none;
 }
-@media (max-width: 800px) {
+
+
+
+
+@media (max-width: 450px) {
+  body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
   .toggle-navbar-btn {
     display: block;
     background-color: transparent;
     color: #7e8590;
-    font-size: 24px;
-    border: none;
-    cursor: pointer;
-    position: fixed;
-    top: 15px;
-    left: 23px;
-    z-index: 1001;
-  }
-  
-  .navbar {
-    display: block;
-    position: fixed;
-    top: 50px;
-    left: 0;
-    width: 250px;
-    height: 100vh;
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.4s ease-in-out;
-    transform: translateX(-100%);
-    z-index: 1000;
-  }
-
-  .navbar.show {
-    transform: translateX(0);
-  }
-
-  .navbar.hide {
-    transform: translateX(-100%);
-  }
-
-  footer {
-    background-image: linear-gradient(
-      139deg,
-      rgba(34, 38, 47, 1) 0%,
-      rgba(32, 36, 42, 1) 50%,
-      rgba(28, 33, 42, 1) 100%
-    );
-    text-align: center;
-    padding: 10px 0px;
-    color: white;
-    margin-left: -35%;
-  }
-}
-
-@media (max-width: 450px) {
-  .toggle-navbar-btn {
-    display: block;
-    background-color: black;
-    color: #7e8590;
-    font-size: 24px;
+    font-size: 24px;  
     border: none;
     cursor: pointer;
     position: fixed;
     top: 10px;
-    left: 23px;
+    left: 15px;
     z-index: 1001;
   }
 
   .top-navbar {
-    width: 50%;
-    height: 50px; 
-    background-color: transparent;
+    width: 100%;
+    height: 50px;
     display: flex;
     align-items: center;
-    padding: 0 20px;
+    justify-content: space-between;
+    padding: 0 16px;
     box-sizing: border-box;
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 1002; 
+    z-index: 1002;
   }
 
   .leftsection-card {
-  top: -55px;
-}
-
+    top: 0;
+  }
 
   .navbar {
-    display: block;
     position: fixed;
-    top: 50px;
+    top: 50px; /* justo debajo del top-navbar */
     left: 0;
-    width: 250px;
-    height: 100vh;
+    width: 100%; /* usar toda la pantalla para pantallas pequeñas */
+    height: calc(100vh - 50px);
+    background-color: #222;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.4s ease-in-out;
     transform: translateX(-100%);
@@ -662,10 +625,12 @@ footer {
 
   .navbar.show {
     transform: translateX(0);
+    background-color: transparent;
   }
 
   .navbar.hide {
     transform: translateX(-100%);
+    background-color: transparent;
   }
 
   footer {
@@ -675,10 +640,13 @@ footer {
       rgba(32, 36, 42, 1) 50%,
       rgba(28, 33, 42, 1) 100%
     );
+    width: 100%;
     text-align: center;
-    padding: 10px 0px;
+    padding: 20px 0;
     color: white;
-    margin-left: -90%;
-  } 
+    position: relative;
+    margin: 0 auto;
+  }
 }
+
 </style>

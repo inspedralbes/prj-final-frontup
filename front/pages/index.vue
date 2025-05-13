@@ -263,94 +263,11 @@ export default {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-@media (max-width: 1024px) {
-  .main-container {
-    margin-left: -20%;
-  }
-}
-@media (max-width: 800px) {
-  .main-container {
-    margin-left: -30%;
-  }
-  .body-content {
-  text-align: left;
-  margin-top: 70px;
-}
-.looping-words {
-  position: absolute;
-  width: 35%;
-  height: 3.4em;
-  font-size: 5vw;
-  padding-left: 0.1em;
-  padding-right: 0.1em;
-  overflow: hidden;
-  right: 2%;
-  top: 10%;
-  border-radius: 10px;
-  padding: 10px;
-}
-.card-container {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  align-items: center;
-}
 
-.card {
-  width: 300px;
-  height: 350px;
-  background: #07182E;
-  position: relative;
-  display: flex;
-  place-content: center;
-  place-items: center;
-  overflow: hidden;
-  border-radius: 10px;
-}
 
-.card-content {
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  padding: 20px;
-  height: 100%;
-  width: 100%;
-}
-
-.card h3 {
-  margin-bottom: 15px;
-  font-size: 25px;
-  background: linear-gradient(45deg, #ffffff, #bd89ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  z-index: 1;
-}
-
-.card p {
-  color: #d4cece;
-  margin-bottom: 20px;
-  flex-grow: 1;
-  font-size: 1.1em;
-  color: #b0b0b0;
-  z-index: 1;
-}
-
-.card::before {
-  content: '';
-  position: absolute;
-  width: 100px;
-  background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
-  height: 130%;
-  animation: rotBGimg 6s linear infinite;
-  transition: all 0.2s linear;
-}
-
-}
 
 @media (max-width: 450px) {
   .main-container {
-    margin-left: -70%;
   }
   .body-content {
   text-align: left;
