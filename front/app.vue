@@ -425,7 +425,7 @@ body {
   gap: 10px;
   position: fixed;
   left: 0;
-  top: -55px;
+  top: -30px;
   z-index: 1000;
 }
 
@@ -604,6 +604,9 @@ footer {
   display: none;
 }
 
+.br{
+  display: none;
+}
 @media (max-width: 800px) {
   .toggle-navbar-btn {
     display: block;
@@ -680,6 +683,11 @@ footer {
     left: 0;
     z-index: 1002; 
   }
+
+  .leftsection-card {
+  top: -55px;
+}
+
 
   .navbar {
     display: block;
