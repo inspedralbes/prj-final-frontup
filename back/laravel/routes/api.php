@@ -34,29 +34,33 @@ Route::middleware('auth:sanctum')->group(function () {
         'index', 'store', 'show', 'update', 'destroy'
     ]);
     Route::get('/nivelUsuari/{id}', [NivellUsuariController::class, 'show']);
+    
 //Niveles
-Route::prefix('niveles')->group(function () {
-    // HTML
-    Route::prefix('html')->group(function () {
-        Route::get('/pregunta/{id}', [NivelController::class, 'getPregunta']);
-        Route::post('/verificar/{id}', [NivelController::class, 'verificarRespuesta']);
-        Route::post('/actualizar', [NivelController::class, 'actualizarNivel']);
-    });
+Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('niveles')->group(function () {
+        // HTML
+        Route::prefix('html')->group(function () {
+            Route::get('/pregunta/{id}', [NivelController::class, 'getPregunta']);
+            Route::post('/verificar/{id}', [NivelController::class, 'verificarRespuesta']);
+            Route::post('/actualizar', [NivelController::class, 'actualizarNivel']);
+        });
 
-    // CSS
-    Route::prefix('css')->group(function () {
-        Route::get('/pregunta/{id}', [NivelCssController::class, 'getPregunta']);
-        Route::post('/verificar/{id}', [NivelCssController::class, 'verificarRespuesta']);
-        Route::post('/actualizar', [NivelCssController::class, 'actualizarNivel']);
-    });
+        // CSS
+        Route::prefix('css')->group(function () {
+            Route::get('/pregunta/{id}', [NivelCssController::class, 'getPregunta']);
+            Route::post('/verificar/{id}', [NivelCssController::class, 'verificarRespuesta']);
+            Route::post('/actualizar', [NivelCssController::class, 'actualizarNivel']);
+        });
 
-    // JavaScript
-    Route::prefix('js')->group(function () {
-        Route::get('/pregunta/{id}', [NivelJsController::class, 'getPregunta']);
-        Route::post('/verificar/{id}', [NivelJsController::class, 'verificarRespuesta']);
-        Route::post('/actualizar', [NivelJsController::class, 'actualizarNivel']);
+        // JS
+        Route::prefix('js')->group(function () {
+            Route::get('/pregunta/{id}', [NivelJsController::class, 'getPregunta']);
+            Route::post('/verificar/{id}', [NivelJsController::class, 'verificarRespuesta']);
+            Route::post('/actualizar', [NivelJsController::class, 'actualizarNivel']);
+        });
     });
 });
+
 //contador de likes para un proyecto
 Route::get('/likes/count/{projectId}', [LikesController::class, 'likeCount']);
 //indexa proyectos de todos los usuarios

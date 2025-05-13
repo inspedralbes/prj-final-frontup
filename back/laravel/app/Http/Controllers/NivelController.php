@@ -47,38 +47,23 @@ class NivelController extends Controller
     public function actualizarNivel(Request $request)
 {
     $request->validate([
-        'userId' => 'required|integer|exists:users,id',
-        'nivel' => 'required|integer',
-        'language' => 'required|string|in:html,css,js'
+        'nivel' => 'required|integer'
     ]);
 
     try {
-        $user = User::findOrFail($request->userId);
-        $language = $request->language;
-        
-        switch ($language) {
-            case 'html':
-                $user->nivel = $request->nivel;
-                break;
-            case 'css':
-                $user->nivel_css = $request->nivel;
-                break;
-            case 'js':
-                $user->nivel_js = $request->nivel;
-                break;
-        }
-        
+        $user = $request->user(); 
+        $user->nivel = $request->nivel;
         $user->save();
 
         return response()->json([
             'success' => true,
-            'message' => "Nivel $language actualizado correctamente",
+            'message' => 'Nivel CSS actualizado correctamente',
             'user' => $user,
         ]);
     } catch (\Exception $e) {
         return response()->json([
             'success' => false,
-            'message' => "Error al actualizar el nivel",
+            'message' => 'Error al actualizar el nivel CSS',
             'error' => $e->getMessage(),
         ], 500);
     }

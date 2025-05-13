@@ -44,28 +44,27 @@ class NivelCssController extends Controller
     }
 
     public function actualizarNivel(Request $request)
-    {
-        $request->validate([
-            'userId' => 'required|integer|exists:users,id',
-            'nivel' => 'required|integer',
+{
+    $request->validate([
+        'nivel' => 'required|integer'
+    ]);
+
+    try {
+        $user = $request->user(); 
+        $user->nivel_css = $request->nivel;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Nivel CSS actualizado correctamente',
+            'user' => $user,
         ]);
-
-        try {
-            $user = \App\Models\User::findOrFail($request->userId);
-            $user->nivel_css = $request->nivel;
-            $user->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Nivel CSS actualizado correctamente',
-                'user' => $user,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al actualizar el nivel CSS',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al actualizar el nivel CSS',
+            'error' => $e->getMessage(),
+        ], 500);
     }
+}
 }

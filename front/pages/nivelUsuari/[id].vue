@@ -91,7 +91,11 @@
         text: '¡Felicidades! 🎉',
         icon: 'success',
         confirmButtonText: 'OK'
-      })
+      }).then((result) => {
+    if (result.isConfirmed) {
+      router.push('/nivelesUsuarios')
+    }
+  })
     } else {
       
       Swal.fire({
