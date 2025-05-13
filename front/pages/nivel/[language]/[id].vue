@@ -474,7 +474,6 @@ export default {
   color: #ffffff;
   height: 93vh;
   box-sizing: border-box;
-  margin-left: -220px;
 }
 
   .header {

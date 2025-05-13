@@ -604,6 +604,12 @@ footer {
     top: 0;
     left: 0;
     z-index: 1002;
+    background-image: linear-gradient(
+    139deg,
+    rgba(36, 40, 50, 1) 0%,
+    rgba(36, 40, 50, 1) 0%,
+    rgba(37, 28, 40, 1) 100%
+  );
   }
 
   .leftsection-card {
