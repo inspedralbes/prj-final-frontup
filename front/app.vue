@@ -380,7 +380,7 @@ body {
   gap: 10px;
   position: fixed;
   left: 0;
-  top: -30px;
+  top: 0px;
   z-index: 1000;
 }
 .leftsection-card, .navbar {
