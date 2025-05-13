@@ -31,7 +31,7 @@
               Dóna vida a les teves idees construint projectes complets o provant funcions i animacions específiques.
             </p>
             <div class="btn-container">
-              <button class="btn">Prova l'Editor</button>
+              <button class="btn" @click="goToEditar">Prova l'Editor</button>
             </div>
           </div>
         </div>
@@ -42,7 +42,7 @@
               Vols provar-te fent uns exercicis per veure quin nivell tens?
             </p>
             <div class="btn-container">
-              <button class="btn">Participa els reptes que et proposem</button>
+              <button class="btn" @click="goToNiveles">Participa els reptes que et proposem</button>
             </div>
           </div>
         </div>
@@ -54,7 +54,7 @@
               altres.
             </p>
             <div class="btn-container">
-              <button class="btn">Descobreix el Més Popular</button>
+              <button class="btn" @click="goToTotsProjectes">Descobreix el Més Popular</button>
             </div>
           </div>
         </div>
@@ -64,32 +64,85 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Index',
-  mounted() {
-    setTimeout(() => {
-      const wordList = document.querySelector('.looping-words__list');
-      const words = Array.from(wordList.children);
-      const wordHeight = 100 / words.length;
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAppStore } from '@/stores/app'
+import { useIdProyectoActualStore } from '@/stores/app'
+import useCommunicationManager from '@/stores/comunicationManager'
 
-      const moveWords = () => {
-        wordList.style.transition = 'transform 1s ease-out';
-        wordList.style.transform = `translateY(-${wordHeight}%)`;
+const router = useRouter()
+const appStore = useAppStore()
+const idProyectoActualStore = useIdProyectoActualStore()
+const comunicationManager = useCommunicationManager()
 
-        setTimeout(() => {
-          wordList.appendChild(words[0]); 
-          wordList.style.transition = 'none';
-          wordList.style.transform = 'translateY(0)';
+// Si quieres mostrar un mensaje de alerta en el template,
+// crea aquí la ref y úsala después:
+const alertaVisible = ref(false)
 
-          words.push(words.shift());
-        }, 1000); 
-      };
+const goToEditar = async () => {
+  if (localStorage.getItem('loginInfo') !== null) {
+    try {
+      // Llamada a la API
+      const respuesta = await comunicationManager.crearProyectoDB({
+        nombre: "untitled",
+        user_id: appStore.loginInfo.id,
+        html_code: "",
+        css_code: "",
+        js_code: "",
+      })
 
-      setInterval(moveWords, 2000);
-    }, 500);
-  },
-};
+      // La API devuelve { success: "...", id: 42 }
+      const nuevoId = respuesta.id
+      if (!nuevoId) {
+        console.error("ID de proyecto no devuelto:", respuesta)
+        return
+      }
+
+      // Guarda el ID en el store y en localStorage
+      idProyectoActualStore.actalizarId(nuevoId)
+      localStorage.setItem("idProyectoActual", nuevoId)
+
+      // Redirige al editor
+      router.push(`/lliure/${nuevoId}`)
+    } catch (error) {
+      console.error("Error al crear el proyecto:", error)
+    }
+  } else {
+    // activa tu alerta en el template
+    alertaVisible.value = true
+  }
+}
+
+const goToNiveles = () => {
+  router.push('/niveles')
+}
+
+const goToTotsProjectes = () => {
+  router.push('/totsProjectes')
+}
+
+onMounted(() => {
+  setTimeout(() => {
+    const wordList = document.querySelector('.looping-words__list')
+    const words = Array.from(wordList.children)
+    const wordHeight = 100 / words.length
+
+    const moveWords = () => {
+      wordList.style.transition = 'transform 1s ease-out'
+      wordList.style.transform = `translateY(-${wordHeight}%)`
+
+      setTimeout(() => {
+        wordList.appendChild(words[0])
+        wordList.style.transition = 'none'
+        wordList.style.transform = 'translateY(0)'
+        words.push(words.shift())
+      }, 1000)
+    }
+
+    setInterval(moveWords, 2000)
+  }, 500)
+})
 </script>
 
 <style scoped>
@@ -188,6 +241,7 @@ export default {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
