@@ -11,33 +11,42 @@ Crear una aplicació tipus CodePen on es puguin desenvolupar projectes amb HTML,
 - **Vue.js**: Framework per construir interfícies d'usuari interactives.
 - **Nuxt.js**: Framework per al desenvolupament d'aplicacions Vue.js amb SSR i SPA.
 - **Pinia**: Gestió d'estat a Vue.js.
+- **TypeScript**: Llenguatge de programació.
+- **CSS**: CSS és un llenguatge d'estil que defineix l'aparença visual de pàgines web en HTML.
 
 ### Backend:
 - **Laravel**: Framework PHP per construir APIs robustes.
 - **Node.js** i **Socket.io**: Gestió de comunicació en temps real entre clients.
+- **MySQL**: Base de dades relacional per emmagatzemar les dades del projecte.
 
 ### Contenidor i desplegament:
 - **Docker**: Contenidorització dels serveis per a un desplegament eficient.
 - **GitHub**: Control de versions i col·laboració.
+- **GitHub Actions**: Integració i desplegament continu.
 
 ## Estructura del Projecte
 
+```
 /back
-  /laravel
-  /node
-/front
-
+  /laravel          # API REST i lògica principal
+  /node             # Servidor WebSocket i tasques en temps real
+/front              # Aplicació frontend amb Nuxt.js
+  /components       # Components Vue reutilitzables
+  /pages            # Pàgines de l'aplicació
+  /stores           # Gestió d'estat amb Pinia
+```
 
 ---
 
 ## Participants del Projecte
 
-| Nom           |
-|---------------|
-| [Gerard Arias] |
-| [Ayoub Boudhafri] |
-| [Marc Ciurans] |
-| [Eduard Renau] |
+| Nom              |
+|------------------|
+| [Gerard Arias]   |
+| [Ayoub Boudhafri]|
+| [Marc Ciurans]   |
+| [Gabriel Montaño]|
+| [Eduard Renau]   |
 
 ---
 
@@ -45,7 +54,7 @@ Crear una aplicació tipus CodePen on es puguin desenvolupar projectes amb HTML,
 
 | Nom           | Contacte          |
 |---------------|-------------------|
-| [        ]    | []  |
+| [Ermengol]    | [ebota@inspedralbes.cat]  |
 
 ---
 
@@ -53,3 +62,41 @@ Crear una aplicació tipus CodePen on es puguin desenvolupar projectes amb HTML,
 
 - **Enllaç a l'aplicació web:** [https://app.ejemplo.com](https://app.ejemplo.com)
 - **Repositori a GitHub:** [https://github.com/inspedralbes/prj-final-frontup](https://github.com/inspedralbes/prj-final-frontup)
+
+## Configuració i Desplegament
+
+### Requisits Previs
+- Docker i Docker Compose
+- Node.js 16.x o superior
+- PHP 8.1 o superior
+- Composer
+
+### Passos per Iniciar el Projecte
+
+1. **Clonar el repositori**:
+```bash
+git clone https://github.com/inspedralbes/prj-final-frontup.git
+cd prj-final-frontup
+```
+
+2. **Configurar variables d'entorn**:
+```bash
+# Frontend
+cp front/.env.example front/.env
+
+# Backend Laravel
+cp back/laravel/.env.example back/laravel/.env
+
+# Backend Node
+cp back/node/.env.example back/node/.env
+```
+
+3. **Iniciar amb Docker**:
+```bash
+docker-compose up 
+```
+
+4. **Accedir a l'aplicació**:
+- Frontend: http://localhost:3000
+- Laravel: http://localhost:8000
+- Node: http://localhost:5000
