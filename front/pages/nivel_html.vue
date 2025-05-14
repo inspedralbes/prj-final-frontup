@@ -197,30 +197,45 @@ export default {
 }
 
 @media (max-width: 450px) {
-  .level-container {
-  position: relative;
-  height: 100vh;
-  width: 190%;
-  display: flex;
-  flex-direction: column;
-  margin-left: -90%;
-  align-items: center;
-  justify-content: center;
-  background-image: url('/fondo.png');
-  background-size: cover;
-  background-position: center;  
+ .level-container {
+    position: relative;
+    height: 100dvh; /* Más fiable en móviles */
+    width: 100vw;   /* Asegura que ocupe el ancho real de la pantalla */
+    margin: 0;      /* Elimina márgenes externos */
+    padding: 0;     /* Elimina padding interno que desplaza el fondo */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background-image: url('/fondo.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+  }
+
+  .level-button-container {
+    position: absolute;
+    width: 40%;
+    max-width: 120px;
+    height: auto;
+  }
+
+  /* Ajustamos las posiciones para que no se monten */
+  .level-button-container:nth-child(1) { top: 10%; left: 10%; }
+  .level-button-container:nth-child(2) { top: 18%; left: 50%; }
+  .level-button-container:nth-child(3) { top: 26%; left: 10%; }
+  .level-button-container:nth-child(4) { top: 34%; left: 50%; }
+  .level-button-container:nth-child(5) { top: 42%; left: 10%; }
+  .level-button-container:nth-child(6) { top: 50%; left: 50%; }
+  .level-button-container:nth-child(7) { top: 58%; left: 10%; }
+  .level-button-container:nth-child(8) { top: 66%; left: 50%; }
+  .level-button-container:nth-child(9) { top: 74%; left: 10%; }
+  .level-button-container:nth-child(10) { top: 82%; left: 50%; }
 }
-.level-button-container:nth-child(1) { top: 15%; left: 20%; }
-.level-button-container:nth-child(2) { top: 23.3%; left: 60%; }
-.level-button-container:nth-child(3) { top: 31.6%; left: 20%; }
-.level-button-container:nth-child(4) { top: 39.9%; left: 60%; }
-.level-button-container:nth-child(5) { top: 48.2%; left: 20%; }
-.level-button-container:nth-child(6) { top: 56.5%; left: 60%; }
-.level-button-container:nth-child(7) { top: 64.8%; left: 20%; }
-.level-button-container:nth-child(8) { top: 73.1%; left: 60%; }
-.level-button-container:nth-child(9) { top: 81.4%; left: 20%; }
-.level-button-container:nth-child(10) { top: 89.7%; left: 60%; }
 
 
-}
+
+
+
 </style>
