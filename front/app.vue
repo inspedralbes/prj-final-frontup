@@ -16,6 +16,7 @@
         <ul class="leftsection-list">
           <li>
           </li>
+          <br class="space">
           <li class="leftsection-element" @click="navigateToHome">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -385,7 +386,23 @@ body {
 }
 .leftsection-card, .navbar {
   transition: transform 0.3s ease;
+  
+   max-height: 100vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #555 transparent;
 }
+
+
+.navbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.navbar::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 3px;
+}
+
 
 .leftsection-separator {
   border-top: 1.5px solid #42434a;
@@ -565,7 +582,7 @@ footer {
 }
 
 
-.br{
+.space{
   display: none;
 }
 
@@ -573,6 +590,10 @@ footer {
 
 
 @media (max-width: 450px) {
+  .space{
+  display: block;
+}
+
   body {
     margin: 0;
     padding: 0;
@@ -593,7 +614,7 @@ footer {
   }
 
   .top-navbar {
-    width: 100%;
+    width: 15%;
     height: 50px;
     display: flex;
     align-items: center;
@@ -613,14 +634,14 @@ footer {
   }
 
   .leftsection-card {
-    top: 0;
+    
+  top: -7%;
   }
-
   .navbar {
     position: fixed;
-    top: 50px; /* justo debajo del top-navbar */
+    top: 50px; 
     left: 0;
-    width: 100%; /* usar toda la pantalla para pantallas pequeñas */
+    width: 100%;
     height: calc(100vh - 50px);
     background-color: #222;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);

@@ -474,7 +474,9 @@ export default {
   color: #ffffff;
   height: 93vh;
   box-sizing: border-box;
+  margin: auto;
 }
+
 
   .header {
     display: flex;
@@ -509,7 +511,6 @@ export default {
   width: 100%;
   padding: 0 12px;
   box-sizing: border-box;
-  margin-left: 8%;
   }
 
   .submit-container {
