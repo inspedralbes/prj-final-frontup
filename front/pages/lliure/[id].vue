@@ -866,7 +866,6 @@ const output = computed(() => {
   font-family: "Arial", sans-serif;
   color: #ffffff;
   margin-left: -210px;
-  margin-left: -210px;
 }
 
 .header {
@@ -1357,6 +1356,7 @@ const output = computed(() => {
 .btn-copy:hover {
   background: #45a049;
 }
+
 @media (max-width: 450px) {
   .todo {
     display: flex;
@@ -1364,62 +1364,147 @@ const output = computed(() => {
     background-color: #1e1e1e;
     font-family: "Arial", sans-serif;
     color: #ffffff;
-    margin-left: -90%;
+    margin: 0;
+    padding: 0 10px;
+    box-sizing: border-box;
+    width: 100vw;
+    overflow-x: hidden;
   }
+
+  .layout {
+    flex-direction: column;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .editor-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 10px 0;
+    gap: 10px;
+  }
+
+  .editor-box {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  margin-top: 0; /* asegúrate que no tenga espacio arriba */
+}
+
+
+  .code-editor {
+    height: 200px;
+    font-size: 14px;
+  }
+
+  .output-container {
+    width: 100%;
+    height: 300px;
+    margin: 0;
+    border-radius: 6px;
+    border: 1px solid #333;
+    overflow: auto;
+  }
+
+  .expand-button {
+    top: 6px;
+    right: 6px;
+    padding: 6px 10px;
+  }
+
+  .layout-buttons,
   .button-position {
     display: none;
   }
 
   .header {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    height: 100px;
-  }
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 10px;
+}
 
-  .header-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: nowrap;
+  width: 100%;
+  overflow-x: hidden;
+}
 
-  .header-title {
-    font-size: 18px;
-    color: #ffffff;
-    background-color: transparent;
-    border: 2px solid transparent;
-    padding: 10px 12px;
-    border-radius: 6px;
-    transition: all 0.3s ease;
-    text-align: center;
-    min-width: 180px;
-  }
+.header-button {
+  padding: 6px 8px;
+  font-size: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+}
 
-  .editor-container {
-    display: block;
-  }
+.header-title {
+  flex: 2 1 auto;
+  font-size: 12px;
+  padding: 6px 8px;
+  min-width: 0;
+}
+.header {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 10px;
+}
 
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: nowrap;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.header-button {
+  padding: 6px 8px;
+  font-size: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.header-title {
+  flex: 2 1 auto;
+  font-size: 12px;
+  padding: 6px 8px;
+  min-width: 0;
+}
   .editor-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 15px;
-    color: red;
-  }
-
-  .editor-tabs button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #444;
-    color: #fff;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-  }
-
-  .output-container {
-  height: 50vh;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 0; /* antes era 10px */
 }
+
+
+   .editor-tabs button {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: none;
+  background-color: #444;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
 }
+
+
+  iframe.output {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+
+
 </style>
 
