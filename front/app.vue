@@ -3,20 +3,17 @@
     <div v-if="show" class="leftsection-alert">
       {{ message }}
     </div>
-      <header class="top-navbar">
+    <header class="top-navbar">
       <button class="toggle-navbar-btn" @click="navbarVisible = !navbarVisible">
         {{ navbarVisible ? "✕" : "☰" }}
       </button>
-    </header>  
-      
-    
-    
+    </header>
+
     <div :class="['navbar', { show: navbarVisible, hide: !navbarVisible }]">
       <div :class="'leftsection-card'">
         <ul class="leftsection-list">
-          <li>
-          </li>
-          <br class="space">
+          <li></li>
+          <br class="space" />
           <li class="leftsection-element" @click="navigateToHome">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -38,70 +35,153 @@
 
         <div class="leftsection-separator"></div>
 
-      <ul class="leftsection-list">
-        <li class="leftsection-element leftsection-element--crear" @click="navigateToLliure">
-          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
-            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
+        <ul class="leftsection-list">
+          <li
+            class="leftsection-element leftsection-element--crear"
+            @click="navigateToLliure"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="25"
+              height="25"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#7e8590"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <p class="label">Crear Projecte</p>
+          </li>
+          <li
+            v-if="isLoged"
+            class="leftsection-element"
+            @click="navigateToMeusProjectes"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="25"
+              height="25"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#7e8590"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <p class="label">Els Meus Projectes</p>
+          </li>
+          <li class="leftsection-element" @click="navigateToNiveles">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="25"
+              height="25"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#7e8590"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 3h18v18H3zM12 8v8m-4-4h8" />
+            </svg>
+            <p class="label">Nivells</p>
+          </li>
+          <li class="leftsection-element" @click="navigateToTotsProjectes">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="25"
+              height="25"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#7e8590"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="M8 7v10M16 7v10M12 7v10" />
+            </svg>
+            <p class="label">Tots els Projectes</p>
+          </li>
+          <li
+            v-if="isLoged"
+            class="leftsection-element"
+            @click="navigateToLikes"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="25"
+              height="25"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#7e8590"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+              ></path>
+            </svg>
+            <p class="label">Likes</p>
+          </li>
+          <li class="leftsection-element" @click="navigateToCreadorNiveles">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="25"
+              height="25"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#7e8590"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 3h18v18H3zM12 8v8m-4-4h8" />
+            </svg>
+            <p class="label">Creador nivells</p>
+          </li>
+          <li class="leftsection-element" @click="navigateToNivelesUsuarios">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="25"
+              height="25"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#7e8590"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 3h18v18H3zM12 8v8m-4-4h8" />
+            </svg>
+            <p class="label">Nivells d'usuaris</p>
+          </li>
+        </ul>
+        <li class="leftsection-element" @click="showCollaborationModal = true">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="25"
+            height="25"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#7e8590"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M10 20v-6h4v6m-7-8h10V4H7z" />
           </svg>
-          <p class="label">Crear Projecte</p>
+          <p class="label">Unir-se a Projecte</p>
         </li>
-        <li v-if="isLoged" class="leftsection-element" @click="navigateToMeusProjectes">
-          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
-            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          <p class="label">Els Meus Projectes</p>
-        </li>
-        <li class="leftsection-element" @click="navigateToNiveles">
-          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
-            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 3h18v18H3zM12 8v8m-4-4h8" />
-          </svg>
-          <p class="label">Nivells</p>
-        </li>
-        <li class="leftsection-element" @click="navigateToTotsProjectes">
-          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
-            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <path d="M8 7v10M16 7v10M12 7v10" />
-          </svg>
-          <p class="label">Tots els Projectes</p>
-        </li>
-        <li v-if="isLoged" class="leftsection-element" @click="navigateToLikes">
-          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
-            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path
-              d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
-            </path>
-          </svg>
-          <p class="label">Likes</p>
-        </li>
-        <li class="leftsection-element" @click="navigateToCreadorNiveles">
-          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
-            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 3h18v18H3zM12 8v8m-4-4h8" />
-          </svg>
-          <p class="label">Creador nivells</p>
-        </li>
-        <li class="leftsection-element" @click="navigateToNivelesUsuarios">
-          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
-            stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 3h18v18H3zM12 8v8m-4-4h8" />
-          </svg>
-          <p class="label">Nivells d'usuaris</p>
-        </li>
-      </ul>
-      <li class="leftsection-element" @click="showCollaborationModal = true">
-        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#7e8590"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M10 20v-6h4v6m-7-8h10V4H7z" />
-        </svg>
-        <p class="label">Unir-se a Projecte</p>
-      </li>
-      <div class="leftsection-separator"></div>
+        <div class="leftsection-separator"></div>
 
         <ul class="leftsection-list">
           <li
@@ -169,8 +249,13 @@
       </div>
     </div>
 
-    <AlertComponent v-if="alertVisible" :success="false" :text="'Has d\'iniciar sessió per crear un projecte nou.'"
-      :duration="3000" @close="alertVisible = false" />
+    <AlertComponent
+      v-if="alertVisible"
+      :success="false"
+      :text="'Has d\'iniciar sessió per crear un projecte nou.'"
+      :duration="3000"
+      @close="alertVisible = false"
+    />
   </div>
   <NuxtPage />
   <footer>
@@ -179,14 +264,14 @@
 </template>
 
 <script setup>
-import { useLliureStore } from '~/stores/app';
-import { useAppStore } from '@/stores/app';
-import { useIdProyectoActualStore } from '@/stores/app';
-import useCommunicationManager from '@/stores/comunicationManager';
-import { ref, watch, onMounted, reactive, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { useBuscadorStore } from '@/stores/app';
-import AlertComponent from './components/AlertComponent.vue';
+import { useLliureStore } from "~/stores/app";
+import { useAppStore } from "@/stores/app";
+import { useIdProyectoActualStore } from "@/stores/app";
+import useCommunicationManager from "@/stores/comunicationManager";
+import { ref, watch, onMounted, reactive, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { useBuscadorStore } from "@/stores/app";
+import AlertComponent from "./components/AlertComponent.vue";
 
 const showCollaborationModal = ref(false);
 const idProyectoActualStore = useIdProyectoActualStore();
@@ -248,7 +333,7 @@ const joinCollaboration = () => {
 
 const navigateToLliure = async () => {
   // Verificar si existe loginInfo en localStorage
-  if (localStorage.getItem('loginInfo') !== null) {
+  if (localStorage.getItem("loginInfo") !== null) {
     try {
       projecte.result = await comunicationManager.crearProyectoDB({
         nombre: "untitled",
@@ -273,16 +358,16 @@ const navigateToLliure = async () => {
 };
 
 const navigateToNiveles = () => {
-  router.push('/niveles');
-}
+  router.push("/niveles");
+};
 
 const navigateToCreadorNiveles = () => {
-  router.push('/creadorNiveles');
-}
+  router.push("/creadorNiveles");
+};
 
 const navigateToNivelesUsuarios = () => {
-  router.push('/nivelesUsuarios');
-}
+  router.push("/nivelesUsuarios");
+};
 
 const navigateToLikes = () => {
   router.push("/likes");
@@ -384,15 +469,15 @@ body {
   top: 0px;
   z-index: 1000;
 }
-.leftsection-card, .navbar {
+.leftsection-card,
+.navbar {
   transition: transform 0.3s ease;
-  
-   max-height: 100vh;
+
+  max-height: 100vh;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #555 transparent;
 }
-
 
 .navbar::-webkit-scrollbar {
   width: 6px;
@@ -402,7 +487,6 @@ body {
   background-color: #555;
   border-radius: 3px;
 }
-
 
 .leftsection-separator {
   border-top: 1.5px solid #42434a;
@@ -460,7 +544,6 @@ footer {
   padding: 10px 0px;
   color: white;
 }
-
 
 .modal-overlay {
   position: fixed;
@@ -575,24 +658,18 @@ footer {
   transform: translateY(-2px);
 }
 
-
 .toggle-navbar-btn {
   display: none;
- 
 }
 
-
-.space{
+.space {
   display: none;
 }
 
-
-
-
 @media (max-width: 450px) {
-  .space{
-  display: block;
-}
+  .space {
+    display: block;
+  }
 
   body {
     margin: 0;
@@ -604,7 +681,7 @@ footer {
     display: block;
     background-color: transparent;
     color: #7e8590;
-    font-size: 24px;  
+    font-size: 24px;
     border: none;
     cursor: pointer;
     position: fixed;
@@ -626,20 +703,19 @@ footer {
     left: 0;
     z-index: 1002;
     background-image: linear-gradient(
-    139deg,
-    rgba(36, 40, 50, 1) 0%,
-    rgba(36, 40, 50, 1) 0%,
-    rgba(37, 28, 40, 1) 100%
-  );
+      139deg,
+      rgba(36, 40, 50, 1) 0%,
+      rgba(36, 40, 50, 1) 0%,
+      rgba(37, 28, 40, 1) 100%
+    );
   }
 
   .leftsection-card {
-    
-  top: -7%;
+    top: -7%;
   }
   .navbar {
     position: fixed;
-    top: 50px; 
+    top: 50px;
     left: 0;
     width: 100%;
     height: calc(100vh - 50px);
@@ -675,5 +751,4 @@ footer {
     margin: 0 auto;
   }
 }
-
 </style>
