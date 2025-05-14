@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <h1>Projectes públics</h1>
+        <h1>Projectes favorits</h1>
         <div class="header">
             <div class="search-bar">
                 <input type="text" v-model="searchQuery" placeholder="🔍 Filtrar projectes..." class="filter-input" />

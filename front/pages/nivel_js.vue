@@ -37,15 +37,32 @@ export default {
         if (!response.ok) throw new Error("Error al obtener el nivel del usuario");
 
         const data = await response.json();
+        const userData = data.user;
+
+        let userLevel = 1;
+
+        switch (this.language) {
+          case "html":
+            userLevel = parseInt(userData.nivel) || 1;
+            break;
+          case "css":
+            userLevel = parseInt(userData.nivel_css) || 1;
+            break;
+          case "js":
+            userLevel = parseInt(userData.nivel_js) || 1;
+            break;
+        }
 
         this.levels = this.levels.map((level) => ({
           ...level,
-          locked: level.id !== 1, 
+          locked: level.id > userLevel,
         }));
+
+        this.userLevel = userLevel;
 
       } catch (error) {
         console.error("Error al cargar el nivel del usuario:", error);
-      
+
         this.levels = this.levels.map((level) => ({
           ...level,
           locked: level.id !== 1,
