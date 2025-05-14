@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} està pujant l'aplicació a PROD  🚀
 on:
   push:
     branches:
-      - main
+      - actions
 jobs:
   Pujar-a-produccio-amb-FTP:
     runs-on: ubuntu-latest
