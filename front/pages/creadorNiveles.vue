@@ -379,4 +379,79 @@ onMounted(() => {
 .btn-secondary:hover {
   background-color: #53535a;
 }
+
+@media (max-width: 450px) {
+  .level-creator-container {
+    padding: 2rem;
+    margin-top: 0.5rem;
+    border-radius: 6px;
+  }
+
+  .level-creator-title {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+
+  .level-creator-subtitle {
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .form-section {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    text-align: center;
+  }
+
+  .section-description {
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-label {
+    font-size: 0.95rem;
+  }
+
+  .form-input,
+  .form-textarea,
+  .code-textarea {
+    font-size: 0.9rem;
+    padding: 0.6rem;
+  }
+
+  .code-editors-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .code-textarea {
+    min-height: 150px;
+  }
+
+  .preview-frame {
+    height: 300px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
+}
+
 </style>

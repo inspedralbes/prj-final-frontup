@@ -269,4 +269,95 @@ onMounted(() => {
 .page-btn:hover:not(:disabled) {
   background-color: #777;
 }
+
+@media (max-width: 450px) {
+  .level-list-container {
+    padding: 2rem;
+    margin-top: 0.5rem;
+    border-radius: 6px;
+  }
+
+  .level-list-title {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+
+  .level-list-subtitle {
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .search-filter-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .search-bar {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .filter-input {
+    width: 100%;
+    font-size: 0.95rem;
+    padding: 0.6rem;
+  }
+
+  .sort-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sort-label {
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+  }
+
+  .sort-select {
+    width: 100%;
+    padding: 0.6rem;
+    font-size: 0.95rem;
+  }
+
+  .levels-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .level-card {
+    padding: 1rem;
+  }
+
+  .level-card-title {
+    font-size: 1.1rem;
+  }
+
+  .level-card-description {
+    font-size: 0.9rem;
+  }
+
+  .level-card-meta {
+    font-size: 0.75rem;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 0.6rem;
+    text-align: center;
+    font-size: 0.95rem;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 1rem;
+  }
+
+  .page-btn {
+    font-size: 0.9rem;
+    padding: 8px 12px;
+  }
+}
+
 </style>
