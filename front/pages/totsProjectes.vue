@@ -243,7 +243,6 @@ export default {
     flex-direction: column;
     min-height: 80vh;
     max-width: 170%;
-    margin-left: -90%;
     padding: 30px;
     padding-top: 80px;
     text-align: center;

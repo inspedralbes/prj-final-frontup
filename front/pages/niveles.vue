@@ -144,7 +144,6 @@ button:hover {
 
 @media (max-width: 450px) {
   .selector {
-    margin-left: -90%; 
     padding: 20px 0;
     margin-top: -30%;
     height: 150vh;

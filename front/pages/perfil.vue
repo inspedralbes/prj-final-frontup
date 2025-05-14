@@ -521,7 +521,6 @@ const logout = () => {
   align-items: center;
   padding: 2rem;
   background-color: #07182E;
-  margin-left: -90%;
 }
 
 
