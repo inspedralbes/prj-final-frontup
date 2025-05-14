@@ -5,14 +5,17 @@
       <div class="boton-container" style="flex: 1;" @mouseenter="hovered = 'HTML'" @mouseleave="hovered = ''">
         <button class="boton HTML" @click="html_ejercicios"></button>
         <div v-if="hovered === 'HTML'" class="hover-text">Benvingut al món de l'HTML! Aprèn a estructurar pàgines web de manera senzilla i eficient.</div>
+        <div class="hover-text static-mobile-text">Benvingut al món de l'HTML! Aprèn a estructurar pàgines web de manera senzilla i eficient.</div>
       </div>
       <div class="boton-container" style="flex: 1;" @mouseenter="hovered = 'CSS'" @mouseleave="hovered = ''">
         <button class="boton boton_CSS" @click="css_ejercicios"></button>
         <div v-if="hovered === 'CSS'" class="hover-text">Benvingut al CSS! Descobreix com donar estil i personalitat a les teves pàgines web.</div>
+        <div class="hover-text static-mobile-text">Benvingut al CSS! Descobreix com donar estil i personalitat a les teves pàgines web.</div>
       </div>
       <div class="boton-container" style="flex: 1;" @mouseenter="hovered = 'JS'" @mouseleave="hovered = ''">
         <button class="boton JAVA_SCRIP" @click="js_ejercicios"></button>
         <div v-if="hovered === 'JS'" class="hover-text">Benvingut a JavaScript! Dona vida a les teves pàgines amb interactivitat i dinamisme.</div>
+        <div class="hover-text static-mobile-text">Benvingut a JavaScript! Dona vida a les teves pàgines amb interactivitat i dinamisme.</div>
       </div>
     </div>
   </div>
@@ -38,12 +41,14 @@ export default {
       this.$router.push("/nivel_js");
     }
   }
+  
 };
+
 </script>
 
 <style scoped>
 .selector {
-  height: 90vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -77,6 +82,7 @@ h1 {
   width: 200px;
   height: 250px;
   flex-direction: column;
+  background-color: transparent;
 }
 
 button {
@@ -131,5 +137,59 @@ button:hover {
 .HTML { background-image: url('/html.svg'); }       
 .boton_CSS { background-image: url('/css.svg'); }
 .JAVA_SCRIP { background-image: url('/js.svg'); }
+
+.static-mobile-text {
+  display: none;
+}
+
+@media (max-width: 450px) {
+  .selector {
+    padding: 20px 0;
+    margin-top: -30%;
+    height: auto;
+    margin-top: 1%;
+  }
+  .botones {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    width: 90%;
+  }
+  .boton-container {
+    width: 90%;
+    max-width: 300px;
+    height: auto;
+    position: relative;
+  }
+  .boton-container button {
+    position: relative; 
+    height: 250px;
+  }
+
+  .hover-text {
+    opacity: 1 ;
+    transform: translateY(0) ;
+    position: static;
+    margin-top: 15px;
+  }
+
+  .boton-container:hover .hover-text {
+    opacity: 1;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .static-mobile-text {
+    display: flex;
+    position: static;
+    opacity: 1 ;
+    transform: none ;
+    margin-top: 15px;
+  }
+
+  .boton-container:hover .hover-text:not(.static-mobile-text) {
+    display: none;
+  }
+}
 
 </style>

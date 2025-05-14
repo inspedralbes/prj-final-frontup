@@ -3,11 +3,15 @@
     @close="alertVisible = false" />
   <div class="todo">
     <header class="header" v-show="!isExpanded">
-      <button class="header-button" @click="leaveCollaborationSession(); goBack()">Enrere</button>
-      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
-        :readonly="!isEditing" />
-      <div class="header-actions">
-        <button class="header-button" @click="generateShareCode">Compartir</button>
+      <div class="header-row">
+        <button class="header-button" @click="leaveCollaborationSession(); goBack()">Enrere</button>
+        <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false" :readonly="!isEditing"/>
+        <button class="header-button" @click="generateShareCode">
+          Compartir
+        </button>
+      </div>
+
+      <div class="header-row">
         <button class="header-button" @click="toggleChat">Xat IA</button>
         <button class="header-button" @click="guardarProyecto">Guardar</button>
         <select v-model="isPrivate" @change="savePrivacy" class="header-select">
@@ -50,43 +54,73 @@
       </div>
     </div>
 
+    <!-- Modal para compartir código de colaboración -->
     <div v-if="showShareModal" class="modal-overlay" @click="closeShareModal">
       <div class="modal-content" @click.stop>
         <h2>Codi de col·laboració</h2>
         <div class="share-code-container">
           <p class="share-code">{{ shareCode }}</p>
-          <button class="modal-button copy-button" @click="copyShareCode">Copiar</button>
+          <button class="modal-button copy-button" @click="copyShareCode">
+            Copiar
+          </button>
         </div>
-        <p class="share-instructions">Comparteix aquest codi amb altres usuaris perquè puguin unir-se i editar aquest
-          projecte en temps real.</p>
+        <p class="share-instructions">
+          Comparteix aquest codi amb altres usuaris perquè puguin unir-se i
+          editar aquest projecte en temps real.
+        </p>
         <div class="modal-actions">
-          <button type="button" class="modal-button" @click="closeShareModal">Tancar</button>
+          <button type="button" class="modal-button" @click="closeShareModal">
+            Tancar
+          </button>
         </div>
       </div>
     </div>
 
-    <div v-if="guardarParaSalir" class="modal-overlay" @click="closeGuardarParaSalir">
+    <!-- Modal para guardar antes de salir -->
+    <div
+      v-if="guardarParaSalir"
+      class="modal-overlay"
+      @click="closeGuardarParaSalir"
+    >
       <div class="modal-content" @click.stop>
         <h2>Vols guardar aquest projecte?</h2>
         <form @submit.prevent="guardarProyecto2">
           <div class="modal-actions">
             <button type="submit" class="modal-button">Guardar</button>
-            <button type="button" class="modal-button cancel" @click="volverHome">Cancel·lar</button>
+            <button
+              type="button"
+              class="modal-button cancel"
+              @click="volverHome"
+            >
+              Cancel·lar
+            </button>
           </div>
         </form>
       </div>
     </div>
 
-    <div v-if="isChatVisible" class="chat-container"
-      :style="{ transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)` }" @mousedown="startDrag">
+    <!-- Chat IA flotante -->
+    <div
+      v-if="isChatVisible"
+      class="chat-container"
+      :style="{
+        transform: `translate(${chatPosition.x}px, ${chatPosition.y}px)`,
+      }"
+      @mousedown="startDrag"
+    >
       <button class="close-chat-button" @click="toggleChat">✖</button>
       <h2 class="chat-title">IA FrontUp</h2>
       <div class="messages-container" ref="messagesContainer">
-        <div v-for="(msg, index) in messages" :key="index" class="message" :class="{
-          user: msg.type === 'user',
-          ai: msg.type === 'ai',
-          loading: msg.type === 'loading'
-        }">
+        <div
+          v-for="(msg, index) in messages"
+          :key="index"
+          class="message"
+          :class="{
+            user: msg.type === 'user',
+            ai: msg.type === 'ai',
+            loading: msg.type === 'loading',
+          }"
+        >
           <div v-if="msg.type === 'loading'" class="loading-indicator">
             <div class="dot-flashing"></div>
           </div>
@@ -105,36 +139,82 @@
         </div>
       </div>
       <div class="input-container">
-        <input type="text" v-model="newMessage" placeholder="Escribe tu mensaje..." class="chat-input"
-          @keyup.enter="sendMessage" :disabled="state.loading" />
-        <button class="send-button" @click="sendMessage" :disabled="state.loading">
-          {{ state.loading ? 'Enviando...' : 'Enviar' }}
+        <input
+          type="text"
+          v-model="newMessage"
+          placeholder="Escribe tu mensaje..."
+          class="chat-input"
+          @keyup.enter="sendMessage"
+          :disabled="state.loading"
+        />
+        <button
+          class="send-button"
+          @click="sendMessage"
+          :disabled="state.loading"
+        >
+          {{ state.loading ? "Enviant..." : "Enviar" }}
         </button>
       </div>
     </div>
 
 
     <div :class="['layout', 'layout-' + layoutType]">
+      <!-- botones solo para móvil -->
+      <div class="editor-tabs" v-if="isMobile">
+        <button
+          :class="{ active: activeTab === 'html' }"
+          @click="activeTab = 'html'"
+        >
+          html
+        </button>
+        <button
+          :class="{ active: activeTab === 'css' }"
+          @click="activeTab = 'css'"
+        >
+          css
+        </button>
+        <button
+          :class="{ active: activeTab === 'js' }"
+          @click="activeTab = 'js'"
+        >
+          js
+        </button>
+      </div>
+      <!-- Contenedor principal de editores -->
       <div class="editor-container">
-        <div class="editor-box">
+        <div class="editor-box" v-show="!isMobile || activeTab === 'html'">
           <div class="editor-label">HTML</div>
           <div ref="htmlEditor" class="code-editor"></div>
         </div>
-        <div class="editor-box">
+        <div class="editor-box" v-show="!isMobile || activeTab === 'css'">
           <div class="editor-label">CSS</div>
           <div ref="cssEditor" class="code-editor"></div>
         </div>
-        <div class="editor-box">
+        <div class="editor-box" v-show="!isMobile || activeTab === 'js'">
           <div class="editor-label">JS</div>
           <div ref="jsEditor" class="code-editor"></div>
         </div>
       </div>
 
       <!-- Contenedor de salida -->
-      <div class="output-container" :class="{ expanded: isExpanded }" ref="outputContainer">
+      <div
+        class="output-container"
+        :class="{ expanded: isExpanded }"
+        ref="outputContainer"
+      >
         <button class="expand-button" @click="toggleExpand">
-          <img v-if="!isExpanded" src="/assets/img/pantalla-grande.svg" alt="Maximitzar" width="30" />
-          <img v-else src="/assets/img/pantalla-pequeña.svg" alt="Minimitzar" width="30" />
+          <img
+            v-if="!isExpanded"
+            src="/assets/img/pantalla-grande.svg"
+            alt="Maximitzar"
+            width="30"
+          />
+          <img
+            v-else
+            src="/assets/img/pantalla-pequeña.svg"
+            alt="Minimitzar"
+            width="30"
+          />
         </button>
         <div class="resize-bar" @mousedown="startResize"></div>
         <iframe class="output" :srcdoc="output"></iframe>
@@ -142,7 +222,6 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, onMounted, computed, onUnmounted, nextTick, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
@@ -299,8 +378,21 @@ const copyCode = async (code) => {
   }
 };
 
+// Soporte para móviles
+const isMobile = ref(false);
+const activeTab = ref('html');
+
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 450;
+}
+
 onMounted(async () => {
   lliureStore.toggleLliure();
+  
+  // Verificar si es dispositivo móvil
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+  
   htmlEditorInstance = CodeMirror(htmlEditor.value, {
     mode: "htmlmixed",
     theme: "dracula",
@@ -386,11 +478,9 @@ onMounted(async () => {
   htmlEditorInstance.on("change", (instance) => {
     if (isApplyingExternalChanges.value.html) return;
 
-
     const newValue = instance.getValue();
     html.value = newValue;
     markDirty();
-
 
     if (isCollaborating.value) {
       socket.value.emit("html-change", {
@@ -400,15 +490,12 @@ onMounted(async () => {
     }
   });
 
-
   cssEditorInstance.on("change", (instance) => {
     if (isApplyingExternalChanges.value.css) return;
-
 
     const newValue = instance.getValue();
     css.value = newValue;
     markDirty();
-
 
     if (isCollaborating.value) {
       socket.value.emit("css-change", {
@@ -418,15 +505,12 @@ onMounted(async () => {
     }
   });
 
-
   jsEditorInstance.on("change", (instance) => {
     if (isApplyingExternalChanges.value.js) return;
-
 
     const newValue = instance.getValue();
     js.value = newValue;
     markDirty();
-
 
     if (isCollaborating.value) {
       socket.value.emit("js-change", {
@@ -436,7 +520,6 @@ onMounted(async () => {
     }
   });
 });
-
 
 manager.initSocketConnection({
   socket,
@@ -453,6 +536,9 @@ manager.initSocketConnection({
 onUnmounted(() => {
   lliureStore.toggleLliure();
   idProyectoActualStore.vaciarId();
+
+  // Eliminar el listener de resize para soporte móvil
+  window.removeEventListener('resize', checkMobile);
 
   if (socket.value) {
     socket.value.disconnect();
@@ -535,7 +621,6 @@ const joinCollaborationSession = (code) => {
     userName: appStore.loginInfo.name,
     avatar: appStore.loginInfo.avatar
   });
-
 
   isCollaborating.value = true;
 };
@@ -723,7 +808,6 @@ const output = computed(() => {
         </html>`;
 });
 </script>
-
 <style scoped>
 .layout-buttons {
   display: flex;
@@ -779,9 +863,8 @@ const output = computed(() => {
   display: flex;
   flex-direction: column;
   background-color: #1e1e1e;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
   color: #ffffff;
-  margin-left: -210px;
   margin-left: -210px;
 }
 
@@ -811,7 +894,7 @@ const output = computed(() => {
 }
 
 .header-title:focus {
-  border-color: #4CAF50;
+  border-color: #4caf50;
   background-color: #292929;
   outline: none;
 }
@@ -846,6 +929,13 @@ const output = computed(() => {
 .button-position svg {
   width: 20px;
   height: 20px;
+}
+
+.layout-buttons {
+  display: flex;
+  gap: 12px;
+  align-self: flex-end;
+  margin: 20px 20px 0 0; 
 }
 
 .header-button:hover {
@@ -891,7 +981,6 @@ const output = computed(() => {
   color: #fff;
   overflow-y: auto;
 }
-
 
 .output-container {
   position: relative;
@@ -1099,12 +1188,12 @@ const output = computed(() => {
   background-color: #9880ff;
   color: #9880ff;
   animation: dotFlashing 1s infinite linear alternate;
-  animation-delay: .5s;
+  animation-delay: 0.5s;
 }
 
 .dot-flashing::before,
 .dot-flashing::after {
-  content: '';
+  content: "";
   display: inline-block;
   position: absolute;
   top: 0;
@@ -1195,7 +1284,6 @@ const output = computed(() => {
   background-color: transparent;
 }
 
-
 .header-select {
   background-color: #2e2e2e;
   color: #fff;
@@ -1268,4 +1356,155 @@ const output = computed(() => {
 .btn-copy:hover {
   background: #45a049;
 }
+
+@media (max-width: 450px) {
+  .todo {
+    display: flex;
+    flex-direction: column;
+    background-color: #1e1e1e;
+    font-family: "Arial", sans-serif;
+    color: #ffffff;
+    margin: 0;
+    padding: 0 10px;
+    box-sizing: border-box;
+    width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .layout {
+    flex-direction: column;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .editor-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 10px 0;
+    gap: 10px;
+  }
+
+  .editor-box {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  margin-top: 0; /* asegúrate que no tenga espacio arriba */
+}
+
+
+  .code-editor {
+    height: 200px;
+    font-size: 14px;
+  }
+
+  .output-container {
+    width: 100%;
+    height: 300px;
+    margin: 0;
+    border-radius: 6px;
+    border: 1px solid #333;
+    overflow: auto;
+  }
+
+  .expand-button {
+    top: 6px;
+    right: 6px;
+    padding: 6px 10px;
+  }
+
+  .layout-buttons,
+  .button-position {
+    display: none;
+  }
+
+  .header {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 10px;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: nowrap;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.header-button {
+  padding: 6px 8px;
+  font-size: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.header-title {
+  flex: 2 1 auto;
+  font-size: 12px;
+  padding: 6px 8px;
+  min-width: 0;
+}
+.header {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 10px;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: nowrap;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.header-button {
+  padding: 6px 8px;
+  font-size: 12px;
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.header-title {
+  flex: 2 1 auto;
+  font-size: 12px;
+  padding: 6px 8px;
+  min-width: 0;
+}
+  .editor-tabs {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 0; /* antes era 10px */
+}
+
+
+   .editor-tabs button {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: none;
+  background-color: #444;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+
+  iframe.output {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+
+
 </style>
+

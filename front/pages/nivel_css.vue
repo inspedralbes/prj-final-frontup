@@ -212,4 +212,41 @@ export default {
 .back-button:hover {
   background-color: #2c3e50;
 }
+@media (max-width: 450px) {
+ .level-container {
+    position: relative;
+    height: 100dvh; /* Más fiable en móviles */
+    width: 100vw;   /* Asegura que ocupe el ancho real de la pantalla */
+    margin: 0;      /* Elimina márgenes externos */
+    padding: 0;     /* Elimina padding interno que desplaza el fondo */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background-image: url('/fondo.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+  }
+
+  .level-button-container {
+    position: absolute;
+    width: 40%;
+    max-width: 120px;
+    height: auto;
+  }
+
+  /* Ajustamos las posiciones para que no se monten */
+  .level-button-container:nth-child(1) { top: 10%; left: 10%; }
+  .level-button-container:nth-child(2) { top: 18%; left: 50%; }
+  .level-button-container:nth-child(3) { top: 26%; left: 10%; }
+  .level-button-container:nth-child(4) { top: 34%; left: 50%; }
+  .level-button-container:nth-child(5) { top: 42%; left: 10%; }
+  .level-button-container:nth-child(6) { top: 50%; left: 50%; }
+  .level-button-container:nth-child(7) { top: 58%; left: 10%; }
+  .level-button-container:nth-child(8) { top: 66%; left: 50%; }
+  .level-button-container:nth-child(9) { top: 74%; left: 10%; }
+  .level-button-container:nth-child(10) { top: 82%; left: 50%; }
+}
 </style>

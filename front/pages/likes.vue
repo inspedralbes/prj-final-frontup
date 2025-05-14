@@ -104,13 +104,14 @@ export default {
 
 <style scoped>
 .container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   max-width: 100%;
   margin: auto;
   padding: 30px;
   text-align: center;
-  border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  height: 100vh;
 }
 
 h1 {
@@ -210,5 +211,59 @@ h1 {
 
 .page-btn:hover:not(:disabled) {
   background-color: #525252;
+}
+@media (max-width: 450px) {
+ .container {
+    display: flex;
+    flex-direction: column;
+    min-height: 80vh;
+    max-width: 170%;
+    padding: 30px;
+    padding-top: 80px;
+    text-align: center;
+    background-color: #252323;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px;
+    align-items: stretch;
+  }
+
+  .search-bar,
+  .sort-container {
+    width: 100%;
+  }
+
+  .filter-input,
+  .sort-select {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    background-color: #3a3a3a;
+    color: #ddd;
+  }
+
+  .sort-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #ccc;
+    text-align: left;
+  }
+  
+  .projects-list {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr); 
+    gap: 30px;
+    padding: 10px;
+    margin-top: 20px;
+  }
 }
 </style>

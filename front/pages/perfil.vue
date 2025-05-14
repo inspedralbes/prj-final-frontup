@@ -512,4 +512,17 @@ const logout = () => {
     flex-direction: column;
   }
 }
+@media (max-width: 450px) {
+  .profile-container {
+  height: 100%;
+  color: #e0e0e0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background-color: #07182E;
+}
+
+
+}
 </style>
