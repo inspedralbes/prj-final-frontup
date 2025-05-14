@@ -48,7 +48,7 @@ export default {
 
 <style scoped>
 .selector {
-  height: 90vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -146,23 +146,21 @@ button:hover {
   .selector {
     padding: 20px 0;
     margin-top: -30%;
-    height: 150vh;
+    height: auto;
+    margin-top: 1%;
   }
-
   .botones {
     flex-direction: column;
     align-items: center;
     gap: 30px;
     width: 90%;
   }
-
   .boton-container {
     width: 90%;
     max-width: 300px;
     height: auto;
     position: relative;
   }
-
   .boton-container button {
     position: relative; 
     height: 250px;
