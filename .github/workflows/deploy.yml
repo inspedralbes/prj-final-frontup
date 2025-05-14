@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} està pujant l'aplicació a PROD  🚀
 on:
   push:
     branches:
-      - actions
+      - main
 jobs:
   Pujar-a-produccio-amb-FTP:
     runs-on: ubuntu-latest
@@ -14,8 +14,8 @@ jobs:
       - name: Prepara fitxer d'ultima actualització
         run: |
           cd ${{ github.workspace }}
-          echo "Action desplegant a produccio" > ../../front/.output/public/last_deploy.txt
-          date >> ../../front/.output/public/last_deploy.txt
+          echo "Action desplegant a produccio" > front/output/public/last_deploy.txt
+          date >> front/output/public/last_deploy.txt
       
       - name: Desplegament FTP a producció
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -23,7 +23,7 @@ jobs:
           server: ${{ secrets.FRONT_HOST }}
           username: ${{ secrets.USER_FRONT_SERVER }}
           password: ${{ secrets.FRONT_SERVER_PASSWORD }}
-          local-dir: ../../front/.output/public/
+          local-dir: front/output/public/
           server-dir: /public/
           
       - run: echo "🍏 This job's status is ${{ job.status }}."
