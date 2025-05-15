@@ -1,33 +1,52 @@
 <template>
   <div class="container">
+
     <h1 class="title">Els meus projectes</h1>
 
-    <!-- Selector de ordenación con nuevo estilo -->
-    <div class="sort-container">
-      <label for="sort" class="sort-label">Ordenar per:</label>
-      <select id="sort" v-model="sortCriteria" class="sort-select">
-        <option value="default">Destacats</option>
-        <option value="date_asc">Data: Més antics primer</option>
-        <option value="date_desc">Data: Més recents primer</option>
-      </select>
+    <div class="header">
+      <div class="search-bar">
+        <input type="text" v-model="searchQuery" placeholder="🔍 Filtrar projectes..." class="filter-input" />
+      </div>
+      <div class="sort-container">
+        <label for="sort" class="sort-label">Ordenar per:</label>
+        <select id="sort" v-model="sortCriteria" class="sort-select">
+          <option value="default">Destacats</option>
+          <option value="popular">Més Populars</option>
+          <option value="date_asc">Data: Més antics primer</option>
+          <option value="date_desc">Data: Més recents primer</option>
+        </select>
+      </div>
     </div>
 
-    <div v-if="loading" class="loading">Cargant projectes...</div>
+    <div v-if="loading" class="loading">Carregant projectes...</div>
+    <div v-else-if="error" class="error">{{ error }}</div>
+    <div v-else>
+      <div v-if="projects.length === 0" class="no-projects">
+        No hi ha projectes disponibles.
+      </div>
+      <div class="projects-list">
+        <div v-for="project in projects" :key="project.id" class="project-card">
+          <Item :project="project" />
+          <button @click="deleteProject(project.id)" class="delete-btn">🗑️ Eliminar</button>
+        </div>
+      </div>
 
-    <div v-else-if="sortedProjects.length === 0" class="no-projects">
-      No tens projectes encara.
-      <br /><br />
-      <button class="btn" @click="navigateToLibre">Crear el teu primer projecte</button>
-    </div>
-
-    <div v-else class="projects-list">
-      <Item v-for="project in sortedProjects" @click="navigateToProject(project.id)" :key="project.id" :project="project"  />
+      <div class="pagination">
+        <button @click="prevPage" :disabled="currentPage === 1" class="page-btn">
+          Anterior
+        </button>
+        <span>Pàgina {{ currentPage }} de {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages" class="page-btn">
+          Següent
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import Item from '@/pages/item.vue';
+import Item from '~/components/item.vue';
+import useCommunicationManager from '~/stores/comunicationManager';
 
 export default {
   name: "Projectes",
@@ -37,145 +56,260 @@ export default {
   data() {
     return {
       projects: [],
+      searchQuery: "",
+      sortCriteria: "default",
       loading: true,
       error: null,
-      sortCriteria: "default",
+      currentPage: 1,
+      totalPages: 1,
+      communicationManager: null,
     };
   },
-  computed: {
-    sortedProjects() {
-      let sorted = [...this.projects];
-
-      if (this.sortCriteria === "date_asc") {
-        return sorted.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-      }
-      if (this.sortCriteria === "date_desc") {
-        return sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-      }
-      return sorted;
-    }
+  watch: {
+    searchQuery() {
+      this.currentPage = 1;
+      this.fetchProjects();
+    },
+    sortCriteria() {
+      this.currentPage = 1;
+      this.fetchProjects();
+    },
   },
   async mounted() {
+    this.communicationManager = useCommunicationManager();
     await this.fetchProjects();
   },
   methods: {
-    async fetchProjects() {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("No hay token guardado");
+    async fetchProjects(page = 1) {
+      this.loading = true;
 
-        const response = await fetch("http://localhost:8000/api/projects", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+      const result = await this.communicationManager.fetchProjects({
+        page,
+        searchQuery: this.searchQuery,
+        sortCriteria: this.sortCriteria,
+      });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Error al obtener los proyectos");
-        }
+      if (result.success) {
+        const data = result.data;
+        this.projects = data.data;
+        this.currentPage = data.current_page;
+        this.totalPages = data.last_page;
+        this.error = null;
+      } else {
+        this.error = result.message;
+      }
 
-        const data = await response.json();
-        this.projects = data.projects;
-        this.loading = false;
-      } catch (error) {
-        this.error = error.message;
-        this.loading = false;
+      this.loading = false;
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+        this.fetchProjects(this.currentPage);
       }
     },
-    navigateToLibre() {
-      this.$router.push("/lliure");
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+        this.fetchProjects(this.currentPage);
+      }
     },
-    navigateToProject(id) {
-      this.$router.push(`/lliure/${id}`);
-    }
+    async deleteProject(id) {
+      if (!confirm("¿Seguro que quieres eliminar este proyecto?")) return;
+
+      try {
+        await this.communicationManager.borrarProyectoDB(id);
+        this.fetchProjects(this.currentPage);
+      } catch (err) {
+        alert("Error eliminando el proyecto: " + err.message);
+      }
+    },
   },
 };
 </script>
 
-
 <style scoped>
 .container {
-  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 100%;
   margin: auto;
-  padding: 20px;
+  padding: 30px;
   text-align: center;
-  background-color: #252323;
+
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .title {
-  font-size: 28px;
-  margin-bottom: 30px;
+  color: #f3f4f6;
+  text-align: left;
+  margin-bottom: 20px;
+  font-size: 2rem;
   font-weight: bold;
-  color: #333;
 }
 
-.loading {
-  font-size: 18px;
-  color: #555;
-}
-
-.no-projects {
-  font-size: 18px;
-  color: red;
-}
-
-.projects-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
   gap: 20px;
-  margin-top: 20px;
-  margin-left: 190px;
 }
 
-.btn {
-  background-color: #292929;
-  color: #ffffff;
-  border: 2px solid #444;
-  padding: 12px 18px;
-  width: 40%;
-  cursor: pointer;
-  text-transform: uppercase;
-  border-radius: 6px;
-  font-weight: bold;
-  transition: background 0.3s ease, transform 0.2s ease;
+.search-bar {
+  flex-grow: 1;
+  max-width: 400px;
 }
 
-.btn:hover {
-  background-color: #3d3d3d;
-  transform: scale(1.05);
+.filter-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  outline: none;
+  background-color: #434952;
+  color: #e5e7eb;
 }
 
 .sort-container {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  margin-bottom: 15px;
-  padding-right: 20px;
+  gap: 10px;
 }
 
 .sort-label {
   font-size: 16px;
-  font-weight: bold;
-  color: #ddd;
-  margin-right: 10px;
+  color: #e5e7eb;
 }
 
 .sort-select {
-  background-color: #292929;
-  color: #ffffff;
-  border: 2px solid #444;
-  padding: 10px 15px;
-  font-size: 14px;
-  font-weight: bold;
-  border-radius: 6px;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #555;
+  outline: none;
+  background-color: #434952;
+  color: #f3f4f6;
   cursor: pointer;
-  transition: all 0.3s ease;
 }
 
-.sort-select:hover {
-  background-color: #3d3d3d;
-  transform: scale(1.05);
+.loading,
+.error {
+  font-size: 18px;
+  color: #f87171;
+}
+
+.no-projects {
+  font-size: 18px;
+  color: #facc15;
+}
+
+.projects-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+  padding: 10px 0;
+}
+
+.delete-btn {
+  margin-top: 10px;
+  padding: 8px 14px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.delete-btn:hover {
+  background-color: #dc2626;
+}
+
+.pagination {
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  color: #e5e7eb;
+  padding-top: 20px;
+}
+
+.page-btn {
+  padding: 10px 15px;
+  background-color: #3b3b3b;
+  color: #e2e8f0;
+  border: 1px solid #555;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.page-btn:disabled {
+  background-color: #555;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.page-btn:hover:not(:disabled) {
+  background-color: #525252;
+}
+
+@media (max-width: 450px) {
+  .container {
+    display: flex;
+    flex-direction: column;
+    min-height: 80vh;
+    max-width: 170%;
+    padding: 30px;
+    padding-top: 80px;
+    text-align: center;
+    background-color: #252323;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px;
+    align-items: stretch;
+  }
+
+  .search-bar,
+  .sort-container {
+    width: 100%;
+  }
+
+  .filter-input,
+  .sort-select {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    background-color: #3a3a3a;
+    color: #ddd;
+  }
+
+  .sort-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #ccc;
+    text-align: left;
+  }
+  
+  .projects-list {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 30px;
+    padding: 10px;
+  }
 }
 </style>

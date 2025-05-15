@@ -4,10 +4,8 @@
 <div class="container mt-4">
     <h2 class="mb-3">Llista de Projectes</h2>
 
-    <!-- Botón para crear un nuevo proyecto -->
     <a href="{{ route('projects.create') }}" class="btn btn-primary mb-3">Crear Projecte</a>
 
-    <!-- Formulario de búsqueda -->
     <form action="{{ route('projects.index') }}" method="GET" class="mb-3">
         <div class="input-group">
             <input type="text" name="search" class="form-control" placeholder="Buscar projecte" value="{{ request('search') }}">
@@ -17,11 +15,9 @@
         </div>
     </form>
 
-    <!-- Mensaje si no hay proyectos -->
     @if($projects->isEmpty())
         <p>No hi ha projectes disponibles.</p>
     @else
-        <!-- Tabla de proyectos -->
         <table class="table table-striped table-bordered">
             <thead class="thead-dark">
                 <tr>
@@ -38,10 +34,8 @@
                         <td>{{ $project->nombre }}</td>
                         <td>{{ $project->statuts == 0 ? 'Público' : 'Privado' }}</td>
                         <td>
-                            <!-- Botón de edición -->
                             <a href="{{ route('projects.edit', $project) }}" class="btn btn-warning btn-sm">Editar</a>
                             
-                            <!-- Formulario para eliminar el proyecto -->
                             <form action="{{ route('projects.destroy', $project) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
@@ -53,6 +47,45 @@
             </tbody>
         </table>
 
+        <div class="custom-pagination">
+            {{ $projects->appends(request()->input())->links() }}
+        </div>
     @endif
 </div>
+@endsection
+
+@section('styles')
+<style>
+    .custom-pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .custom-pagination .page-item a, 
+    .custom-pagination .page-item span {
+        color: #fff;
+        background-color: #007bff;
+        border: 1px solid #007bff;
+        padding: 8px 14px;
+        margin: 0 5px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+    }
+    .custom-pagination .page-item a:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+    .custom-pagination .page-item.active span {
+        background-color: #0056b3;
+        border-color: #0056b3;
+        font-weight: bold;
+    }
+    .custom-pagination .page-item.disabled span {
+        background-color: #ddd;
+        border-color: #ddd;
+        color: #666;
+        cursor: not-allowed;
+    }
+</style>
 @endsection

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Project;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
@@ -11,14 +12,48 @@ class ProjectController extends Controller
 
     public function indexAll(Request $request)
     {
-        $projects = Project::get();
+        $query = Project::query();
+        
+        $query->where('statuts', 0);
+        
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where('nombre', 'like', "%{$search}%");
+        }
+        
+        if ($request->has('sort')) {
+            $sort = $request->input('sort');
+            if ($sort === 'date_asc') {
+                $query->orderBy('created_at', 'asc');
+            } elseif ($sort === 'date_desc') {
+                $query->orderBy('created_at', 'desc');
+            } elseif ($sort === 'popular') {
+                $query->withCount('likes')->orderBy('likes_count', 'desc');
+            }
+        }
+        
+        $projects = $query->paginate(9);
 
-        return response()->json([
-            'message' => 'Proyectos obtenidos con éxito',
-            'projects' => $projects,
-        ], 200);
+        $projects->getCollection()->transform(function ($project) {
+            $project->preview_url = $this->generatePreviewUrl($project);
+            return $project;
+        });
+    
+        return response()->json($projects, 200);
+    }  
+
+    protected function generatePreviewUrl($project)
+    {
+    return route('projects.preview', ['id' => $project->id]);
     }
 
+    public function preview($id)
+    {
+    $project = Project::findOrFail($id);
+    
+    return view('projects.preview', compact('project'));
+    }
+    
     public function index(Request $request)
     {
         if ($request->is('api/*')) {
@@ -27,40 +62,70 @@ class ProjectController extends Controller
             if (!$user) {
                 return response()->json(['message' => 'Usuario no autenticado'], 401);
             }
-            $projects = Project::where('user_id', $user->id)->get();
 
-            return response()->json([
-                'message' => 'Proyectos obtenidos con éxito',
-                'projects' => $projects,
-            ], 200);
-        }
-        $search = $request->input('search');
+            $query = Project::where('user_id', $user->id);
 
-        if ($search) {
-            $projects = Project::where('nombre', 'like', "%$search%")->get();
-        } else {
-            $projects = Project::all();
+            if ($request->has('search')) {
+                $search = $request->input('search');
+                $query->where('nombre', 'like', "%{$search}%");
+            }
+            
+            if ($request->has('sort')) {
+                $sort = $request->input('sort');
+                if ($sort === 'date_asc') {
+                    $query->orderBy('created_at', 'asc');
+                } elseif ($sort === 'date_desc') {
+                    $query->orderBy('created_at', 'desc');
+                } elseif ($sort === 'popular') {
+                    $query->withCount('likes')->orderBy('likes_count', 'desc');
+                }
+            }
+
+            $projects = $query->paginate(9);
+
+            $projects->getCollection()->transform(function ($project) {
+                $project->preview_url = $this->generatePreviewUrl($project);
+                return $project;
+            });
+
+            return response()->json($projects, 200);
         }
+
+        $query = Project::query();
+
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where('nombre', 'like', "%{$search}%");
+        }
+        
+        if ($request->has('sort')) {
+            $sort = $request->input('sort');
+            if ($sort === 'date_asc') {
+                $query->orderBy('created_at', 'asc');
+            } elseif ($sort === 'date_desc') {
+                $query->orderBy('created_at', 'desc');
+            }
+        }
+
+        $projects = $query->paginate(9);
 
         return view('projects.index', compact('projects'));
     }
 
 
 
-
-
     public function show($id)
-{
-    $project = Project::find($id);
+    {
+        $project = Project::find($id);
 
-    if (!$project) {
-        return response()->json([
-            'message' => 'Proyecto no encontrado',
-        ], 404);
+        if (!$project) {
+            return response()->json([
+                'message' => 'Proyecto no encontrado',
+            ], 404);
+        }
+
+        return response()->json($project);
     }
-
-    return response()->json($project);
-}
 
 
     public function create()
@@ -89,12 +154,26 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         if (request()->expectsJson()) {
-            $project->update(request()->all());
+            $userId = Auth::id();
+            if($userId == $project->user_id){
+                $project->update(request()->all());
+    
+                return response()->json([
+                    'user' => $userId,
+                    'user_project' => $project->user_id,
+                    'success' => true,
+                    'message' => 'Proyecto actualizado correctamente'
+                ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Proyecto actualizado correctamente'
-            ]);
+            }
+            else{
+                return response()->json([
+                    'user' => $userId,
+                    'user_project' => $project->user_id,
+                    'success' => false,
+                    'message' => 'Para actualizar debes ser el creador'
+                ]);
+            }
         }
 
         return view('projects.edit', compact('project'));
@@ -105,7 +184,8 @@ class ProjectController extends Controller
     {
         if ($request->is('api/*')) {
             $project = Project::find($id);
-
+            $userId = Auth::id();
+        
             if (!$project) {
                 return response()->json([
                     'message' => 'Proyecto no encontrado'
@@ -113,42 +193,36 @@ class ProjectController extends Controller
             }
 
             $validatedData = $request->validate([
-                'nombre'   => 'required|string|max:255',
+                'nombre'    => 'required|string|max:255',
                 'html_code' => 'nullable|string',
-                'css_code' => 'nullable|string',
-                'js_code'  => 'nullable|string',
+                'css_code'  => 'nullable|string',
+                'js_code'   => 'nullable|string',
+                'statuts'   => 'nullable|boolean',
             ]);
 
-            $project->update($validatedData);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Proyecto actualizado con éxito',
-                'project' => $project,
-            ], 200);
-        }
-        $project = Project::find($id);
-
-            if (!$project) {
+            
+            if($userId == $project->user_id){
+                $project->update($validatedData);
+    
                 return response()->json([
-                    'message' => 'Proyecto no encontrado',
-                ], 404);
+                    'user' => $userId,
+                    'user_project' => $project->user_id,
+                    'success' => true,
+                    'message' => 'Proyecto actualizado con éxito',
+                    'project' => $project,
+                ], 200);
+
             }
+            else{
+                return response()->json([
+                    'user' => $userId,
+                    'user_project' => $project->user_id,
+                    'success' => false,
+                    'message' => 'Para actualizar debes ser el creador'
+                ]);
+            }
+        }
 
-            $validatedData = $request->validate([
-                'nombre' => 'required|string|max:255',
-                'html_code' => 'nullable|string',
-                'css_code' => 'nullable|string',
-                'js_code' => 'nullable|string',
-            ]);
-
-            $project->update($validatedData);
-
-            return redirect()->route('projects.index')->with('success', 'Proyecto actualizado con éxito');
-    }
-
-    public function destroy(Request $request, $id)
-    {
         $project = Project::find($id);
 
         if (!$project) {
@@ -157,10 +231,41 @@ class ProjectController extends Controller
             ], 404);
         }
 
-        $project->delete();
-        if ($request->is('api/*')) {
-            return response()->json(['success', 'Proyecto eliminado']);
+        $validatedData = $request->validate([
+            'nombre'    => 'required|string|max:255',
+            'html_code' => 'nullable|string',
+            'css_code'  => 'nullable|string',
+            'js_code'   => 'nullable|string',
+            'statuts'   => 'nullable|boolean',
+        ]);
+
+        $project->update($validatedData);
+
+        return redirect()->route('projects.index')->with('success', 'Proyecto actualizado con éxito');
+    }
+
+
+    public function destroy(Request $request, $id)
+    {
+        $project = Project::find($id);
+        $userId = Auth::id();
+
+        if (!$project) {
+            return response()->json([
+                'message' => 'Proyecto no encontrado',
+            ], 404);
         }
+
+        if ($request->is('api/*')) {
+            if($userId == $project->user_id){
+                $project->delete();
+                return response()->json(['success', 'Proyecto eliminado']);
+            }
+            else{
+                return response()->json(['error', 'No tienes permiso para eliminar este proyecto']);
+            }
+        }
+        $project->delete();
         $projects = Project::all();
         return redirect()->route('projects.index')->with('success', 'Proyecto eliminado con éxito');
     }

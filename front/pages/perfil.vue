@@ -1,6 +1,10 @@
 <template>
   <div class="profile-container">
+    <AlertComponent v-if="alertVisible" :success="alertSuccess" :text="alertText" :duration="2000"
+      @close="alertVisible = false" />
+      
     <div class="profile-card">
+      <div class="profile-card-bg"></div>
       <div class="profile-header">
         <h1>👤 Perfil d'Usuari</h1>
         <button class="logout-btn" @click="logout">
@@ -9,9 +13,7 @@
       </div>
 
       <div v-if="loading" class="loading-container">
-        <div class="loading-content">
-          <img src="assets/img/loading2.gif" alt="Cargando..." />
-        </div>
+        <div class="spinner"></div>
       </div>
 
       <div v-if="user && !loading" class="profile-content">
@@ -33,35 +35,29 @@
             <div class="skill">
               <span class="skill-icon">🛠️</span>
               <div class="skill-progress">
-                <div class="progress-bar html" :style="{width: (user.nivel * 10) + '%'}"></div>
+                <div class="progress-bar html" :style="{ width: (user.nivel * 10) + '%' }"></div>
                 <span>HTML {{ user.nivel * 10 }}%</span>
               </div>
             </div>
             <div class="skill">
               <span class="skill-icon">🎨</span>
               <div class="skill-progress">
-                <div class="progress-bar css" :style="{ width: ((user.nivel_css - 11) / (20 - 11) * 90 + 10) + '%' }"></div>
-                <span>CSS {{ ((user.nivel_css - 11) / (20 - 11) * 90 + 10).toFixed(0) }}%</span>
+                <div class="progress-bar css" :style="{ width: (user.nivel_css * 10) + '%' }"></div>
+                <span>CSS {{ user.nivel_css * 10 }}%</span>
               </div>
             </div>
-
             <div class="skill">
               <span class="skill-icon">⚙️</span>
               <div class="skill-progress">
-                <div class="progress-bar js" :style="{width: ((user.nivel_js - 21) / 9 * 90 + 10) + '%'}"></div>
-                <span>JS {{ ((user.nivel_js - 21) / 9 * 90 + 10).toFixed(0) }}%</span>
+                <div class="progress-bar js" :style="{ width: (user.nivel_js * 10) + '%' }"></div>
+                <span>JS {{ user.nivel_js * 10 }}%</span>
               </div>
             </div>
           </div>
         </div>
 
         <form @submit.prevent="updateAvatar" class="avatar-form">
-          <input 
-            v-model="newAvatar" 
-            type="text" 
-            placeholder="Introdueix text per al nou avatar" 
-            class="avatar-input"
-          />
+          <input v-model="newAvatar" type="text" placeholder="Introdueix text per al nou avatar" class="avatar-input" />
           <button type="submit" class="submit-btn">
             <span class="icon">🔄</span>Actualitzar Avatar
           </button>
@@ -75,12 +71,17 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAppStore } from '../stores/app';
+import AlertComponent from '../components/AlertComponent';
 
 const user = ref(null);
 const newAvatar = ref('');
-const loading = ref(true);  // Esta variable controla el estado de carga
+const loading = ref(true);
 const router = useRouter();
 const appStore = useAppStore();
+
+const alertVisible = ref(false);
+const alertSuccess = ref(false);
+const alertText = ref('');
 
 onMounted(() => {
   if (!appStore.isLoggedIn) {
@@ -90,9 +91,14 @@ onMounted(() => {
   }
 });
 
+const showAlert = (text, success) => {
+  alertText.value = text;
+  alertSuccess.value = success;
+  alertVisible.value = true;
+};
+
 const fetchUserData = async (token) => {
   try {
-    // Simula una carga de 2 segundos
     setTimeout(async () => {
       const response = await fetch('http://127.0.0.1:8000/api/user', {
         method: 'GET',
@@ -112,12 +118,12 @@ const fetchUserData = async (token) => {
       } else {
         console.error('No se pudo obtener los detalles del usuario');
       }
-      loading.value = false;  // Detiene el gif después de obtener los datos
-    }, 2000); // 2 segundos de espera
+      loading.value = false;  
+    }, 2000); 
 
   } catch (error) {
     console.error('Error al obtener los datos del usuario:', error);
-    loading.value = false;  // Detiene el gif si ocurre un error
+    loading.value = false;
   }
 };
 
@@ -141,42 +147,89 @@ const updateAvatar = async () => {
     if (response.ok) {
       const data = await response.json();
       user.value = data.user;
-      newAvatar.value = ''; 
+      newAvatar.value = '';
+      showAlert("Avatar actualitzat correctament", true);
     } else {
       console.error('Error al actualizar el avatar');
+      showAlert("Error al actualitzar l'avatar", false);
     }
   } catch (error) {
     console.error('Error al enviar la solicitud:', error);
+    showAlert("Error al actualitzar l'avatar", false);
   }
 };
 
 const logout = () => {
-  appStore.logout();
-  router.push('/login');
+  showAlert("Sessió tancada correctament", true);
+  
+  setTimeout(() => {
+    appStore.logout();
+    router.push('/login');
+  }, 1000);
 };
 </script>
-
 <style scoped>
 .profile-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+  height: 100%;
+  color: #e0e0e0;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   padding: 2rem;
-  margin-left: 180px;
+  background-color: #07182E;
 }
 
 .profile-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
+  width: 90%;
+  max-width: 900px;
+  background: #07182E;
+  border-radius: 15px;
+  position: relative;
+  overflow: hidden;
   padding: 2.5rem;
-  width: 100%;
-  max-width: 800px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  margin-top: 6rem;
+}
+
+/* Animación del lado derecho */
+.profile-card::before {
+  content: '';
+  position: absolute;
+  width: 150px;
+  background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
+  height: 170%;
+  animation: rotBGimg 8s linear infinite;
+  transition: all 0.2s linear;
+  top: -20%;
+  right: -50px;
+}
+
+/* Nueva animación del lado izquierdo */
+.profile-card::after {
+  content: '';
+  position: absolute;
+  width: 150px;
+  background-image: linear-gradient(180deg, rgb(255, 48, 255), rgb(0, 183, 255));
+  height: 170%;
+  animation: rotBGimgReverse 8s linear infinite;
+  transition: all 0.2s linear;
+  bottom: -20%;
+  left: -50px;
+  z-index: 0;
+}
+
+/* Capa interior para el contenido */
+.profile-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Fondo interno para crear el efecto de borde */
+.profile-card-bg {
+  content: '';
+  position: absolute;
+  background: #07182E;
+  inset: 5px;
+  border-radius: 12px;
+  z-index: 1;
 }
 
 .profile-header {
@@ -184,21 +237,33 @@ const logout = () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 2;
 }
 
-h1 {
-  color: #fff;
+.profile-header h1 {
   font-size: 2.2rem;
   margin: 0;
+  background: linear-gradient(45deg, #ffffff, #bd89ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.avatar-section {
+.profile-content {
   position: relative;
-  width: 150px;
-  margin: 0 auto 2rem;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.avatar-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
 }
 
 .avatar {
@@ -206,70 +271,65 @@ h1 {
   height: 150px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #4CAF50;
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-}
-
-.avatar-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.7);
-  color: #fff;
-  padding: 0.5rem;
-  text-align: center;
-  border-radius: 0 0 20px 20px;
-  cursor: pointer;
-  opacity: 0;
+  border: 3px solid rgba(189, 137, 255, 0.6);
+  box-shadow: 0 0 20px rgba(189, 137, 255, 0.4);
   transition: all 0.3s ease;
 }
 
-.avatar-section:hover .avatar-overlay {
-  opacity: 1;
+.avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(189, 137, 255, 0.7);
 }
 
 .user-info {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 15px;
+  background: rgba(7, 24, 46, 0.8);
+  border-radius: 10px;
   padding: 1.5rem;
-  margin-bottom: 2rem;
+  border: 1px solid rgba(189, 137, 255, 0.2);
 }
 
 .info-item {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-  align-items: center;
+  display: flex;
   margin-bottom: 1rem;
+  align-items: center;
 }
 
-label {
-  color: #4CAF50;
-  font-weight: 500;
+.info-item label {
+  font-weight: bold;
+  width: 100px;
+  color: #bd89ff;
 }
 
 .info-value {
-  color: #fff;
+  flex: 1;
   padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 5px;
+  border-left: 3px solid #bd89ff;
+  color: #fff;
 }
 
 .skill-levels {
-  margin-top: 2rem;
+  margin-top: 1.5rem;
 }
 
 .skill {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.skill-icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  width: 30px;
+  text-align: center;
 }
 
 .skill-progress {
-  flex-grow: 1;
+  flex: 1;
   background: rgba(255, 255, 255, 0.1);
-  height: 30px;
+  height: 25px;
   border-radius: 15px;
   position: relative;
   overflow: hidden;
@@ -281,126 +341,188 @@ label {
   position: absolute;
   left: 0;
   top: 0;
-  transition: width 0.5s ease;
+  transition: width 1s ease-out;
 }
 
-.html { background: #E44D26; }
-.css { background: #264DE4; }
-.js { background: #cab31c; }
+.progress-bar.html {
+  background: linear-gradient(90deg, #ff8a00, #e52e71);
+}
+
+.progress-bar.css {
+  background: linear-gradient(90deg, #3498db, #8e44ad);
+}
+
+.progress-bar.js {
+  background: linear-gradient(90deg, #f1c40f, #e67e22);
+}
 
 .skill-progress span {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: 15px;
   color: #fff;
-  padding-left: 1rem;
-  line-height: 30px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
 }
 
 .avatar-form {
   display: flex;
   gap: 1rem;
-  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
 }
 
 .avatar-input {
-  flex-grow: 1;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  padding: 0.8rem 1.2rem;
-  border-radius: 8px;
+  padding: 0.8rem 6rem;
+  border-radius: 10px;
+  border: 1px solid rgba(189, 137, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.05);
   color: #fff;
   font-size: 1rem;
+}
+
+.avatar-input:focus {
+  outline: none;
+  border-color: rgba(189, 137, 255, 0.8);
+  box-shadow: 0 0 10px rgba(189, 137, 255, 0.3);
 }
 
 .avatar-input::placeholder {
   color: rgba(255, 255, 255, 0.6);
 }
 
-.submit-btn, .logout-btn {
-  background: #4CAF50;
-  color: #fff;
+.submit-btn,
+.logout-btn {
   border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 8px;
+  border-radius: 10px;
+  background-color: rgba(189, 137, 255, 0.2);
+  color: #fff;
   cursor: pointer;
+  padding: 12px 20px;
+  font-size: 1em;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+  border: 1px solid rgba(189, 137, 255, 0.3);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  transition: all 0.3s ease;
 }
 
-.submit-btn:hover, .logout-btn:hover {
-  background: #45a049;
+.submit-btn:hover,
+.logout-btn:hover {
+  background-color: rgba(189, 137, 255, 0.4);
+  box-shadow: 0 0 15px rgba(189, 137, 255, 0.5);
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
 }
 
 .logout-btn {
-  background: #f44336;
+  background-color: rgba(229, 46, 113, 0.2);
+  border: 1px solid rgba(229, 46, 113, 0.3);
 }
 
 .logout-btn:hover {
-  background: #d32f2f;
-  box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
+  background-color: rgba(229, 46, 113, 0.4);
+  box-shadow: 0 0 15px rgba(229, 46, 113, 0.5);
 }
 
-.auth-message {
-  text-align: center;
-  color: #fff;
-  font-size: 1.2rem;
+.loading-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(7, 24, 46, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  border-radius: 15px;
 }
 
-.login-link {
-  color: #4CAF50;
-  text-decoration: none;
-  margin-top: 1rem;
-  display: inline-block;
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top: 4px solid #bd89ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rotBGimg {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rotBGimgReverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+/* Responsive styles */
+@media (min-width: 768px) {
+  .profile-content {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .avatar-section {
+    width: 30%;
+  }
+  
+  .user-info {
+    width: 65%;
+  }
 }
 
 @media (max-width: 768px) {
   .profile-card {
     padding: 1.5rem;
   }
-  
+
   .profile-header {
     flex-direction: column;
     gap: 1rem;
   }
-  
-  .info-item {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-  
+
   .avatar-form {
     flex-direction: column;
   }
-  
-  .avatar-input {
-    width: 100%;
-  }
 }
-
-.loading-container {
+@media (max-width: 450px) {
+  .profile-container {
+  height: 100%;
+  color: #e0e0e0;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 10;
+  padding: 2rem;
+  background-color: #07182E;
 }
 
-.loading-content {
-  text-align: center;
-}
 
-.loading-container img {
-  width: 10vw;
-  height: 20vh;
 }
 </style>

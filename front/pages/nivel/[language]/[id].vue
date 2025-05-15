@@ -1,17 +1,19 @@
 <template>
   <div class="todo">
     <header class="header">
-      <button class="header-button" @click="goBack">Enrere</button>
-      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
-        :readonly="!isEditing" />
-      <div class="header-actions">
-        <button class="header-button" @click="guardarProyecto">Desar</button>
-        <button class="header-button" @click="openSettingsModal">Configuració</button>
-        <button class="header-button">💡</button>
-      </div>
-    </header>
+  <div class="header-row">
+    <button class="header-button" @click="goBack">Atrás</button>
+    <h1 class="header-title">{{ title }}</h1>
+    <button class="header-button" @click="toggleChat">Xat IA</button>
+  </div>
 
-    <div class="exercise-number">Títol {{ id }}</div>
+  <div class="header-row">
+    <button class="header-button" @click="guardarProyecto">Guardar</button>
+    <button class="header-button" @click="openSettingsModal">Configuració</button>
+    <button class="header-button">💡</button>
+  </div>
+</header>
+
 
     <div class="exercise-instructions">
       <p><strong>Instruccions:</strong></p>
@@ -22,7 +24,7 @@
 
     <div class="editor-output-wrapper">
       <div class="editor-box">
-        <div class="editor-label">{{ languageLabel }}</div> 
+        <div class="editor-label">{{ languageLabel }}</div>
         <div ref="htmlEditor" class="code-editor"></div>
       </div>
 
@@ -47,6 +49,7 @@ import "codemirror/mode/htmlmixed/htmlmixed";
 import "codemirror/mode/css/css";
 import "codemirror/mode/javascript/javascript";
 import { useLliureStore } from "~/stores/app";
+import Swal from 'sweetalert2';
 
 export default {
   setup() {
@@ -55,135 +58,174 @@ export default {
     const lliureStore = useLliureStore();
 
     const title = computed(() => `Exercici ${id.value}`);
-    
+    const language = ref(route.params.language);
+    const id = ref(parseInt(route.params.id));
+
     const languageLabel = computed(() => {
-      if (language.value === 'html') return 'Llenguatge: HTML';
-      if (language.value === 'css') return 'Llenguatge: CSS';
-      if (language.value === 'js') return 'Llenguatge: JavaScript';
-      return 'Llenguatge desconegut';
+      return {
+        'html': 'Llenguatge: HTML',
+        'css': 'Llenguatge: CSS',
+        'js': 'Llenguatge: JavaScript'
+      }[language.value] || 'Llenguatge desconegut';
     });
 
     const html = ref("");
     const css = ref("");
     const js = ref("");
-    const isEditing = ref(false);
-    const question = ref(""); 
+    const question = ref("");
     const loading = ref(true);
     const error = ref(false);
-    const language = ref(route.params.language);  
-    const id = ref(route.params.id);  
-
     const htmlEditor = ref(null);
     let htmlEditorInstance;
 
+    const levelLimits = {
+      html: { min: 1, max: 10 },
+      css: { min: 1, max: 10 },
+      js: { min: 1, max: 10 }
+    };
+
     watch(() => route.params.language, (newLanguage) => {
-      if (newLanguage === 'html') {
-        id.value = Math.max(1, Math.min(10, parseInt(route.params.id))); 
-      } else if (newLanguage === 'css') {
-        id.value = Math.max(11, Math.min(20, parseInt(route.params.id))); 
-      } else if (newLanguage === 'js') {
-        id.value = Math.max(21, Math.min(30, parseInt(route.params.id)));
-      }
+      language.value = newLanguage;
+      id.value = Math.max(
+        levelLimits[newLanguage].min,
+
+        Math.min(levelLimits[newLanguage].max, id.value)
+      );
     }, { immediate: true });
+
+    watch(() => route.fullPath, () => {
+      id.value = parseInt(route.params.id);
+      fetchQuestion();
+      clearEditors();
+    });
 
     const fetchQuestion = async () => {
       try {
         loading.value = true;
-        error.value = false; 
+        error.value = false;
 
-        const response = await fetch(`http://localhost:8000/api/preguntas/${language.value}/${id.value}`);
+        const response = await fetch(
+          `http://localhost:8000/api/niveles/${language.value}/pregunta/${id.value}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          }
+        );
+
         if (!response.ok) throw new Error("Error a l'obtenir la pregunta");
 
         const data = await response.json();
-        question.value = data.question;  
+        question.value = data.question;
       } catch (err) {
         console.error("Error en fetchQuestion:", err);
         error.value = true;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: "No s'ha pogut carregar la pregunta",
+        });
       } finally {
         loading.value = false;
       }
     };
 
     const validateExercise = async () => {
-  if (!question.value) {
-    alert("No s'ha carregat la pregunta.");
-    return;
-  }
-
-  try {
-    const response = await fetch(`http://localhost:8000/api/preguntas/${language.value}/${id.value}`); 
-    if (!response.ok) throw new Error("Error a l'obtenir la resposta correcta");
-
-    const data = await response.json();
-
-    const cleanString = (str) => {
-  return str.replace(/[\s\u200B\u200C\u200D\uFEFF]+/g, '').toUpperCase();
-};
-
-const respuestaCorrecta = cleanString(data.resp_correcta);
-console.log("respuesta correcta", respuestaCorrecta);
-const respuestaUsuario = cleanString(html.value);
-    console.log("respuesta usuari", respuestaUsuario);
-
-    
-    if (respuestaUsuario === respuestaCorrecta) {
-      alert("¡Felicitats! Has completat l'exercici.");
-      
-      await actualizarNivel();
-
-      let nextId = parseInt(id.value) + 1;
-
-      if ((language.value === "html" && nextId > 10) ||
-          (language.value === "css" && nextId > 20) ||
-          (language.value === "js" && nextId > 30)) {
-        alert("¡Felicitats! Has completat totes les preguntes d'aquest llenguatge.");
+      if (!question.value) {
+        alert("No s'ha carregat la pregunta.");
         return;
       }
 
-      router.push(`/nivel/${language.value}/${nextId}`);
-    } else {
-      alert("La teva resposta no es correcta. Torna-ho a intentar.");
-    }
-
-  } catch (error) {
-    console.error("Error al validar l'exercici:", error);
-  }
-};
-
-
-    const actualizarNivel = async () => {
       try {
-        const userId = 1; 
-        let campoNivel = "";
+        const response = await fetch(
+          `http://localhost:8000/api/niveles/${language.value}/verificar/${id.value}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+              respuesta_usuario: {
+                html: html.value,
+                css: css.value,
+                js: js.value
+              }[language.value]
+            })
+          }
+        );
 
-        if (language.value === "html") campoNivel = "nivel";
-        else if (language.value === "css") campoNivel = "nivel_css";
-        else if (language.value === "js") campoNivel = "nivel_js";
+        if (!response.ok) throw new Error("Error en la verificació");
 
-        const response = await fetch(`http://localhost:8000/api/actualizar-nivel`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: userId,
-            campo: campoNivel,
-            nivel: id.value,
-          }),
-        });
+        const { correct, message } = await response.json();
 
-        if (!response.ok) throw new Error("Error a l'actualizar el nivell");
+        if (correct) {
+          await Swal.fire({
+            icon: 'success',
+            title: '¡Felicitats!',
+            text: message,
+          });
 
+          await updateUserLevel();
+
+          const nextId = id.value + 1;
+          if (nextId > levelLimits[language.value].max) {
+            await Swal.fire({
+              icon: 'info',
+              title: '🎉 Enhorabona!',
+              text: "Has completat totes les preguntes d'aquest llenguatge.",
+            });
+            router.push('/niveles');
+          } else {
+            router.push(`/nivel/${language.value}/${nextId}`);
+          }
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Incorrecte',
+            text: message,
+          });
+        }
       } catch (error) {
-        console.error("Error en actualizarNivel:", error);
+        console.error("Error al validar l'exercici:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: "Hi ha hagut un problema en verificar la resposta",
+        });
       }
     };
 
-    watch(() => route.params.id, (newId)=> {
-      id.value = newId;
-      fetchQuestion(); 
-      clearEditors();
-    });
+    const updateUserLevel = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/api/niveles/${language.value}/actualizar`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+              nivel: id.value,
+              language: language.value
+            })
+          }
+        );
+
+        if (!response.ok) throw new Error("Error a l'actualizar el nivell");
+
+        const data = await response.json();
+        console.log("Nivel actualizado:", data);
+      } catch (error) {
+        console.error("Error en actualizarNivel:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: "No s'ha pogut actualitzar el nivell",
+        });
+      }
+    };
 
     const clearEditors = () => {
       html.value = '';
@@ -195,55 +237,42 @@ const respuestaUsuario = cleanString(html.value);
       }
     };
 
+    const goBack = () => {
+      router.push(`/nivel_${language.value}`);
+    };
+
     onMounted(() => {
-  lliureStore.toggleLliure();
+      lliureStore.toggleLliure();
+      fetchQuestion();
 
-  fetchQuestion();  
+      let mode = "htmlmixed";
+      if (language.value === "css") mode = "css";
+      else if (language.value === "js") mode = "javascript";
 
-  htmlEditorInstance = CodeMirror(htmlEditor.value, {
-    mode: "htmlmixed",
-    theme: "dracula",
-    lineNumbers: true,
-  });
+      htmlEditorInstance = CodeMirror(htmlEditor.value, {
+        mode,
+        theme: "dracula",
+        lineNumbers: true,
+      });
 
-  htmlEditorInstance.on("change", (instance) => {
-    html.value = instance.getValue();  
-  });
+      const initialContent = {
+        html: "<!-- Escriu el teu codi HTML aquí -->",
+        css: "/* Escriu el teu codi CSS aquí */",
+        js: "// Escriu el teu codi JavaScript aquí"
+      }[language.value];
 
-  if (language.value === "css") {
-    const basicHTML = `<!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<style>
+      htmlEditorInstance.setValue(initialContent);
+      if (language.value === "html") html.value = initialContent;
+      else if (language.value === "css") css.value = initialContent;
+      else if (language.value === "js") js.value = initialContent;
 
-</style>
-<body>
-    <h1>Hola, mon</h1>
-    <p>Modifica el CSS per cambiar l'estil.</p>
-</body>
-</html>`;
-    htmlEditorInstance.setValue(basicHTML);
-    html.value = basicHTML;
-  }
-});
-
-const goBack = () => {
-  let rutaBase = "/nivel_";
-
-  if (language.value === "html") {
-    rutaBase += "html";
-  } else if (language.value === "css") {
-    rutaBase += "css";
-  } else if (language.value === "js") {
-    rutaBase += "js";
-  }
-
-  router.push(rutaBase);
-};
-
-
+      htmlEditorInstance.on("change", (instance) => {
+        const value = instance.getValue();
+        if (language.value === "html") html.value = value;
+        else if (language.value === "css") css.value = value;
+        else if (language.value === "js") js.value = value;
+      });
+    });
 
     onUnmounted(() => {
       lliureStore.toggleLliure();
@@ -255,24 +284,27 @@ const goBack = () => {
       css,
       js,
       htmlEditor,
-      isEditing,
-      goBack,
       question,
       loading,
       error,
       output: computed(() => `
-        <html>
-          <head><style>${css.value}</style></head>
-          <body>${html.value}</body>
-        </html>
-      `),
+  <html>
+    <head>
+      <style>${css.value}</style>
+    </head>
+    <body>
+      ${html.value}
+      <script>${js.value}<\/script>
+    </body>
+  </html>
+`),
       validateExercise,
-      languageLabel,  
+      languageLabel,
+      goBack
     };
   },
 };
 </script>
-
 
 <style scoped>
 .todo {
@@ -285,90 +317,105 @@ const goBack = () => {
   color: #ffffff;
   height: 100vh;
   box-sizing: border-box;
+  margin-left: -220px;
 }
 
 .header {
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 15px; 
-  background-color: #2d2d2d;
-  color: #fff;
-  width: 100%;
-  height: 10%;
-  box-sizing: border-box;
+  padding: 0 30px;
+  background-color: #1f1f1f;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 100;
 }
 
 .header-title {
-  font-size: 16px; 
-  color: #fff;
-  background-color: #444;
-  border: none;
-  padding: 6px;
-  border-radius: 4px;
+  font-size: 18px;
+  color: #ffffff;
   text-align: center;
+  min-width: 180px;
+  margin: 0;
+}
+
+.header-title:focus {
+  border-color: #4CAF50;
+  background-color: #292929;
+  outline: none;
 }
 
 .header-actions {
   display: flex;
-  gap: 8px; 
+  gap: 12px;
 }
 
 .header-button {
-  background-color: #555;
-  border: none;
+  background-color: #2e2e2e;
+  border: 1px solid #444;
   color: #fff;
-  padding: 6px 10px;
-  border-radius: 4px;
+  padding: 8px 14px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
 .header-button:hover {
-  background-color: #777;
+  background-color: #3a3a3a;
 }
 
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+
 .exercise-instructions {
-  margin-top: 100px; 
+  margin-top: 100px;
   background-color: #1e1e1e;
   color: #fff;
-  padding: 8px 15px; 
+  padding: 8px 15px;
   border-radius: 6px;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.3);
-  max-width: 750px; 
+  max-width: 750px;
 }
 
 .editor-output-wrapper {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 30px; 
+  gap: 30px;
   width: 100%;
   max-width: 1000px;
-  margin-top: 30px; 
+  margin-top: 30px;
   box-sizing: border-box;
- 
+
 }
 
 .editor-box,
 .output-container {
   flex: 1;
-  max-width: 100%; 
+  max-width: 100%;
   border-radius: 6px;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .editor-box {
   background-color: #2d2d2d;
-  padding: 10px; 
+  padding: 10px;
   display: flex;
   flex-direction: column;
 }
 
 .editor-label {
   margin-bottom: 8px;
-  font-size: 15px; 
+  font-size: 15px;
   color: #fff;
   background-color: #444;
   padding: 4px 6px;
@@ -413,5 +460,107 @@ const goBack = () => {
 
 .submit-button:hover {
   background-color: #45a049;
+}
+
+@media (max-width: 450px) {
+
+  .todo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: #000000;
+  font-family: 'Arial', sans-serif;
+  color: #ffffff;
+  height: 93vh;
+  box-sizing: border-box;
+  margin: auto;
+}
+
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100px;
+  }
+
+  .header-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-title {
+    font-size: 18px;
+    color: #ffffff;
+    background-color: transparent;
+    border: 2px solid transparent;
+    padding: 10px 12px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    text-align: center;
+    min-width: 180px;
+  }
+
+  .editor-output-wrapper {
+    flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 12px;
+  box-sizing: border-box;
+  }
+
+  .submit-container {
+    order: 0;
+    display: flex;
+    justify-content: center;
+    margin-top: -280px;
+    padding: 0 170px;
+  }
+  
+
+  .editor-box {
+  order: 1;
+  max-width: 400px; /* o el ancho que desees */
+  width: 100%;
+  margin: 0 auto; /* centra horizontalmente */
+  box-sizing: border-box;
+  background-color: #2d2d2d; /* asegúrate que este sea el color que quieres */
+  border-radius: 8px; /* opcional, mejora el aspecto en móvil */
+}
+
+
+  .output-container {
+    order: 2;
+  }
+
+  .submit-button {
+    width: 100%;
+  }
+
+  .code-editor {
+    width: 100%;
+    height: 200px;
+  }
+
+  .editor-box,
+  .output-container {
+    width: 100%;
+  }
+
+  .exercise-instructions {
+  margin-top: 100px;
+  background-color: #1e1e1e;
+  color: #fff;
+  padding: 8px 40px;
+  border-radius: 6px;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.3);
+  max-width: 750px;
+} 
+
+
 }
 </style>
