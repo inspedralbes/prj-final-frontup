@@ -3,10 +3,10 @@
     <div class="slider" :class="{ slide: showRegister }">
       <div>
         <button v-if="showRegister" class="atras" @click="gohome">
-          FrontUp
+          FrontApp
         </button>
         <button v-else class="atras" @click="gohome">
-          FrontUp
+          FrontApp
         </button>
       </div>
       <div class="Formulario">

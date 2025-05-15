@@ -29,7 +29,7 @@
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
               <polyline points="9 22 9 12 15 12 15 22"></polyline>
             </svg>
-            <p class="label">FrontUp</p>
+            <p class="label">FrontApp</p>
           </li>
         </ul>
 
@@ -259,7 +259,7 @@
   </div>
   <NuxtPage />
   <footer>
-    <p>© 2025 FrontUp</p>
+    <p>© 2025 FrontApp</p>
   </footer>
 </template>
 

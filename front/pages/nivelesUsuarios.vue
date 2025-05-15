@@ -2,7 +2,7 @@
   <div class="level-list-container">
     <div class="level-list-header">
       <h2 class="level-list-title">Nivells Publicats</h2>
-      <p class="level-list-subtitle">Explora els nivells creats per la comunitat FrontUp</p>
+      <p class="level-list-subtitle">Explora els nivells creats per la comunitat FrontApp</p>
     </div>
     
     <div class="search-filter-container">

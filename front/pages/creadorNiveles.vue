@@ -2,7 +2,7 @@
   <div class="level-creator-container">
     <div class="level-creator-header">
       <h2 class="level-creator-title">Crear Nou Nivell</h2>
-      <p class="level-creator-subtitle">Comparteix el teu coneixement amb la comunitat FrontUp</p>
+      <p class="level-creator-subtitle">Comparteix el teu coneixement amb la comunitat FrontApp</p>
     </div>
 
     <form @submit.prevent="handleSubmit" class="level-creator-form">

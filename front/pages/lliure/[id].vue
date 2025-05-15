@@ -104,7 +104,7 @@
       @mousedown="startDrag"
     >
       <button class="close-chat-button" @click="toggleChat">✖</button>
-      <h2 class="chat-title">IA FrontUp</h2>
+      <h2 class="chat-title">IA FrontApp</h2>
       <div class="messages-container" ref="messagesContainer">
         <div
           v-for="(msg, index) in messages"

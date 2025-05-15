@@ -3,7 +3,7 @@
   <div id="app">
     <!-- Barra lateral y barra superior -->
     <div class="left-section">
-      <h2>FrontUp</h2>
+      <h2>FrontApp</h2>
       <button class="btn">Els meus projectes</button>
       <button class="btn" @click="navigateToLliure">Lliure</button>
       <button class="btn" @click="navigateToNiveles">Nivells</button>
