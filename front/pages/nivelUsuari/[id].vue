@@ -45,7 +45,7 @@
   
   const fetchLevel = async () => {
     try {
-      const response = await $fetch(`http://161.22.40.52/api/nivells_usuaris/${route.params.id}`, {
+      const response = await $fetch(`http://161.22.40.52/public/api/nivells_usuaris/${route.params.id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Accept': 'application/json'

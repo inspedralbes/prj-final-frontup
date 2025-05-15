@@ -63,7 +63,7 @@ const fetchLevels = async (page = 1) => {
     if (searchQuery.value) params.append('search', searchQuery.value)
     if (sortCriteria.value !== 'default') params.append('sort', sortCriteria.value)
     
-    const response = await $fetch(`http://161.22.40.52/api/nivells_usuaris?${params.toString()}`, {
+    const response = await $fetch(`http://161.22.40.52/public/api/nivells_usuaris?${params.toString()}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Accept': 'application/json'
