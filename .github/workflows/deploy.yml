@@ -39,6 +39,6 @@ jobs:
           username: ${{ secrets.USER_FRONT_SERVER }}
           password: ${{ secrets.FRONT_SERVER_PASSWORD }}
           local-dir: ./front/.output/public/
-          server-dir: /private/
+          server-dir: /public/
           
       - run: echo "🍏 This job's status is ${{ job.status }}."
