@@ -14,7 +14,7 @@
         <ul class="leftsection-list">
           <li></li>
           <br class="space" />
-          <li class="leftsection-element" @click="navigateToHome">
+          <li class="leftsection-element" @click="navigateToHome(); navbarVisible = false">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="25"
@@ -38,7 +38,7 @@
         <ul class="leftsection-list">
           <li
             class="leftsection-element leftsection-element--crear"
-            @click="navigateToLliure"
+            @click="navigateToLliure(); navbarVisible = false"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -59,7 +59,7 @@
           <li
             v-if="isLoged"
             class="leftsection-element"
-            @click="navigateToMeusProjectes"
+            @click="navigateToMeusProjectes(); navbarVisible = false"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -77,7 +77,7 @@
             </svg>
             <p class="label">Els Meus Projectes</p>
           </li>
-          <li class="leftsection-element" @click="navigateToNiveles">
+          <li class="leftsection-element" @click="navigateToNiveles(); navbarVisible = false">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="25"
@@ -93,7 +93,7 @@
             </svg>
             <p class="label">Nivells</p>
           </li>
-          <li class="leftsection-element" @click="navigateToTotsProjectes">
+          <li class="leftsection-element" @click="navigateToTotsProjectes(); navbarVisible = false">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="25"
@@ -113,7 +113,7 @@
           <li
             v-if="isLoged"
             class="leftsection-element"
-            @click="navigateToLikes"
+            @click="navigateToLikes(); navbarVisible = false"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -132,7 +132,7 @@
             </svg>
             <p class="label">Likes</p>
           </li>
-          <li class="leftsection-element" @click="navigateToCreadorNiveles">
+          <li class="leftsection-element" @click="navigateToCreadorNiveles(); navbarVisible = false">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="25"
@@ -148,7 +148,7 @@
             </svg>
             <p class="label">Creador nivells</p>
           </li>
-          <li class="leftsection-element" @click="navigateToNivelesUsuarios">
+          <li class="leftsection-element" @click="navigateToNivelesUsuarios(); navbarVisible = false">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="25"
@@ -165,7 +165,7 @@
             <p class="label">Nivells d'usuaris</p>
           </li>
         </ul>
-        <li class="leftsection-element" @click="showCollaborationModal = true">
+        <li class="leftsection-element" @click="showCollaborationModal = true; navbarVisible = false">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="25"
@@ -186,7 +186,7 @@
         <ul class="leftsection-list">
           <li
             class="leftsection-element"
-            @click="navigateToProfile"
+            @click="navigateToProfile(); navbarVisible = false"
             v-if="appStore.isLoggedIn"
           >
             <svg
@@ -205,7 +205,7 @@
             </svg>
             <p class="label">Perfil</p>
           </li>
-          <li class="leftsection-element" @click="navigateToLogin" v-else>
+          <li class="leftsection-element" @click="navigateToLogin(); navbarVisible = false" v-else>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="25"
@@ -472,7 +472,6 @@ body {
 .leftsection-card,
 .navbar {
   transition: transform 0.3s ease;
-
   max-height: 100vh;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -691,7 +690,7 @@ footer {
   }
 
   .top-navbar {
-    width: 15%;
+    width: 100%;
     height: 50px;
     display: flex;
     align-items: center;
@@ -711,9 +710,10 @@ footer {
   }
 
   .leftsection-card {
-    top: -7%;
+    top: -5%;
   }
   .navbar {
+    scrollbar-width: none; 
     position: fixed;
     top: 50px;
     left: 0;
@@ -729,6 +729,8 @@ footer {
   .navbar.show {
     transform: translateX(0);
     background-color: transparent;
+    width: 60%;
+    scrollbar-width: none; 
   }
 
   .navbar.hide {
