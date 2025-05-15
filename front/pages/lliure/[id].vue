@@ -52,7 +52,6 @@
       </div>
     </div>
 
-    <!-- Modal para compartir código de colaboración -->
     <div v-if="showShareModal" class="modal-overlay" @click="closeShareModal">
       <div class="modal-content" @click.stop>
         <button class="close-modal-button" @click="closeShareModal">✖</button>
@@ -71,7 +70,6 @@
       </div>
     </div>
 
-    <!-- Modal para guardar antes de salir -->
     <div
       v-if="guardarParaSalir"
       class="modal-overlay"
@@ -94,7 +92,6 @@
       </div>
     </div>
 
-    <!-- Chat IA flotante -->
     <div
       v-if="isChatVisible"
       class="chat-container"
@@ -154,7 +151,6 @@
 
 
     <div :class="['layout', 'layout-' + layoutType]">
-      <!-- botones solo para móvil -->
       <div class="editor-tabs" v-if="isMobile">
         <button
           :class="{ active: activeTab === 'html' }"
@@ -175,7 +171,6 @@
           js
         </button>
       </div>
-      <!-- Contenedor principal de editores -->
       <div class="editor-container">
         <div class="editor-box" v-show="!isMobile || activeTab === 'html'">
           <div class="editor-label">HTML</div>
