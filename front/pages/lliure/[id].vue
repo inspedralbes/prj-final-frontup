@@ -8,7 +8,7 @@
         :readonly="!isEditing" />
       <div class="header-actions">
         <button class="header-button" @click="handleShare" :class="{ 'sharing-active': isCollaborating }">
-          {{ isCollaborating ? 'Compartiendo' : 'Compartir' }}
+          {{ isCollaborating ? 'Compartint' : 'Compartir' }}
         </button>
         <button class="header-button" @click="toggleChat">Xat IA</button>
         <button class="header-button" @click="guardarProyecto">Guardar</button>
