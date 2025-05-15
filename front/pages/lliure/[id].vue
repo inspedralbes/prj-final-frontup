@@ -969,6 +969,18 @@ const output = computed(() => {
   z-index: 100;
 }
 
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.header-row:last-child {
+  margin-bottom: 0;
+}
+
+
 .header-title {
   font-size: 18px;
   color: #ffffff;
@@ -978,7 +990,7 @@ const output = computed(() => {
   border-radius: 6px;
   transition: all 0.3s ease;
   text-align: center;
-  min-width: 180px;
+  min-width: 400px;
 }
 
 .header-title:focus {
@@ -1001,6 +1013,7 @@ const output = computed(() => {
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.3s ease;
+  margin-right: 10px;
 }
 
 .header-button.sharing-active {
@@ -1594,6 +1607,7 @@ const output = computed(() => {
   flex-wrap: nowrap;
   width: 100%;
   overflow-x: hidden;
+margin-bottom: 6px; 
 }
 
 .header-button {
