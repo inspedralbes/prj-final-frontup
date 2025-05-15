@@ -3,13 +3,15 @@
     @close="alertVisible = false" />
   <div class="todo">
     <header class="header" v-show="!isExpanded">
-      <button class="header-button" @click="leaveCollaborationSession(); goBack()">Enrere</button>
-      <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false"
-        :readonly="!isEditing" />
-      <div class="header-actions">
-        <button class="header-button" @click="handleShare" :class="{ 'sharing-active': isCollaborating }">
-          {{ isCollaborating ? 'Compartint' : 'Compartir' }}
+      <div class="header-row">
+        <button class="header-button" @click="leaveCollaborationSession(); goBack()">Enrere</button>
+        <input type="text" v-model="title" class="header-title" @focus="isEditing = true" @blur="isEditing = false" :readonly="!isEditing"/>
+        <button class="header-button" @click="generateShareCode">
+          Compartir
         </button>
+      </div>
+
+      <div class="header-row">
         <button class="header-button" @click="toggleChat">Xat IA</button>
         <button class="header-button" @click="guardarProyecto">Guardar</button>
         <select v-model="isPrivate" @change="savePrivacy" class="header-select">
@@ -54,7 +56,6 @@
 
     <div v-if="showShareModal" class="modal-overlay" @click="closeShareModal">
       <div class="modal-content" @click.stop>
-        <button class="close-modal-button" @click="closeShareModal">✖</button>
         <h2>Codi de col·laboració</h2>
         <div class="share-code-container">
           <p class="share-code">{{ shareCode }}</p>
@@ -62,10 +63,14 @@
             Copiar
           </button>
         </div>
-        <p class="share-instructions">Comparteix aquest codi amb altres usuaris perquè puguin unir-se i editar aquest
-          projecte en temps real.</p>
-        <div class="modal-actions-single">
-          <button type="button" class="modal-button cancel-room" @click="closeRoom">Tancar Room</button>
+        <p class="share-instructions">
+          Comparteix aquest codi amb altres usuaris perquè puguin unir-se i
+          editar aquest projecte en temps real.
+        </p>
+        <div class="modal-actions">
+          <button type="button" class="modal-button" @click="closeShareModal">
+            Tancar
+          </button>
         </div>
       </div>
     </div>
@@ -186,7 +191,12 @@
         </div>
       </div>
 
-      <div class="output-container" :class="{ expanded: isExpanded }" ref="outputContainer">
+      <!-- Contenedor de salida -->
+      <div
+        class="output-container"
+        :class="{ expanded: isExpanded }"
+        ref="outputContainer"
+      >
         <button class="expand-button" @click="toggleExpand">
           <img
             v-if="!isExpanded"
@@ -246,6 +256,7 @@ const {
 } = useCommunicationManager();
 const lliureStore = useLliureStore();
 
+// Variables per les alertes 
 const alertVisible = ref(false);
 const alertSuccess = ref(false);
 const alertText = ref('');
@@ -268,6 +279,7 @@ const guardarParaSalir = ref(false);
 const isPrivate = ref(0);
 const layoutType = ref('normal');
 
+//Variables per als sockets
 const showShareModal = ref(false);
 const shareCode = ref("");
 const socket = ref(null);
@@ -291,26 +303,6 @@ const showAlert = (message, isSuccess = false) => {
   alertText.value = message;
   alertSuccess.value = isSuccess;
   alertVisible.value = true;
-};
-
-const redirectToHome = (message) => {
-  if (cambiadoSinGuardar.value) {
-    try {
-      guardarProyecto();
-    } catch (error) {
-      console.error("Error al guardar proyecto antes de redirigir:", error);
-    }
-  }
-
-  isCollaborating.value = false;
-  shareCode.value = "";
-  activeUsersList.value = [];
-  
-  showAlert(message, false);
-  
-  setTimeout(() => {
-    router.push("/");
-  }, 2000);
 };
 
 const startDrag = (event) => {
@@ -361,11 +353,17 @@ const setLayout = (dir) => {
   layoutType.value = dir
 }
 
+/**
+ * Extrae el contenido entre triple backticks.
+ */
 const extractCode = (text) => {
   const match = text.match(/```(?:[\w-]+\n)?([\s\S]*?)```/);
   return match ? match[1].trim() : text;
 };
 
+/**
+ * Copia al portapapeles y muestra alerta.
+ */
 const copyCode = async (code) => {
   try {
     await navigator.clipboard.writeText(code);
@@ -382,75 +380,6 @@ const activeTab = ref('html');
 const checkMobile = () => {
   isMobile.value = window.innerWidth <= 450;
 }
-const handleShare = () => {
-  if (isCollaborating.value) {
-    showShareModal.value = true;
-  } else {
-    generateShareCode();
-  }
-};
-
-const setupSocketListeners = () => {
-  if (!socket.value) return;
-  
-  socket.value.on("room-deleted", ({ roomId }) => {
-    if (roomId === shareCode.value) {
-      if (isCollaborating.value) {
-        const isHost = activeUsersList.value.some(user => 
-          user.name === appStore.loginInfo.name && user.isHost
-        );
-        
-        if (!isHost) {
-          redirectToHome("El host ha tancat la sessió de col·laboració");
-        } else {
-          isCollaborating.value = false;
-          shareCode.value = "";
-          activeUsersList.value = [];
-          closeShareModal();
-        }
-      }
-    }
-  });
-  
-  socket.value.on("host-status", ({ isHost }) => {
-    if (isHost) {
-      showAlert("Ara ets el host d'aquesta sessió", true);
-    }
-  });
-};
-
-const closeRoom = async () => {
-  if (!isCollaborating.value || !shareCode.value) {
-    showAlert("No estàs en una sessió de col·laboració", false);
-    return;
-  }
-  
-  try {
-    const isHost = activeUsersList.value.some(user => 
-      user.name === appStore.loginInfo.name && user.isHost
-    );
-    
-    if (!isHost) {
-      showAlert("Només el host pot tancar la room", false);
-      return;
-    }
-    
-    socket.value.emit("delete-room", { roomId: shareCode.value });
-    
-    socket.value.once("room-deleted", ({ roomId }) => {
-      if (roomId === shareCode.value) {
-        showAlert("Room tancada correctament", true);
-        isCollaborating.value = false;
-        shareCode.value = "";
-        activeUsersList.value = [];
-        closeShareModal();
-      }
-    });
-  } catch (error) {
-    console.error("Error al tancar la room:", error);
-    showAlert("Error al tancar la room", false);
-  }
-};
 
 onMounted(async () => {
   lliureStore.toggleLliure();
@@ -501,7 +430,7 @@ onMounted(async () => {
     extraKeys: {
       "Ctrl-Space": "autocomplete"
     },
-    placeholder: "// ctrl + espai per suggeriments d'etiquetes"
+    placeholder: "// ctrl + espai per suggeriments d’etiquetes"
   });
 
   const projectId = route.params.id;
@@ -535,10 +464,6 @@ onMounted(async () => {
     cssEditorInstance,
     jsEditorInstance,
   });
-
-  if (socket.value) {
-    setupSocketListeners();
-  }
 
   const collabCode = route.query.code;
   if (collabCode) {
@@ -637,15 +562,17 @@ const generateShareCode = async () => {
     if (data.success) {
       shareCode.value = data.roomId;
 
+      // Si la sala és nova, ens connectarem a través del socket
       if (data.isNewRoom) {
+        // Ens unim a la sala que acabem de crear
         socket.value.emit("join-room", {
           roomId: data.roomId,
           projectId: idProyectoActualStore.id,
           userName: appStore.loginInfo.name,
           avatar: appStore.loginInfo.avatar
         });
-        showAlert("Has començat a compartir el projecte", true);
       } else {
+        // Si la sala ja existia, simplement ens hi unim
         socket.value.emit("join-room", {
           roomId: data.roomId,
           projectId: idProyectoActualStore.id,
@@ -658,11 +585,11 @@ const generateShareCode = async () => {
       showShareModal.value = true;
     } else {
       console.error('Error al generar el codi de compartir:', data.error);
-      showAlert("Error al generar el codi de compartir", false);
+      // Mostrar algun missatge d'error
     }
   } catch (error) {
     console.error('Error al generar el codi de compartir:', error);
-    showAlert("Error al generar el codi de compartir", false);
+    // Mostrar algun missatge d'error
   }
 };
 
@@ -835,17 +762,6 @@ const stopResize = () => {
 };
 
 const leaveCollaborationSession = () => {
-  if (!isCollaborating.value) return;
-  
-  const isHost = activeUsersList.value.some(user => 
-    user.name === appStore.loginInfo.name && user.isHost
-  );
-  
-  if (isHost) {
-    socket.value.emit("delete-room", { roomId: shareCode.value });
-    showAlert("Has tancat la sessió de col·laboració", true);
-  }
-  
   if (socket.value) {
     socket.value.disconnect();
     socket.value = null;
@@ -854,7 +770,6 @@ const leaveCollaborationSession = () => {
   isCollaborating.value = false;
   shareCode.value = "";
   activeUsers.value = 0;
-  activeUsersList.value = [];
 
   manager.initSocketConnection({
     socket,
@@ -867,10 +782,6 @@ const leaveCollaborationSession = () => {
     cssEditorInstance,
     jsEditorInstance,
   });
-  
-  if (socket.value) {
-    setupSocketListeners();
-  }
 };
 
 const output = computed(() => {
@@ -1011,11 +922,6 @@ const output = computed(() => {
   margin-right: 10px;
 }
 
-.header-button.sharing-active {
-  background-color: #00796b;
-  border-color: #00796b;
-}
-
 .button-position {
   background-color: #2e2e2e;
   border: 1px solid #444;
@@ -1041,10 +947,6 @@ const output = computed(() => {
 
 .header-button:hover {
   background-color: #3a3a3a;
-}
-
-.header-button.sharing-active:hover {
-  background-color: #00695c;
 }
 
 .editor-container {
@@ -1148,7 +1050,6 @@ const output = computed(() => {
   width: 500px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   color: #fff;
-  position: relative;
 }
 
 .modal-input,
@@ -1165,13 +1066,7 @@ const output = computed(() => {
 
 .modal-actions {
   display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-.modal-actions-single {
-  display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   margin-top: 20px;
 }
 
@@ -1195,64 +1090,6 @@ const output = computed(() => {
 
 .cancel:hover {
   background-color: #aaa;
-}
-
-.close-modal-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.close-modal-button:hover {
-  color: #ff4444;
-}
-
-.share-code-container {
-  display: flex;
-  align-items: center;
-  background-color: #1e1e1e;
-  padding: 12px;
-  border-radius: 6px;
-  margin: 15px 0;
-}
-
-.share-code {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin: 0;
-  flex: 1;
-  text-align: center;
-}
-
-.copy-button {
-  background-color: #00796b;
-  color: white;
-}
-
-.copy-button:hover {
-  background-color: #004d40;
-}
-
-.cancel-room {
-  background-color: #d32f2f;
-  padding: 12px 24px;
-  font-size: 16px;
-  min-width: 200px;
-}
-
-.cancel-room:hover {
-  background-color: #b71c1c;
-}
-
-.share-instructions {
-  margin: 15px 0;
-  line-height: 1.5;
-  color: #bbb;
 }
 
 .chat-container {
@@ -1678,4 +1515,3 @@ margin-bottom: 6px;
 
 
 </style>
-
