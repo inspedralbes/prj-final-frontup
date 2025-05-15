@@ -100,7 +100,7 @@ const showAlert = (text, success) => {
 const fetchUserData = async (token) => {
   try {
     setTimeout(async () => {
-      const response = await fetch('http://127.0.0.1:8000/api/user', {
+      const response = await fetch('http://161.22.40.52/api/user', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ const updateAvatar = async () => {
       avatarUrl = `https://api.dicebear.com/9.x/personas/svg?seed=${encodeURIComponent(avatarUrl)}`;
     }
 
-    const response = await fetch('http://127.0.0.1:8000/api/user/avatar', {
+    const response = await fetch('http://161.22.40.52/api/user/avatar', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
