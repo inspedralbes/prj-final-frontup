@@ -69,7 +69,8 @@ app.get('/debug-rooms', (req, res) => {
     rooms.forEach((value, key) => {
         data[key] = {
             projectId: value.projectId,
-            users: value.users
+            users: value.users,
+            hostId: value.hostId
         };
     });
     res.json(data);
@@ -100,7 +101,8 @@ app.post('/generate-share-code', (req, res) => {
             html: html || '',
             css: css || '',
             js: js || '',
-            users: []  
+            users: [],
+            hostId: null // El host se asignará cuando se conecte al socket
         });
         
         projectRooms.set(projectId, shareCode);
@@ -119,6 +121,65 @@ app.post('/generate-share-code', (req, res) => {
     }
 });
 
+// Nova ruta per esborrar una room manualment
+app.post('/delete-room', (req, res) => {
+    try {
+        const { roomId, userId } = req.body;
+        
+        if (!rooms.has(roomId)) {
+            return res.status(404).json({
+                success: false,
+                error: 'La sala no existeix'
+            });
+        }
+        
+        const room = rooms.get(roomId);
+        
+        // Verificar que la petició prové del host
+        if (room.hostId && room.hostId !== userId) {
+            return res.status(403).json({
+                success: false,
+                error: 'Només el host pot esborrar la sala'
+            });
+        }
+        
+        // Esborrar la room
+        deleteRoom(roomId);
+        
+        res.json({
+            success: true,
+            message: 'Sala esborrada correctament'
+        });
+    } catch (error) {
+        console.error('Error esborrant sala:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Funció auxiliar per esborrar una room i notificar als usuaris
+function deleteRoom(roomId) {
+    if (!rooms.has(roomId)) return;
+    
+    const room = rooms.get(roomId);
+    
+    // Notificar a tots els usuaris que la sala s'ha esborrat
+    io.to(roomId).emit('room-deleted', { roomId });
+    
+    // Esborrar relació projecte-sala
+    for (const [projectId, roomCode] of projectRooms.entries()) {
+        if (roomCode === roomId) {
+            projectRooms.delete(projectId);
+            break;
+        }
+    }
+    
+    // Esborrar la sala
+    rooms.delete(roomId);
+    console.log(`Room ${roomId} ha estat esborrada`);
+}
 
 io.on('connection', (socket) => {
     console.log(`Usuario conectado: ${socket.id}`);
@@ -131,7 +192,8 @@ io.on('connection', (socket) => {
             html: initialData.html || '',
             css: initialData.css || '',
             js: initialData.js || '',
-            users: [{ id: socket.id, name: userName, avatar }]
+            users: [{ id: socket.id, name: userName, avatar }],
+            hostId: socket.id // Designem el creador com a host
         });
         projectRooms.set(projectId, roomId);
 
@@ -150,6 +212,11 @@ io.on('connection', (socket) => {
 
         room.users = room.users.filter(u => u.id !== socket.id && u.name !== userName);
 
+        // Si no hi ha host, el primer que s'uneix esdevé host
+        if (!room.hostId) {
+            room.hostId = socket.id;
+        }
+
         room.users.push({ id: socket.id, name: userName, avatar });
         socket.join(roomId);
 
@@ -161,8 +228,26 @@ io.on('connection', (socket) => {
 
         socket.emit('joinedRoom', { projectId });
         updateActiveUsers(roomId);
+        
+        // Informar si l'usuari és el host
+        if (room.hostId === socket.id) {
+            socket.emit('host-status', { isHost: true });
+        }
     });
 
+    // Nova funció per esborrar una room des del client
+    socket.on('delete-room', ({ roomId }) => {
+        const room = rooms.get(roomId);
+        if (!room) return;
+        
+        // Verificar que la petició prové del host
+        if (room.hostId !== socket.id) {
+            socket.emit('error', { message: 'Només el host pot esborrar la sala' });
+            return;
+        }
+        
+        deleteRoom(roomId);
+    });
 
     function updateActiveUsers(roomId) {
         const room = rooms.get(roomId);
@@ -170,7 +255,8 @@ io.on('connection', (socket) => {
 
         const usersInfo = room.users.map(user => ({
             name: user.name,
-            avatar: user.avatar || ''
+            avatar: user.avatar || '',
+            isHost: user.id === room.hostId
         }));
 
         io.to(roomId).emit('active-users', usersInfo);
@@ -182,22 +268,21 @@ io.on('connection', (socket) => {
         for (const [roomId, room] of rooms.entries()) {
             const userIndex = room.users.findIndex(user => user.id === socket.id);
             if (userIndex !== -1) {
+                // Verificar si l'usuari que es desconnecta és el host
+                const isHost = room.hostId === socket.id;
+                
+                // Eliminar l'usuari de la llista
                 room.users.splice(userIndex, 1);
                 console.log(`Usuari ${socket.id} eliminat de la room ${roomId}`);
                 console.log(`Queden ${room.users.length} usuaris`);
 
-                updateActiveUsers(roomId);
-
-                if (room.users.length === 0) {
-                    rooms.delete(roomId);
-                    // També eliminem la relació projecte-sala
-                    for (const [projectId, roomCode] of projectRooms.entries()) {
-                        if (roomCode === roomId) {
-                            projectRooms.delete(projectId);
-                            break;
-                        }
-                    }
-                    console.log(`Room ${roomId} eliminada per estar buida`);
+                // Si l'usuari era el host, esborrar la room independentment de si queden usuaris
+                if (isHost) {
+                    console.log(`El host ${socket.id} ha sortit. Esborrant room ${roomId}`);
+                    deleteRoom(roomId);
+                } else {
+                    // Si no era el host, només actualitzar la llista d'usuaris
+                    updateActiveUsers(roomId);
                 }
                 break;
             }
