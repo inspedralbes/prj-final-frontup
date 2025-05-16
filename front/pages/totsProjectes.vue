@@ -227,7 +227,6 @@ export default {
     padding: 30px;
     padding-top: 80px;
     text-align: center;
-    background-color: #252323;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   }
@@ -253,7 +252,7 @@ export default {
     font-size: 16px;
     border-radius: 5px;
     border: none;
-    background-color: #3a3a3a;
+    background-color: #434952;
     color: #ddd;
   }
 
