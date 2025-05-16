@@ -62,24 +62,21 @@ export default {
       error: null,
       currentPage: 1,
       totalPages: 1,
-      communicationManager: null,
     };
   },
   watch: {
-    searchQuery() {
-      this.currentPage = 1;
-      this.fetchProjects();
-    },
-    sortCriteria() {
-      this.currentPage = 1;
-      this.fetchProjects();
-    },
+    searchQuery: 'resetAndFetch',
+    sortCriteria: 'resetAndFetch'
   },
   async mounted() {
     this.communicationManager = useCommunicationManager();
     await this.fetchProjects();
   },
   methods: {
+    resetAndFetch() {
+      this.currentPage = 1;
+      this.fetchProjects();
+    },
     async fetchProjects(page = 1) {
       this.loading = true;
 
@@ -304,7 +301,7 @@ export default {
     color: #ccc;
     text-align: left;
   }
-  
+
   .projects-list {
     display: grid;
     grid-template-columns: repeat(1, 1fr);
