@@ -321,22 +321,14 @@ onMounted(() => {
 
 
 @media (max-width: 450px) {
-  .main-container {}
 
   .body-content {
-    text-align: left;
     margin-top: 70px;
   }
 
 
   .body-content h2 {
-    width: 50%;
     font-size: 1.5em;
-    margin-bottom: 30px;
-    background: linear-gradient(45deg, #ffffff, #bd89ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    line-height: 1.2;
   }
 
   .body-content p {

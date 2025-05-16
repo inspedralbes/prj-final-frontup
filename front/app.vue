@@ -571,6 +571,8 @@ footer {
     top: 0;
     left: 0;
     z-index: 1002;
+    background-color: rgba(36, 40, 50, 1);
+
   }
 
   .leftsection-card {
