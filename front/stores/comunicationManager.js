@@ -386,7 +386,7 @@ const useCommunicationManager = () => {
 
   const loginUser = async (email, password) => {
     try {
-      const response = await fetch("http://161.22.40.52/public/api/login", {
+      const response = await fetch("https://back.frontapp.cat/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -414,7 +414,7 @@ const useCommunicationManager = () => {
     const avatarUrl = `https://api.dicebear.com/9.x/personas/svg?seed=${formData.name}`;
 
     try {
-      const response = await fetch("http://161.22.40.52/public/api/register", {
+      const response = await fetch("https://back.frontapp.cat/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -431,7 +431,7 @@ const useCommunicationManager = () => {
         throw new Error(data.message || "Error al crear la cuenta");
       }
 
-      const loginResponse = await fetch("http://161.22.40.52/public/api/login", {
+      const loginResponse = await fetch("https://back.frontapp.cat/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -461,7 +461,7 @@ const useCommunicationManager = () => {
 
   const fetchProjects = async ({ page = 1, searchQuery = "", sortCriteria = "default" }) => {
     try {
-      const url = new URL("http://161.22.40.52/public/api/projects");
+      const url = new URL("https://back.frontapp.cat/api/projects");
       url.searchParams.append("page", page);
       if (searchQuery) {
         url.searchParams.append("search", searchQuery);
@@ -505,7 +505,7 @@ const useCommunicationManager = () => {
       if (searchQuery) params.append("search", searchQuery);
       if (sortCriteria && sortCriteria !== "default") params.append("sort", sortCriteria);
 
-      const response = await fetch(`http://161.22.40.52/public/api/projects/all?${params.toString()}`, {
+      const response = await fetch(`https://back.frontapp.cat/api/projects/all?${params.toString()}`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -540,7 +540,7 @@ const useCommunicationManager = () => {
     cssEditorInstance,
     jsEditorInstance,
   }) => {
-    socket.value = io("http://161.22.40.52:5000");
+    socket.value = io("https://back.frontapp.cat:5000");
 
     socket.value.on("connect", () => {
       console.log("Conectado al servidor de socket");

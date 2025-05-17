@@ -28,7 +28,7 @@ export default {
   methods: {
     async fetchUserLevel() {
       try {
-        const response = await fetch("http://161.22.40.52/public/api/user", {
+        const response = await fetch("https://back.frontapp.cat/api/user", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },

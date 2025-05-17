@@ -153,7 +153,7 @@ const handleSubmit = async () => {
   isSubmitting.value = true
 
   try {
-    const response = await $fetch('http://161.22.40.52/public/api/nivells_usuaris', {
+    const response = await $fetch('https://back.frontapp.cat/api/nivells_usuaris', {
       method: 'POST',
       body: JSON.stringify({
         title: level.value.title,

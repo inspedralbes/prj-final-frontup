@@ -105,7 +105,7 @@ export default {
         error.value = false;
 
         const response = await fetch(
-          `http://161.22.40.52/public/api/niveles/${language.value}/pregunta/${id.value}`,
+          `https://back.frontapp.cat/api/niveles/${language.value}/pregunta/${id.value}`,
           {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -138,7 +138,7 @@ export default {
 
       try {
         const response = await fetch(
-          `http://161.22.40.52/public/api/niveles/${language.value}/verificar/${id.value}`,
+          `https://back.frontapp.cat/api/niveles/${language.value}/verificar/${id.value}`,
           {
             method: 'POST',
             headers: {
@@ -199,7 +199,7 @@ export default {
     const updateUserLevel = async () => {
       try {
         const response = await fetch(
-          `http://161.22.40.52/public/api/niveles/${language.value}/actualizar`,
+          `https://back.frontapp.cat/api/niveles/${language.value}/actualizar`,
           {
             method: 'POST',
             headers: {

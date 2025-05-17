@@ -335,4 +335,4 @@ io.on('connection', (socket) => {
 
 
 const PORT = 5000;
-server.listen(PORT, () => console.log("Servidor corriendo en http://161.22.40.52:" + PORT));
+server.listen(PORT, () => console.log("Servidor corriendo en https://back.frontapp.cat:" + PORT));
