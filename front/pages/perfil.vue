@@ -2,7 +2,7 @@
   <div class="profile-container">
     <AlertComponent v-if="alertVisible" :success="alertSuccess" :text="alertText" :duration="2000"
       @close="alertVisible = false" />
-      
+
     <div class="profile-card">
       <div class="profile-card-bg"></div>
       <div class="profile-header">
@@ -118,8 +118,8 @@ const fetchUserData = async (token) => {
       } else {
         console.error('No se pudo obtener los detalles del usuario');
       }
-      loading.value = false;  
-    }, 2000); 
+      loading.value = false;
+    }, 2000);
 
   } catch (error) {
     console.error('Error al obtener los datos del usuario:', error);
@@ -161,7 +161,7 @@ const updateAvatar = async () => {
 
 const logout = () => {
   showAlert("Sessió tancada correctament", true);
-  
+
   setTimeout(() => {
     appStore.logout();
     router.push('/login');
@@ -217,7 +217,7 @@ const logout = () => {
 }
 
 /* Capa interior para el contenido */
-.profile-card > * {
+.profile-card>* {
   position: relative;
   z-index: 2;
 }
@@ -459,6 +459,7 @@ const logout = () => {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -468,6 +469,7 @@ const logout = () => {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -477,6 +479,7 @@ const logout = () => {
   from {
     transform: rotate(360deg);
   }
+
   to {
     transform: rotate(0deg);
   }
@@ -488,11 +491,11 @@ const logout = () => {
     flex-direction: row;
     flex-wrap: wrap;
   }
-  
+
   .avatar-section {
     width: 30%;
   }
-  
+
   .user-info {
     width: 65%;
   }
@@ -511,18 +514,5 @@ const logout = () => {
   .avatar-form {
     flex-direction: column;
   }
-}
-@media (max-width: 450px) {
-  .profile-container {
-  height: 100%;
-  color: #e0e0e0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
-  background-color: #07182E;
-}
-
-
 }
 </style>

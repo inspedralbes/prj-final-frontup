@@ -51,7 +51,6 @@ export default {
       error: null,
       currentPage: 1,
       totalPages: 1,
-      communicationManager: null,
     };
   },
   async mounted() {
@@ -59,16 +58,14 @@ export default {
     await this.fetchProjects(this.currentPage);
   },
   watch: {
-    searchQuery() {
+    searchQuery: 'resetAndFetch',
+    sortCriteria: 'resetAndFetch'
+  },
+  methods: {
+    resetAndFetch() {
       this.currentPage = 1;
       this.fetchProjects(this.currentPage);
     },
-    sortCriteria() {
-      this.currentPage = 1;
-      this.fetchProjects(this.currentPage);
-    }
-  },
-  methods: {
     async fetchProjects(page = 1) {
       this.loading = true;
 
@@ -191,22 +188,6 @@ export default {
   padding: 10px 0;
 }
 
-.delete-btn {
-  margin-top: 10px;
-  padding: 8px 14px;
-  background-color: #ef4444;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.delete-btn:hover {
-  background-color: #dc2626;
-}
-
 .pagination {
   margin-top: auto;
   display: flex;
@@ -246,7 +227,6 @@ export default {
     padding: 30px;
     padding-top: 80px;
     text-align: center;
-    background-color: #252323;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   }
@@ -272,7 +252,7 @@ export default {
     font-size: 16px;
     border-radius: 5px;
     border: none;
-    background-color: #3a3a3a;
+    background-color: #434952;
     color: #ddd;
   }
 
@@ -282,10 +262,10 @@ export default {
     color: #ccc;
     text-align: left;
   }
-  
+
   .projects-list {
     display: grid;
-    grid-template-columns: repeat(1, 1fr); 
+    grid-template-columns: repeat(1, 1fr);
     gap: 30px;
     padding: 10px;
     margin-top: 20px;

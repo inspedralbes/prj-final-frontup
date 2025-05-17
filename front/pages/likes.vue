@@ -180,7 +180,7 @@ h1 {
 
 .projects-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
@@ -221,7 +221,6 @@ h1 {
     padding: 30px;
     padding-top: 80px;
     text-align: center;
-    background-color: #252323;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   }
@@ -247,7 +246,7 @@ h1 {
     font-size: 16px;
     border-radius: 5px;
     border: none;
-    background-color: #3a3a3a;
+    background-color: #434952;
     color: #ddd;
   }
 
