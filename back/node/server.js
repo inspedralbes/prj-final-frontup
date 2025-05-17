@@ -335,4 +335,4 @@ io.on('connection', (socket) => {
 
 
 const PORT = 5000;
-server.listen(PORT, () => console.log("Servidor corriendo en http://localhost:" + PORT));
+server.listen(PORT, () => console.log("Servidor corriendo en http://161.22.40.52:" + PORT));
