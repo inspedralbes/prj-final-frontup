@@ -30,9 +30,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/projects/{id}', [ProjectController::class, 'update']); 
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy']); 
 });
-    Route::apiResource('nivells_usuaris', NivellUsuariController::class)->only([
-        'index', 'store', 'show', 'update', 'destroy'
-    ]);
+
+    Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('nivells_usuaris', NivellUsuariController::class);
+    });
+
     Route::get('/nivelUsuari/{id}', [NivellUsuariController::class, 'show']);
     
 //Niveles

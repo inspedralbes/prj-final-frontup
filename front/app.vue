@@ -561,18 +561,17 @@ footer {
 
   .top-navbar {
     width: 100%;
-    height: 50px;
+    height: 55px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 16px;
     box-sizing: border-box;
     position: fixed;
-    top: 0;
+    top: 0px;
     left: 0;
     z-index: 1002;
     background-color: rgba(36, 40, 50, 1);
-
   }
 
   .leftsection-card {

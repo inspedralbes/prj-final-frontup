@@ -2,7 +2,7 @@
   <div class="todo">
     <header class="header">
   <div class="header-row">
-    <button class="header-button" @click="goBack">Atrás</button>
+    <button class="header-button" @click="goBack">Enrere</button>
     <h1 class="header-title">{{ title }}</h1>
     <button class="header-button" @click="toggleChat">Xat IA</button>
   </div>

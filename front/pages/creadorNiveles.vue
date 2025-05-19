@@ -175,7 +175,7 @@ const handleSubmit = async () => {
     })
     
     showNotification('Nivell creat amb èxit!', 'success')
-    router.push('/niveles')
+    router.push('/nivelesUsuarios')
   } catch (error) {
     console.error('Error creating level:', error)
     let errorMsg = 'Error al crear el nivel'
