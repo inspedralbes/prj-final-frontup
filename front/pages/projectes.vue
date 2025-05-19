@@ -62,24 +62,21 @@ export default {
       error: null,
       currentPage: 1,
       totalPages: 1,
-      communicationManager: null,
     };
   },
   watch: {
-    searchQuery() {
-      this.currentPage = 1;
-      this.fetchProjects();
-    },
-    sortCriteria() {
-      this.currentPage = 1;
-      this.fetchProjects();
-    },
+    searchQuery: 'resetAndFetch',
+    sortCriteria: 'resetAndFetch'
   },
   async mounted() {
     this.communicationManager = useCommunicationManager();
     await this.fetchProjects();
   },
   methods: {
+    resetAndFetch() {
+      this.currentPage = 1;
+      this.fetchProjects();
+    },
     async fetchProjects(page = 1) {
       this.loading = true;
 
@@ -268,7 +265,6 @@ export default {
     padding: 30px;
     padding-top: 80px;
     text-align: center;
-    background-color: #252323;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   }
@@ -294,7 +290,7 @@ export default {
     font-size: 16px;
     border-radius: 5px;
     border: none;
-    background-color: #3a3a3a;
+    background-color: #434952;
     color: #ddd;
   }
 
@@ -304,7 +300,7 @@ export default {
     color: #ccc;
     text-align: left;
   }
-  
+
   .projects-list {
     display: grid;
     grid-template-columns: repeat(1, 1fr);
