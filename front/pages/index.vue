@@ -323,10 +323,8 @@ onMounted(() => {
 @media (max-width: 450px) {
 
   .body-content {
-    margin-top: 70px;
+    margin: 50px;
   }
-
-
   .body-content h2 {
     font-size: 1.5em;
   }
@@ -337,6 +335,9 @@ onMounted(() => {
     line-height: 1.6;
     max-width: 80%;
   }
+  .looping-words {
+  top: 8%;
+}
 
   .card-container {
     display: flex;
