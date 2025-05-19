@@ -1521,11 +1521,7 @@ const output = computed(() => {
 
 @media (max-width: 450px) {
   .todo {
-    display: flex;
-    flex-direction: column;
-    background-color: #1e1e1e;
-    font-family: "Arial", sans-serif;
-    color: #ffffff;
+    margin-left: 0;
     margin: 0;
     padding: 0 10px;
     box-sizing: border-box;
@@ -1551,7 +1547,7 @@ const output = computed(() => {
   width: 100%;
   padding: 10px;
   box-sizing: border-box;
-  margin-top: 0; /* asegúrate que no tenga espacio arriba */
+  margin-top: 0; 
 }
 
 
@@ -1580,71 +1576,50 @@ const output = computed(() => {
     display: none;
   }
 
-  .header {
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  gap: 10px;
-}
-
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: nowrap;
-  width: 100%;
-  overflow-x: hidden;
-}
-
-.header-button {
-  padding: 6px 8px;
-  font-size: 12px;
-  flex: 1 1 auto;
-  min-width: 0;
-  white-space: nowrap;
-}
-
-.header-title {
-  flex: 2 1 auto;
-  font-size: 12px;
-  padding: 6px 8px;
-  min-width: 0;
-}
+ 
 .header {
   display: flex;
-  flex-direction: column;
-  padding: 10px;
-  gap: 10px;
+  flex-wrap: wrap;          
+  align-items: center;
+  gap: 0.5rem;              
+  padding: 1rem  0.5rem 1.5rem; 
+  background-color: #1f1f1f; 
 }
 
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: nowrap;
-  width: 100%;
-  overflow-x: hidden;
-}
-
-.header-button {
-  padding: 6px 8px;
-  font-size: 12px;
-  flex: 1 1 auto;
-  min-width: 0;
-  white-space: nowrap;
+.header > button:first-child {
+  flex: 0 0 auto;
+  margin-right: 0.5rem;
 }
 
 .header-title {
-  flex: 2 1 auto;
-  font-size: 12px;
-  padding: 6px 8px;
+  flex: 1 1 clamp(120px, 60%, 400px);
   min-width: 0;
 }
+
+
+.header-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: clamp(6px, 1.5vw, 12px);  
+  margin-top: clamp(4px, 1vw, 8px);
+  align-items: center; /* Cambiado de flex-start a center para alineación vertical */
+  justify-content: center; /* Añadido para centrar horizontalmente */
+  width: 100%; 
+}
+
+.header-actions .header-button,
+.header-actions .header-select {
+  flex: 1 1 clamp(100px, 20%, 160px); 
+  min-width: 0;
+  padding: clamp(8px, 2vw, 14px) clamp(10px, 2.5vw, 16px);
+  font-size: clamp(13px, 1.2vw, 16px);
+}
+
   .editor-tabs {
   flex-wrap: wrap;
   justify-content: center;
   gap: 6px;
-  margin-bottom: 0; /* antes era 10px */
+  margin-bottom: 0; 
 }
 
 
