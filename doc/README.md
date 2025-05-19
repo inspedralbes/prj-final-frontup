@@ -5,7 +5,7 @@ Llistat d'alguns dels punts que han de quedar explicats en aquesta carpeta. Pode
 
 ## Documentació bàsica MÍNIMA
  * Objectius
-    L'objectiu principal del nostre projecte és fer que la gent aprengui i millori la seva capacitat per programar en els tres llenguatges bàsics de programació: HTML, CSS i JavaScript. Dins del projecte, oferim un xat per a resoldre dubtes de l'usuari en temps real, i un sistema de nivells bàsics per ajudar-lo a progressar gradualment.
+    L'objectiu principal del nostre projecte és fer que la gent millori la seva capacitat per programar en els tres llenguatges bàsics de programació: HTML, CSS i JavaScript. Dins del projecte, oferim un xat per a resoldre dubtes de l'usuari en temps real, un sistema de nivells bàsics per ajudar-lo a progressar gradualment, una seccio per veure els teus projectes i una altre per veure el projectes dels altres usuaris.
 
      * Arquitectura bàsica
     L'aplicació segueix una arquitectura basada en microserveis:
@@ -41,42 +41,42 @@ Llistat d'alguns dels punts que han de quedar explicats en aquesta carpeta. Pode
  * Llistat d'endpoints de l'API de backend
     * Rutes
     Endpoints d’Autenticació: 
-    POST	/register	 Registre d’un nou usuari
-    POST	/login     Autenticació (login) d’un usuari
+    POST	/register	                        Registre d’un nou usuari
+    POST	/login                              Autenticació (login) d’un usuari
     Endpoints d'Usuari (autenticats):  
-    GET	/user	   Obté informació de l’usuari actual
-    POST	/user/avatar  Actualitza l’avatar de l’usuari
+    GET	/user	                              Obté informació de l’usuari actual
+    POST	/user/avatar                        Actualitza l’avatar de l’usuari
     Endpoints de Projectes:
-    GET	/projects	    Llista de projectes de l’usuari actual
-    GET	/projects/all	Llista de tots els projectes (sense login)
-    GET	/projectsAllPaginado	Llista paginada de projectes
-    POST	/projects	  Crear un nou projecte
-    GET	/projects/{id}	 Obtenir un projecte pel seu ID
-    GET	/projects/{id}/preview	 Obtenir la vista prèvia d’un projecte
-    PUT	/projects/{id}	 Actualitzar projecte
-    DELETE	/projects/{id}	 Esborrar projecte
+    GET	/projects	                        Llista de projectes de l’usuari actual
+    GET	/projects/all	                     Llista de tots els projectes (sense login)
+    GET	/projectsAllPaginado	               Llista paginada de projectes
+    POST	/projects	                        Crear un nou projecte
+    GET	/projects/{id}	                     Obtenir un projecte pel seu ID
+    GET	/projects/{id}/preview	            Obtenir la vista prèvia d’un projecte
+    PUT	/projects/{id}	                     Actualitzar projecte
+    DELETE	/projects/{id}	                  Esborrar projecte
     Endpoints de Nivells (Aprenentatge):
     HTML:
-    GET	/niveles/html/pregunta/{id}	Obté una pregunta HTML pel nivell
-    POST	/niveles/html/verificar/{id}	Verifica la resposta
-    POST	/niveles/html/actualizar	Actualitza el progrés del nivell
+    GET	/niveles/html/pregunta/{id}	      Obté una pregunta HTML pel nivell
+    POST	/niveles/html/verificar/{id}	      Verifica la resposta
+    POST	/niveles/html/actualizar	         Actualitza el progrés del nivell
 
     CSS:
-    GET	/niveles/css/pregunta/{id}	Obté una pregunta CSS pel nivell
-    POST	/niveles/css/verificar/{id}	Verifica la resposta
-    POST	/niveles/css/actualizar	Actualitza el progrés del nivell
+    GET	/niveles/css/pregunta/{id}	         Obté una pregunta CSS pel nivell
+    POST	/niveles/css/verificar/{id}	      Verifica la resposta
+    POST	/niveles/css/actualizar	            Actualitza el progrés del nivell
 
     JavaScript:
-    GET	/niveles/js/pregunta/{id}	Obté una pregunta JS pel nivell
-    POST	/niveles/js/verificar/{id}	Verifica la resposta
-    POST	/niveles/js/actualizar	Actualitza el progrés del nivell
+    GET	/niveles/js/pregunta/{id}	         Obté una pregunta JS pel nivell
+    POST	/niveles/js/verificar/{id}	         Verifica la resposta
+    POST	/niveles/js/actualizar	            Actualitza el progrés del nivell
 
     Nivell d’Usuari:
-    GET	/nivells_usuaris	Llista de nivells d’usuari
-    POST	/nivells_usuaris	Crear nou registre de nivell
-    GET	/nivells_usuaris/{id}	Obté nivell usuari pel seu ID
-    PUT	/nivells_usuaris/{id}	Actualitza nivell d’un usuari
-    DELETE	/nivells_usuaris/{id}	Elimina nivell d’usuari
+    GET	/nivells_usuaris	                  Llista de nivells d’usuari
+    POST	/nivells_usuaris	                  Crear nou registre de nivell
+    GET	/nivells_usuaris/{id}	            Obté nivell usuari pel seu ID
+    PUT	/nivells_usuaris/{id}	            Actualitza nivell d’un usuari
+    DELETE	/nivells_usuaris/{id}	         Elimina nivell d’usuari
    * Exemples de JSON de peticó
    POST /register
     {
