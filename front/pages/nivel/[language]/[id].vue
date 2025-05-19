@@ -1,18 +1,11 @@
 <template>
   <div class="todo">
     <header class="header">
-  <div class="header-row">
-    <button class="header-button" @click="goBack">Enrere</button>
-    <h1 class="header-title">{{ title }}</h1>
-    <button class="header-button" @click="toggleChat">Xat IA</button>
-  </div>
-
-  <div class="header-row">
-    <button class="header-button" @click="guardarProyecto">Guardar</button>
-    <button class="header-button" @click="openSettingsModal">Configuració</button>
-    <button class="header-button">💡</button>
-  </div>
-</header>
+      <div class="header-row">
+        <button class="header-button" @click="goBack">Enrere</button>
+        <h1 class="header-title">{{ title }}</h1>
+      </div>
+    </header>
 
 
     <div class="exercise-instructions">
@@ -341,6 +334,7 @@ export default {
   text-align: center;
   min-width: 180px;
   margin: 0;
+  margin-left: 450px;
 }
 
 .header-title:focus {
@@ -465,17 +459,17 @@ export default {
 @media (max-width: 450px) {
 
   .todo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  background-color: #000000;
-  font-family: 'Arial', sans-serif;
-  color: #ffffff;
-  height: 93vh;
-  box-sizing: border-box;
-  margin: auto;
-}
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: #000000;
+    font-family: 'Arial', sans-serif;
+    color: #ffffff;
+    height: 93vh;
+    box-sizing: border-box;
+    margin: auto;
+  }
 
 
   .header {
@@ -505,12 +499,12 @@ export default {
 
   .editor-output-wrapper {
     flex-direction: column;
-  align-items: center;
-  max-width: 400px;
-  margin: 0 auto;
-  width: 100%;
-  padding: 0 12px;
-  box-sizing: border-box;
+    align-items: center;
+    max-width: 400px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 0 12px;
+    box-sizing: border-box;
   }
 
   .submit-container {
@@ -520,17 +514,21 @@ export default {
     margin-top: -280px;
     padding: 0 170px;
   }
-  
+
 
   .editor-box {
-  order: 1;
-  max-width: 400px; /* o el ancho que desees */
-  width: 100%;
-  margin: 0 auto; /* centra horizontalmente */
-  box-sizing: border-box;
-  background-color: #2d2d2d; /* asegúrate que este sea el color que quieres */
-  border-radius: 8px; /* opcional, mejora el aspecto en móvil */
-}
+    order: 1;
+    max-width: 400px;
+    /* o el ancho que desees */
+    width: 100%;
+    margin: 0 auto;
+    /* centra horizontalmente */
+    box-sizing: border-box;
+    background-color: #2d2d2d;
+    /* asegúrate que este sea el color que quieres */
+    border-radius: 8px;
+    /* opcional, mejora el aspecto en móvil */
+  }
 
 
   .output-container {
@@ -552,14 +550,14 @@ export default {
   }
 
   .exercise-instructions {
-  margin-top: 100px;
-  background-color: #1e1e1e;
-  color: #fff;
-  padding: 8px 40px;
-  border-radius: 6px;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.3);
-  max-width: 750px;
-} 
+    margin-top: 100px;
+    background-color: #1e1e1e;
+    color: #fff;
+    padding: 8px 40px;
+    border-radius: 6px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.3);
+    max-width: 750px;
+  }
 
 
 }
