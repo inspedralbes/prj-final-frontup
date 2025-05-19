@@ -52,6 +52,7 @@
       </div>
     </div>
 
+    <!-- Modal para compartir código de colaboración -->
     <div v-if="showShareModal" class="modal-overlay" @click="closeShareModal">
       <div class="modal-content" @click.stop>
         <button class="close-modal-button" @click="closeShareModal">✖</button>
@@ -70,6 +71,7 @@
       </div>
     </div>
 
+    <!-- Modal para guardar antes de salir -->
     <div
       v-if="guardarParaSalir"
       class="modal-overlay"
@@ -92,6 +94,7 @@
       </div>
     </div>
 
+    <!-- Chat IA flotante -->
     <div
       v-if="isChatVisible"
       class="chat-container"
@@ -101,7 +104,7 @@
       @mousedown="startDrag"
     >
       <button class="close-chat-button" @click="toggleChat">✖</button>
-      <h2 class="chat-title">IA FrontApp</h2>
+      <h2 class="chat-title">IA FrontUp</h2>
       <div class="messages-container" ref="messagesContainer">
         <div
           v-for="(msg, index) in messages"
@@ -151,6 +154,7 @@
 
 
     <div :class="['layout', 'layout-' + layoutType]">
+      <!-- botones solo para móvil -->
       <div class="editor-tabs" v-if="isMobile">
         <button
           :class="{ active: activeTab === 'html' }"
@@ -159,6 +163,7 @@
           html
         </button>
         <button
+
           :class="{ active: activeTab === 'css' }"
           @click="activeTab = 'css'"
         >
@@ -171,6 +176,7 @@
           js
         </button>
       </div>
+      <!-- Contenedor principal de editores -->
       <div class="editor-container">
         <div class="editor-box" v-show="!isMobile || activeTab === 'html'">
           <div class="editor-label">HTML</div>
@@ -617,7 +623,7 @@ onUnmounted(() => {
 
 const generateShareCode = async () => {
   try {
-    const response = await fetch('https://back.frontapp.cat:5000/generate-share-code', {
+    const response = await fetch('http://localhost:5000/generate-share-code', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -1620,13 +1626,14 @@ const output = computed(() => {
 
    .editor-tabs button {
   padding: 6px 12px;
-  font-size: 12px;
+  font-size: 18px;
   border: none;
   background-color: #444;
   color: #fff;
   cursor: pointer;
   border-radius: 5px;
   transition: background-color 0.3s;
+  margin-right: 10px;
 }
 
 

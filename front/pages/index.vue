@@ -3,10 +3,11 @@
     <div class="main-container">
       <div class="body-content">
         <h2>El lloc ideal per crear, provar i explorar codi web.</h2>
-        <br><br>
+        <br /><br />
         <p>
-          Aquesta plataforma és un entorn interactiu per a desenvolupadors i dissenyadors front-end.
-          Crea i experimenta amb projectes, comparteix les teves creacions, prova les teves idees i troba inspiració per
+          Aquesta plataforma és un entorn interactiu per a desenvolupadors i
+          dissenyadors front-end. Crea i experimenta amb projectes, comparteix
+          les teves creacions, prova les teves idees i troba inspiració per
           continuar aprenent.
         </p>
       </div>
@@ -22,13 +23,14 @@
           </ul>
         </div>
       </div>
-      <br><br><br>
+      <br /><br /><br />
       <div class="card-container">
         <div class="card">
           <div class="card-content">
             <h3>Crea i Experimenta</h3>
             <p>
-              Dóna vida a les teves idees construint projectes complets o provant funcions i animacions específiques.
+              Dóna vida a les teves idees construint projectes complets o
+              provant funcions i animacions específiques.
             </p>
             <div class="btn-container">
               <button class="btn" @click="goToEditar">Prova l'Editor</button>
@@ -38,11 +40,11 @@
         <div class="card">
           <div class="card-content">
             <h3>Practica els teus coneixements</h3>
-            <p>
-              Vols provar-te fent uns exercicis per veure quin nivell tens?
-            </p>
+            <p>Vols provar-te fent uns exercicis per veure quin nivell tens?</p>
             <div class="btn-container">
-              <button class="btn" @click="goToNiveles">Participa els reptes que et proposem</button>
+              <button class="btn" @click="goToNiveles">
+                Participa els reptes que et proposem
+              </button>
             </div>
           </div>
         </div>
@@ -50,38 +52,40 @@
           <div class="card-content">
             <h3>Comparteix els Teus Projectes</h3>
             <p>
-              Uneix-te a la comunitat global de desenvolupadors front-end compartint les teves creacions i inspirant
-              altres.
+              Uneix-te a la comunitat global de desenvolupadors front-end
+              compartint les teves creacions i inspirant altres.
             </p>
             <div class="btn-container">
-              <button class="btn" @click="goToTotsProjectes">Descobreix el Més Popular</button>
+              <button class="btn" @click="goToTotsProjectes">
+                Descobreix el Més Popular
+              </button>
             </div>
           </div>
         </div>
       </div>
-      <br><br>
+      <br /><br />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAppStore } from '@/stores/app'
-import { useIdProyectoActualStore } from '@/stores/app'
-import useCommunicationManager from '@/stores/comunicationManager'
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useAppStore } from "@/stores/app";
+import { useIdProyectoActualStore } from "@/stores/app";
+import useCommunicationManager from "@/stores/comunicationManager";
 
-const router = useRouter()
-const appStore = useAppStore()
-const idProyectoActualStore = useIdProyectoActualStore()
-const comunicationManager = useCommunicationManager()
+const router = useRouter();
+const appStore = useAppStore();
+const idProyectoActualStore = useIdProyectoActualStore();
+const comunicationManager = useCommunicationManager();
 
 // Si quieres mostrar un mensaje de alerta en el template,
 // crea aquí la ref y úsala después:
-const alertaVisible = ref(false)
+const alertaVisible = ref(false);
 
 const goToEditar = async () => {
-  if (localStorage.getItem('loginInfo') !== null) {
+  if (localStorage.getItem("loginInfo") !== null) {
     try {
       // Llamada a la API
       const respuesta = await comunicationManager.crearProyectoDB({
@@ -90,59 +94,59 @@ const goToEditar = async () => {
         html_code: "",
         css_code: "",
         js_code: "",
-      })
+      });
 
       // La API devuelve { success: "...", id: 42 }
-      const nuevoId = respuesta.id
+      const nuevoId = respuesta.id;
       if (!nuevoId) {
-        console.error("ID de proyecto no devuelto:", respuesta)
-        return
+        console.error("ID de proyecto no devuelto:", respuesta);
+        return;
       }
 
       // Guarda el ID en el store y en localStorage
-      idProyectoActualStore.actalizarId(nuevoId)
-      localStorage.setItem("idProyectoActual", nuevoId)
+      idProyectoActualStore.actalizarId(nuevoId);
+      localStorage.setItem("idProyectoActual", nuevoId);
 
       // Redirige al editor
-      router.push(`/lliure/${nuevoId}`)
+      router.push(`/lliure/${nuevoId}`);
     } catch (error) {
-      console.error("Error al crear el proyecto:", error)
+      console.error("Error al crear el proyecto:", error);
     }
   } else {
     // activa tu alerta en el template
-    alertaVisible.value = true
+    alertaVisible.value = true;
   }
-}
+};
 
 const goToNiveles = () => {
-  router.push('/niveles')
-}
+  router.push("/niveles");
+};
 
 const goToTotsProjectes = () => {
-  router.push('/totsProjectes')
-}
+  router.push("/totsProjectes");
+};
 
 onMounted(() => {
   setTimeout(() => {
-    const wordList = document.querySelector('.looping-words__list')
-    const words = Array.from(wordList.children)
-    const wordHeight = 100 / words.length
+    const wordList = document.querySelector(".looping-words__list");
+    const words = Array.from(wordList.children);
+    const wordHeight = 100 / words.length;
 
     const moveWords = () => {
-      wordList.style.transition = 'transform 1s ease-out'
-      wordList.style.transform = `translateY(-${wordHeight}%)`
+      wordList.style.transition = "transform 1s ease-out";
+      wordList.style.transform = `translateY(-${wordHeight}%)`;
 
       setTimeout(() => {
-        wordList.appendChild(words[0])
-        wordList.style.transition = 'none'
-        wordList.style.transform = 'translateY(0)'
-        words.push(words.shift())
-      }, 1000)
-    }
+        wordList.appendChild(words[0]);
+        wordList.style.transition = "none";
+        wordList.style.transform = "translateY(0)";
+        words.push(words.shift());
+      }, 1000);
+    };
 
-    setInterval(moveWords, 2000)
-  }, 500)
-})
+    setInterval(moveWords, 2000);
+  }, 500);
+});
 </script>
 
 <style scoped>
@@ -190,7 +194,7 @@ onMounted(() => {
 .card {
   width: 300px;
   height: 350px;
-  background: #07182E;
+  background: #07182e;
   position: relative;
   display: flex;
   place-content: center;
@@ -228,10 +232,14 @@ onMounted(() => {
 }
 
 .card::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 100px;
-  background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
+  background-image: linear-gradient(
+    180deg,
+    rgb(0, 183, 255),
+    rgb(255, 48, 255)
+  );
   height: 130%;
   animation: rotBGimg 6s linear infinite;
   transition: all 0.2s linear;
@@ -248,9 +256,9 @@ onMounted(() => {
 }
 
 .card::after {
-  content: '';
+  content: "";
   position: absolute;
-  background: #07182E;
+  background: #07182e;
   inset: 5px;
   border-radius: 15px;
 }
@@ -318,26 +326,35 @@ onMounted(() => {
   -webkit-text-fill-color: transparent;
 }
 
-
-
 @media (max-width: 450px) {
-
-  .body-content {
-    margin: 50px;
-  }
   .body-content h2 {
-    font-size: 1.5em;
+    font-size: 2.5em;
+    margin-bottom: 1rem;
+    display: block;
+    width: 100%;
+    max-width: none;
   }
 
   .body-content p {
-    font-size: 1.1em;
+    font-size: 1em;
     color: #b0b0b0;
     line-height: 1.6;
     max-width: 80%;
   }
+
+  .body-content {
+    position: relative;
+    padding-top: 0.2rem;
+    margin: 50px;
+  }
+
+  .body-content p {
+    margin-top: 0;
+  }
+
   .looping-words {
-  top: 8%;
-}
+    display: none;
+  }
 
   .card-container {
     display: flex;
@@ -349,7 +366,7 @@ onMounted(() => {
   .card {
     width: 300px;
     height: 350px;
-    background: #07182E;
+    background: #07182e;
     position: relative;
     display: flex;
     place-content: center;
@@ -387,14 +404,17 @@ onMounted(() => {
   }
 
   .card::before {
-    content: '';
+    content: "";
     position: absolute;
     width: 100px;
-    background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
+    background-image: linear-gradient(
+      180deg,
+      rgb(0, 183, 255),
+      rgb(255, 48, 255)
+    );
     height: 130%;
     animation: rotBGimg 6s linear infinite;
     transition: all 0.2s linear;
   }
-
 }
 </style>
