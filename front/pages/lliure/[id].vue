@@ -623,7 +623,7 @@ onUnmounted(() => {
 
 const generateShareCode = async () => {
   try {
-    const response = await fetch('http://localhost:5000/generate-share-code', {
+    const response = await fetch('https://back.frontapp.cat:5000/generate-share-code', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
