@@ -60,9 +60,9 @@ Crear una aplicació tipus CodePen on es puguin desenvolupar projectes amb HTML,
 
 ## Enllaços del Projecte
 
-- **Enllaç a l'aplicació web:** [https://app.ejemplo.com](https://app.ejemplo.com)
+- **Enllaç a l'aplicació web:** [https://frontapp.cat](https://frontapp.cat)
 - **Repositori a GitHub:** [https://github.com/inspedralbes/prj-final-frontup](https://github.com/inspedralbes/prj-final-frontup)
-- **Disseny inicial Penpot:** [https://design.penpot.app/#/view?file-id=96c4bd8e-df43-800f-8005-9c1fc7430a25&page-id=96c4bd8e-df43-800f-8005-9c1fc7430a26&section=interactions&index=0&share-id=790b4dba-cade-8121-8005-9c28a8bb9552](Enllaç pempot)
+- **Disseny inicial Penpot:** [Enllaç Penpot](https://design.penpot.app/#/view?file-id=96c4bd8e-df43-800f-8005-9c1fc7430a25&page-id=96c4bd8e-df43-800f-8005-9c1fc7430a26&section=interactions&index=0&share-id=790b4dba-cade-8121-8005-9c28a8bb9552)
 
 ## Configuració i Desplegament
 
