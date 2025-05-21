@@ -1046,6 +1046,46 @@ const output = computed(() => {
   gap: 20px;
 }
 
+.alert {
+  z-index: 1002;
+  position: fixed;
+  font-size: larger;
+  top: 20px;
+  right: 20px;
+  padding: 4vh 4vw;
+  background: rgb(50, 226, 40);
+  color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  animation: movimiento 0.3s ease-out, opacidad 2s ease-in-out forwards;
+}
+
+@keyframes movimiento {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 0.9;
+  }
+}
+
+@keyframes opacidad {
+  0% {
+    opacity: 0.9;
+  }
+
+  60% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
 .editor-box {
   flex: 1;
   position: relative;

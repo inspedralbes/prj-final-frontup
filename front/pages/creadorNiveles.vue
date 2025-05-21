@@ -335,7 +335,7 @@ onMounted(() => {
   height: 400px;
   border: 1px solid #42434a;
   border-radius: 4px;
-  background-color: #1d2027;
+  background-color: white;
 }
 
 .form-actions {
