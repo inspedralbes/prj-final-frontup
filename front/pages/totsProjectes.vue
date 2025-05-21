@@ -53,10 +53,16 @@ export default {
       totalPages: 1,
     };
   },
-  async mounted() {
+  mounted() {
+  if (!sessionStorage.getItem('reloaded')) {
+    sessionStorage.setItem('reloaded', 'true');
+    window.location.reload();
+  } else {
+    sessionStorage.removeItem('reloaded');
     this.communicationManager = useCommunicationManager();
-    await this.fetchProjects(this.currentPage);
-  },
+    this.fetchProjects(this.currentPage);
+  }
+},
   watch: {
     searchQuery: 'resetAndFetch',
     sortCriteria: 'resetAndFetch'
