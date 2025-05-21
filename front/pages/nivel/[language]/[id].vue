@@ -159,10 +159,10 @@ export default {
             text: message,
           });
 
-          await updateUserLevel();
-
           const nextId = id.value + 1;
+
           if (nextId > levelLimits[language.value].max) {
+            await updateUserLevel(id.value); 
             await Swal.fire({
               icon: 'info',
               title: '🎉 Enhorabona!',
@@ -170,8 +170,10 @@ export default {
             });
             router.push('/niveles');
           } else {
+            await updateUserLevel(nextId); 
             router.push(`/nivel/${language.value}/${nextId}`);
           }
+
         } else {
           Swal.fire({
             icon: 'error',
@@ -189,36 +191,37 @@ export default {
       }
     };
 
-    const updateUserLevel = async () => {
-      try {
-        const response = await fetch(
-          `https://back.frontapp.cat/api/niveles/${language.value}/actualizar`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({
-              nivel: id.value,
-              language: language.value
-            })
-          }
-        );
-
-        if (!response.ok) throw new Error("Error a l'actualizar el nivell");
-
-        const data = await response.json();
-        console.log("Nivel actualizado:", data);
-      } catch (error) {
-        console.error("Error en actualizarNivel:", error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: "No s'ha pogut actualitzar el nivell",
-        });
+    const updateUserLevel = async (nivelActualizado) => {
+  try {
+    const response = await fetch(
+      `https://back.frontapp.cat/api/niveles/${language.value}/actualizar`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          nivel: nivelActualizado,
+          language: language.value
+        })
       }
-    };
+    );
+
+    if (!response.ok) throw new Error("Error a l'actualizar el nivell");
+
+    const data = await response.json();
+    console.log("Nivel actualizado:", data);
+  } catch (error) {
+    console.error("Error en actualizarNivel:", error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: "No s'ha pogut actualitzar el nivell",
+    });
+  }
+};
+
 
     const clearEditors = () => {
       html.value = '';

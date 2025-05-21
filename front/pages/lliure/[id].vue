@@ -104,7 +104,7 @@
       @mousedown="startDrag"
     >
       <button class="close-chat-button" @click="toggleChat">✖</button>
-      <h2 class="chat-title">IA FrontUp</h2>
+      <h2 class="chat-title">IA FrontApp</h2>
       <div class="messages-container" ref="messagesContainer">
         <div
           v-for="(msg, index) in messages"
@@ -268,7 +268,7 @@ const isExpanded = ref(false);
 const isChatVisible = ref(false);
 const newMessage = ref("");
 const cambiadoSinGuardar = ref(false);
-const messages = ref([{ type: "ai", content: "¡Hola! ¿En qué puedo ayudarte hoy?" }]);
+const messages = ref([{ type: "ai", content: "Hola! En què et puc ajudar avui?" }]);
 const messagesContainer = ref(null);
 const guardarParaSalir = ref(false);
 const isPrivate = ref(0);
