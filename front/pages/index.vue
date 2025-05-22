@@ -131,7 +131,10 @@ onMounted(() => {
     const wordList = document.querySelector(".looping-words__list");
     const words = Array.from(wordList.children);
     const wordHeight = 100 / words.length;
-
+    if (sessionStorage.getItem('reloadHomePage')) {
+    sessionStorage.removeItem('reloadHomePage');
+    window.location.reload();
+  }
     const moveWords = () => {
       wordList.style.transition = "transform 1s ease-out";
       wordList.style.transform = `translateY(-${wordHeight}%)`;

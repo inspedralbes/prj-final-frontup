@@ -303,6 +303,7 @@ const login = async () => {
       avatar: data.user.avatar,
     };
     appStore.setLoginInfo(loginInfo);
+    sessionStorage.setItem('reloadHomePage', 'true');
     router.push("/");
   } else {
     errorMessage.value = result.message;
@@ -331,6 +332,7 @@ const register = async () => {
       nivel_js: result.user.nivel_js,
       avatar: result.avatar,
     });
+    sessionStorage.setItem('reloadHomePage', 'true');
     router.push("/");
   } else {
     errorMessage.value = result.message;

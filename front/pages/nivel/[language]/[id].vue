@@ -7,7 +7,6 @@
       </div>
     </header>
 
-
     <div class="exercise-instructions">
       <p><strong>Instruccions:</strong></p>
       <p v-if="loading">Carregant pregunta...</p>
